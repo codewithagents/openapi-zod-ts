@@ -9,7 +9,7 @@ catalog:
   '@vitest/coverage-v8': ^4.1.9
 
   # TypeScript
-  typescript: ^6.0.3
+  typescript: ^7.0.2
 
   # Node types
   '@types/node': ^26.0.0
@@ -27,8 +27,8 @@ catalog:
   esbuild: ^0.28.1
 
   # Mutation testing
-  '@stryker-mutator/core': ^9.6.1
-  '@stryker-mutator/vitest-runner': ^9.6.1
+  '@stryker-mutator/core': ^10.0.0
+  '@stryker-mutator/vitest-runner': ^10.0.0
 
   # ESLint (integration lint)
   eslint: ^10.5.0
