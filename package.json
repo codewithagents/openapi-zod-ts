@@ -25,7 +25,7 @@
     "eslint": "catalog:",
     "fallow": "^3.0.0",
     "prettier": "catalog:",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
