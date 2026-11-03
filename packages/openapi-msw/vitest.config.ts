@@ -5,14 +5,14 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],
-      exclude: ['src/**/*.test.ts', 'src/cli.ts', 'src/generator.ts'],
-      // Seeded below current (82.98/75/96.96/87.97) with generous margin (smaller,
-      // more volatile suite). Ratchet up over time.
+      exclude: ['src/**/*.test.ts', 'src/__tests__/**', 'src/cli.ts', 'src/generator.ts'],
+      // Ratcheted below current (stmts/branches/funcs/lines 89.27/82.6/97.95/93.45) with
+      // margin (smaller, more volatile suite). Ratchet up over time.
       thresholds: {
-        branches: 70,
-        functions: 90,
-        lines: 83,
-        statements: 78,
+        branches: 76,
+        functions: 92,
+        lines: 88,
+        statements: 84,
       },
       reporter: ['text', ['lcov', { projectRoot: '../../' }]],
     },
