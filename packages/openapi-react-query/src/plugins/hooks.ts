@@ -7,6 +7,7 @@ import {
   resolveBodyRefToWritableName,
   CLIENT_INTERNAL_NAMES,
   getParamPresence,
+  buildOperationErrorTypeNames,
 } from 'openapi-zod-ts'
 
 type OperationObject = OpenAPIV3_1.OperationObject
@@ -27,6 +28,13 @@ export interface HookGenOptions {
    * - false: never emit useXxxInfinite hooks.
    */
   infiniteQuery?: boolean | 'auto'
+  /**
+   * When true, hooks type their error as the client's per-operation error alias
+   * (e.g. `GetPetError = ApiError<404, NotFound> | ApiError<422, ...>`) instead of
+   * bare `ApiError`, so `error.status === 422` narrows `error.body`. Operations
+   * without documented 4xx/5xx responses keep `ApiError`. Default: false.
+   */
+  typedErrors?: boolean
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -113,6 +121,8 @@ interface OperationMeta {
   deprecated: boolean
   isPaginated: boolean
   pageParamName: string | undefined
+  /** TError for this operation's hooks: `ApiError` or the client's per-operation alias. */
+  errorType: string
 }
 
 // ── Pagination detection ───────────────────────────────────────────────────────
@@ -454,7 +464,7 @@ function buildQueryOptionsFactory(
     sigParts.push(`${paramsToken}: Parameters<typeof ${op.funcName}>[${pathParams.length}]`)
   }
   sigParts.push(
-    `options?: Omit<UseQueryOptions<${dataType}, ApiError, TData>, 'queryKey' | 'queryFn'>`
+    `options?: Omit<UseQueryOptions<${dataType}, ${op.errorType}, TData>, 'queryKey' | 'queryFn'>`
   )
 
   const queryKeyCall = buildQueryKeyCall(
@@ -477,7 +487,7 @@ function buildQueryOptionsFactory(
   lines.push(`export function ${factoryName}<TData = ${dataType}>(`)
   lines.push(`  ${sigParts.join(',\n  ')},`)
   lines.push(`) {`)
-  lines.push(`  return queryOptions<${dataType}, ApiError, TData>({`)
+  lines.push(`  return queryOptions<${dataType}, ${op.errorType}, TData>({`)
   lines.push(`    queryKey: ${queryKeyCall},`)
   lines.push(`    queryFn: () => ${queryFnCall},`)
   lines.push(`    staleTime: ${staleTime},`)
@@ -518,7 +528,7 @@ function buildQueryHook(
     sigParts.push(`${paramsToken}: Parameters<typeof ${op.funcName}>[${pathParams.length}]`)
   }
   sigParts.push(
-    `options?: Omit<UseQueryOptions<${dataType}, ApiError, TData>, 'queryKey' | 'queryFn'>`
+    `options?: Omit<UseQueryOptions<${dataType}, ${op.errorType}, TData>, 'queryKey' | 'queryFn'>`
   )
 
   // Build queryKey call (with non-null assertions for path params, since hook has enabled guard)
@@ -541,7 +551,7 @@ function buildQueryHook(
   lines.push(`export function ${op.hookName}<TData = ${dataType}>(`)
   lines.push(`  ${sigParts.join(',\n  ')},`)
   lines.push(`) {`)
-  lines.push(`  return useQuery<${dataType}, ApiError, TData>({`)
+  lines.push(`  return useQuery<${dataType}, ${op.errorType}, TData>({`)
   lines.push(`    queryKey: ${queryKeyCall},`)
   lines.push(`    queryFn: () => ${queryFnCall},`)
   lines.push(`    staleTime: ${staleTime},`)
@@ -581,7 +591,7 @@ function buildSuspenseQueryHook(
     sigParts.push(`${paramsToken}: Parameters<typeof ${op.funcName}>[${pathParams.length}]`)
   }
   sigParts.push(
-    `options?: Omit<UseSuspenseQueryOptions<${dataType}, ApiError, TData>, 'queryKey' | 'queryFn'>`
+    `options?: Omit<UseSuspenseQueryOptions<${dataType}, ${op.errorType}, TData>, 'queryKey' | 'queryFn'>`
   )
 
   // Build queryKey call (no non-null assertions — suspense params are always required strings)
@@ -606,7 +616,7 @@ function buildSuspenseQueryHook(
   lines.push(`export function ${suspenseHookName}<TData = ${dataType}>(`)
   lines.push(`  ${sigParts.join(',\n  ')},`)
   lines.push(`) {`)
-  lines.push(`  return useSuspenseQuery<${dataType}, ApiError, TData>({`)
+  lines.push(`  return useSuspenseQuery<${dataType}, ${op.errorType}, TData>({`)
   lines.push(`    queryKey: ${queryKeyCall},`)
   lines.push(`    queryFn: () => ${queryFnCall},`)
   lines.push(`    staleTime: ${staleTime},`)
@@ -664,7 +674,7 @@ function buildInfiniteQueryHook(
     sigParts.push(`${paramsToken}: Parameters<typeof ${funcName}>[0]`)
   }
   sigParts.push(
-    `options?: Omit<UseInfiniteQueryOptions<${dataType}, ApiError, TData, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>`
+    `options?: Omit<UseInfiniteQueryOptions<${dataType}, ${op.errorType}, TData, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>`
   )
 
   const queryKeyCall = buildInfiniteQueryKeyCall(keyFactoryName, keyEntry, hasQueryParams)
@@ -683,7 +693,7 @@ function buildInfiniteQueryHook(
   lines.push(`export function ${infiniteHookName}<TData = InfiniteData<${dataType}>>(`)
   lines.push(`  ${sigParts.join(',\n  ')},`)
   lines.push(`) {`)
-  lines.push(`  return useInfiniteQuery<${dataType}, ApiError, TData, QueryKey, unknown>({`)
+  lines.push(`  return useInfiniteQuery<${dataType}, ${op.errorType}, TData, QueryKey, unknown>({`)
   lines.push(`    queryKey: ${queryKeyCall},`)
   lines.push(`    queryFn: ${queryFnBody},`)
   lines.push(`    initialPageParam: undefined,`)
@@ -825,7 +835,7 @@ function buildMutationHook(
   }
   lines.push(`export function ${hookName}(`)
   lines.push(
-    `  options?: Omit<UseMutationOptions<Awaited<ReturnType<typeof ${funcName}>>, ApiError, ${variablesType}>, 'mutationFn'>,`
+    `  options?: Omit<UseMutationOptions<Awaited<ReturnType<typeof ${funcName}>>, ${op.errorType}, ${variablesType}>, 'mutationFn'>,`
   )
   lines.push(`) {`)
 
@@ -835,7 +845,7 @@ function buildMutationHook(
   }
 
   lines.push(
-    `  return useMutation<Awaited<ReturnType<typeof ${funcName}>>, ApiError, ${variablesType}>({`
+    `  return useMutation<Awaited<ReturnType<typeof ${funcName}>>, ${op.errorType}, ${variablesType}>({`
   )
   lines.push(`    mutationFn: ${mutationFnBody},`)
   // Spread options first so caller can override mutationFn-unrelated options (e.g. retry, meta).
@@ -895,7 +905,8 @@ function buildMutationHook(
  */
 function collectOperations(
   spec: OpenAPIV3_1.Document,
-  infiniteQuery: boolean | 'auto' = 'auto'
+  infiniteQuery: boolean | 'auto' = 'auto',
+  errorTypeNames: ReadonlyMap<string, string> = new Map()
 ): OperationMeta[] {
   const paths = spec.paths as Record<string, Record<string, OperationObject>> | undefined
 
@@ -968,6 +979,7 @@ function collectOperations(
           deprecated,
           isPaginated,
           pageParamName,
+          errorType: errorTypeNames.get(funcName) ?? 'ApiError',
         })
       }
     }
@@ -986,10 +998,12 @@ export function generateHooks(
     suspense = false,
     autoInvalidate = false,
     infiniteQuery = 'auto',
+    typedErrors = false,
   } = options
 
   // Collect all operations (metadata extraction separated from string emission)
-  const operations = collectOperations(spec, infiniteQuery)
+  const errorTypeNames = typedErrors ? buildOperationErrorTypeNames(spec) : undefined
+  const operations = collectOperations(spec, infiniteQuery, errorTypeNames)
 
   // Separate GET vs mutation operations
   const getOps = operations.filter((op) => op.method === 'get')
@@ -1165,11 +1179,13 @@ export function generateHooks(
   if (rqImports.length > 0) {
     lines.push(`import { ${rqImports.join(', ')} } from '@tanstack/react-query'`)
   }
-  if (allFuncNames.length > 0) {
-    lines.push(`import { ${allFuncNames.join(', ')}, type ApiError } from './client.js'`)
-  } else {
-    lines.push(`import { type ApiError } from './client.js'`)
-  }
+  // Error types: bare ApiError (default) plus any per-operation aliases in use.
+  const errorTypeImports = [...new Set(operations.map((op) => op.errorType))]
+    .filter((t) => t !== 'ApiError')
+    .sort()
+    .map((t) => `type ${t}`)
+  const clientImports = [...allFuncNames, 'type ApiError', ...errorTypeImports]
+  lines.push(`import { ${clientImports.join(', ')} } from './client.js'`)
   lines.push('')
 
   if (keyFactoryBlocks.length > 0) {

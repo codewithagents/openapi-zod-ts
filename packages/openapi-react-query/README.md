@@ -55,6 +55,7 @@ Create `openapi-react-query.config.json` in your project root:
 | `suspense` | No | `false` | When `true`, generates a `useSuspense*` variant alongside every query hook |
 | `auto_invalidate` | No | `false` | When `true`, mutation hooks auto-invalidate related queries on success |
 | `infinite_query` | No | `'auto'` | `boolean \| 'auto'`. Generates a `useXxxInfinite` hook for paginated list operations. `'auto'` detects paginated GETs; `true` forces generation, `false` disables it |
+| `typed_errors` | No | `false` | When `true`, hooks type their error as the client's per-operation error alias (e.g. `GetTaskError`), so `error.status` narrows `error.body` (see [Typed per-status errors](#typed-per-status-errors)) |
 | `overrides` | No | none | Per-resource cache timing (see [Per-resource cache timing](#per-resource-cache-timing)) |
 
 ## Generate
@@ -177,6 +178,25 @@ useQuery(getTaskQueryOptions(id, { select: (task) => task.id }))
 ```
 
 Without `select`, `data` is still the raw response type, so existing call sites (including explicit `UseQueryResult<Task, ApiError>` annotations) keep compiling.
+
+## Typed per-status errors
+
+`openapi-zod-ts` exports a per-operation error alias from `client.ts` for every operation that documents explicit `4xx` / `5xx` responses, e.g. `export type GetTaskError = ApiError<404, NotFound> | ApiError<422, ValidationProblem>`. With `typed_errors: true` the hooks use it as their error type:
+
+```ts
+const { error } = useGetTask(id)
+if (error?.status === 422) {
+  error.body.errors // ValidationProblem
+}
+
+useCreateTask({
+  onError: (error) => {
+    if (error.status === 409) toast(error.body.message)
+  },
+})
+```
+
+Operations without documented error statuses keep `ApiError`. This is opt-in because the alias only lists *documented* statuses: an existing comparison against an undocumented status (`error.status === 500`) stops compiling once the type is narrowed, and an undocumented status at runtime is still thrown as a plain `ApiError`.
 
 ## Next.js App Router SSR prefetch
 

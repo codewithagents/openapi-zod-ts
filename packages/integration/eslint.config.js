@@ -3,7 +3,12 @@ import tsParser from '@typescript-eslint/parser'
 
 export default [
   {
-    files: ['generated/**/*.ts', 'generated-matrix/**/*.ts', 'generated-matrix-legit/**/*.ts'],
+    files: [
+      'generated/**/*.ts',
+      'generated-hooks-extended/**/*.ts',
+      'generated-matrix/**/*.ts',
+      'generated-matrix-legit/**/*.ts',
+    ],
     languageOptions: {
       parser: tsParser,
       parserOptions: {

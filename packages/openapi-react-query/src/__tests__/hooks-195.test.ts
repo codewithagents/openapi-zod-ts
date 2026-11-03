@@ -79,3 +79,57 @@ describe('#195 typed select transforms: TData generic', () => {
     expect(content).toContain('export function useCreateTask(')
   })
 })
+
+// task-hooks fixture plus documented error responses on getTask / createTask.
+const errorSpec = structuredClone(spec)
+errorSpec.paths!['/api/v1/tasks/{id}']!.get!.responses!['404'] = { description: 'missing' }
+errorSpec.paths!['/api/v1/tasks']!.post!.responses!['422'] = { description: 'invalid' }
+
+describe('#195 typed per-status errors: typedErrors option', () => {
+  it('default (typedErrors off) keeps bare ApiError everywhere', () => {
+    const { content } = generateHooks(errorSpec, { staleTime: 0, gcTime: 0 })
+    expect(content).not.toMatch(/\bGetTaskError\b/)
+    expect(content).toContain(', type ApiError } from')
+  })
+
+  it('types query, factory and mutation hooks with the per-operation alias', () => {
+    const { content } = generateHooks(errorSpec, {
+      staleTime: 0,
+      gcTime: 0,
+      suspense: true,
+      typedErrors: true,
+    })
+    expect(content).toMatch(/type ApiError, type CreateTaskError, type GetTaskError/)
+    expect(block(content, 'export function useGetTask<')).toContain(
+      'return useQuery<Awaited<ReturnType<typeof getTask>>, GetTaskError, TData>({'
+    )
+    expect(block(content, 'export function getTaskQueryOptions<')).toContain(
+      'queryOptions<Awaited<ReturnType<typeof getTask>>, GetTaskError, TData>'
+    )
+    expect(block(content, 'export function useSuspenseGetTask<')).toContain(
+      'useSuspenseQuery<Awaited<ReturnType<typeof getTask>>, GetTaskError, TData>'
+    )
+    expect(block(content, 'export function useCreateTask(')).toContain(
+      'useMutation<Awaited<ReturnType<typeof createTask>>, CreateTaskError,'
+    )
+  })
+
+  it('operations without documented error statuses keep ApiError', () => {
+    const { content } = generateHooks(errorSpec, { staleTime: 0, gcTime: 0, typedErrors: true })
+    expect(block(content, 'export function useListTasks<')).toContain(
+      'useQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>'
+    )
+  })
+
+  it('infinite hooks use the alias too', () => {
+    const errSpec = structuredClone(paginatedSpec)
+    errSpec.paths!['/items']!.get!.responses = {
+      '200': { description: 'ok' },
+      '429': { description: 'slow down' },
+    }
+    const { content } = generateHooks(errSpec, { staleTime: 0, gcTime: 0, typedErrors: true })
+    expect(block(content, 'export function useListItemsInfinite<')).toContain(
+      'useInfiniteQuery<Awaited<ReturnType<typeof listItems>>, ListItemsError, TData, QueryKey, unknown>'
+    )
+  })
+})

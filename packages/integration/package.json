@@ -6,11 +6,12 @@
   "scripts": {
     "generate": "openapi-zod-ts --config openapi-zod-ts.config.json",
     "generate:hooks": "openapi-react-query --config openapi-react-query.config.json",
+    "generate:hooks:extended": "openapi-react-query --config openapi-react-query.extended.config.json",
     "generate:mocks": "openapi-msw --config openapi-msw.config.json",
     "generate:matrix": "openapi-zod-ts --config openapi-zod-ts.matrix.config.json && node node_modules/@codewithagents/openapi-server/dist/cli.cjs --config openapi-server.matrix.config.json",
     "generate:legit-unknown": "openapi-zod-ts --config openapi-zod-ts.legit-unknown.config.json",
     "test": "vitest run",
-    "lint": "tsc --noEmit && eslint generated/ generated-matrix/ generated-matrix-legit/"
+    "lint": "tsc --noEmit && eslint generated/ generated-hooks-extended/ generated-matrix/ generated-matrix-legit/"
   },
   "dependencies": {
     "@codewithagents/api-errors": "workspace:*",
