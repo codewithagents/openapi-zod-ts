@@ -187,6 +187,7 @@ async function generateSchemaEnhancedRouter(
     schemaImportAliases: importAliases,
     schemaImportPath: schemaImportPathJs,
     contextType: config.context_type,
+    emitResponseValidation: config.emit_response_validation === true,
     errorsImportPath,
     errorFormat: config.error_format,
   })

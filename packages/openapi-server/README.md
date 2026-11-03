@@ -296,7 +296,7 @@ serve({ fetch: app.fetch, port: 3001 })
 | `framework` | No | `"none"` | Router framework to generate: `"hono"`, `"express"`, `"fastify"`, or `"none"`. Use `"none"` to generate only `service.ts` |
 | `input_schema` | No | none | Path to user-owned Zod schema file. Enables server-side request validation (see below) |
 | `context_type` | No | none | TypeScript type name to thread through service methods as a final `ctx` argument. See below. |
-| `emit_response_validation` | No | `false` | Fastify only. Synthesize inline Zod response schemas for flat inline schemas. See below. |
+| `emit_response_validation` | No | `false` | Validate JSON service results against the response schema before sending (Hono, Express, Fastify). Invalid results get a `500`. See below. |
 | `shared_output` | No | derived | Override directory for `_shared/errors.ts`. Default: derived from output paths (see below). |
 | `spec_prefix` | No | none | Namespace prefix for schema lookups when several specs share one `input_schema` file: looks up `${spec_prefix}${Type}Schema` instead of `${Type}Schema`. See [Sharing one schemas file across specs](#sharing-one-schemas-file-across-specs-spec_prefix). |
 | `error_format` | No | `"default"` | `"default"` or `"problem+json"`. With `"problem+json"`, router-produced errors use RFC 9457 / RFC 7807 `application/problem+json` bodies in all three frameworks. See [Problem details errors](#problem-details-errors-error_format). |
@@ -505,6 +505,7 @@ What is covered per framework:
 | Path / query / header / cookie / body validation | 422 | 422 | 400 (native validation; cookies 422) |
 | Invalid JSON body / unsupported media type | 400 / 415 | n/a (`express.json()` handles these) | other 4xx framework errors, e.g. 415 |
 | `HttpError` thrown by the service | its status | its status | its status |
+| Response validation failure (`emit_response_validation`) | 500 | 500 | 500 |
 | Any other thrown error | re-thrown | re-thrown | re-thrown |
 
 On Fastify the mapping lives in the generated default `setErrorHandler`; a caller-supplied `errorHandler` in `CreateRouterOptions` still replaces it entirely. Errors raised by your own app-level handlers or middleware are not reshaped.
@@ -1017,29 +1018,53 @@ Hono uses the shared `{ error }` envelope from the generated router. Fastify use
 
 ---
 
-## Response validation opt-in (`emit_response_validation`, Fastify only)
+## Response validation opt-in (`emit_response_validation`)
 
-Set `emit_response_validation: true` in your config to instruct the Fastify emitter to synthesize inline Zod expressions for `schema.response` on routes that have no named schema from `input_schema`.
+Set `emit_response_validation: true` to validate what your service returns before it goes on the wire. It works for all three router frameworks:
 
 ```json
 {
   "input_openapi": "./spec/api.json",
   "output": "./generated",
-  "framework": "fastify",
+  "framework": "hono",
+  "input_schema": "./generated/schemas.ts",
   "emit_response_validation": true
 }
 ```
 
-**What the synthesizer does:**
+**Which schema is used** (the same rules for every framework):
 
-- Flat `object` schema with scalar properties: emits `z.object({ field: z.string(), count: z.number() })`
-- Scalar top-level responses: emits `z.string()`, `z.number()`, `z.boolean()`
-- Array of scalars: emits `z.array(z.string())` (or the appropriate item type)
-- `$ref`, `allOf`, `oneOf`, `anyOf`, or nested object properties: emits `z.unknown()` for that field or the whole response
+1. A `$ref` (or array-of-`$ref`) JSON response with a matching named schema in `input_schema`: that schema (`PetSchema`, `z.array(PetSchema)`).
+2. Otherwise an inline response schema is synthesized:
+   - Flat `object` schema with scalar properties: `z.object({ field: z.string(), count: z.number() })`
+   - Scalar top-level responses: `z.string()`, `z.number()`, `z.boolean()`
+   - Array of scalars: `z.array(z.string())` (or the appropriate item type)
+   - `$ref`, `allOf`, `oneOf`, `anyOf`, or nested object properties: `z.unknown()` for that field or the whole response
+3. A `$ref` with no named schema, or a whole response that synthesizes to `z.unknown()`, is effectively not checked.
+
+Only JSON responses are validated: void (`204`), multi-status envelopes, `text/plain` and `application/octet-stream` responses are passed through.
+
+**Hono and Express.** The router `safeParse`s the service result and sends the **parsed** data, so keys the schema does not declare are stripped. On failure it responds `500 { error: 'Response validation failed' }` (a `500` problem body with `error_format: "problem+json"`) and never sends the invalid result:
+
+```ts
+app.get('/pets/:id', async (c) => {
+  try {
+    const _rv = PetSchema.safeParse(await service.getPet(c.req.param('id')))
+    if (!_rv.success) {
+      return c.json({ error: 'Response validation failed' }, 500)
+    }
+    return c.json(_rv.data)
+  } catch (err) {
+    // HttpError mapping ...
+  }
+})
+```
+
+**Fastify.** Named response schemas from `input_schema` are always attached to `schema.response` (validated by the `fastify-type-provider-zod` serializer, which fails with a `500`). `emit_response_validation` additionally attaches the synthesized inline schemas.
 
 **Limitations.** The synthesizer is intentionally minimal and honest. It does not chase `$ref` pointers or handle composition keywords. Complex schemas fall back to `z.unknown()`, which passes through any value. If your spec uses `$ref` or composition heavily, wire `input_schema` instead for full coverage.
 
-**Recommendation.** Use `input_schema` (point it at the `schemas.ts` from `openapi-zod-ts`) for complete, type-safe response validation. `emit_response_validation` is a lightweight alternative for specs with simple flat inline response schemas where adding a full Zod schema file is not yet practical.
+**Recommendation.** Use `input_schema` (point it at the `schemas.ts` from `openapi-zod-ts`) for complete, type-safe response validation. Without `input_schema`, `emit_response_validation` still covers specs with simple flat inline response schemas.
 
 ---
 

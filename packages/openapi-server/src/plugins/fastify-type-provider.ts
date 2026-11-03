@@ -373,7 +373,7 @@ function synthesizePropExpr(
  * CI runs fallow audit without coverage data.
  */
 // fallow-ignore-next-line complexity
-function synthesizeResponseSchemaExpr(
+export function synthesizeResponseSchemaExpr(
   schema: OpenAPIV3_1.SchemaObject | ReferenceObject | undefined
 ): string {
   if (schema === undefined || isRef(schema)) return 'z.unknown()'
@@ -415,6 +415,39 @@ function synthesizeResponseSchemaExpr(
 }
 
 const SCALAR_QUERY_BOOL_EXPR = "z.enum(['true', 'false']).transform((v) => v === 'true')"
+
+/**
+ * Return the JSON schema of the operation's primary 2xx response: the first of 200, 201, then
+ * the other 2xx codes (204 excluded) that declares `application/json` content with a schema.
+ * $ref'd response objects are skipped. The returned schema may itself be a $ref.
+ *
+ * The priority-ordered 2xx scan mirrors fastify-service.ts getReturnInfo, which resolves type
+ * names rather than schemas; the two passes stay independent by design.
+ */
+export function findPrimaryJsonResponseSchema(
+  operation: OperationObject
+): OpenAPIV3_1.SchemaObject | ReferenceObject | undefined {
+  const responses = operation.responses as
+    Record<string, ResponseObject | ReferenceObject> | undefined
+  if (responses === undefined) return undefined
+  // fallow-ignore-next-line code-duplication
+  const priority = [
+    '200',
+    '201',
+    ...Object.keys(responses).filter(
+      (k) => /^2\d\d$/.test(k) && k !== '200' && k !== '201' && k !== '204'
+    ),
+  ]
+  for (const code of priority) {
+    const response = responses[code]
+    if (response === undefined || isRef(response)) continue
+    const content = (response as ResponseObject).content as
+      Record<string, { schema?: OpenAPIV3_1.SchemaObject | ReferenceObject }> | undefined
+    const schema = content?.['application/json']?.schema
+    if (schema !== undefined) return schema
+  }
+  return undefined
+}
 
 function queryParamItemExpr(itemsTsType: string | undefined): string {
   if (itemsTsType === 'number') return 'z.coerce.number()'
@@ -660,35 +693,10 @@ function buildFastifyTypeProviderHandler(
     op.responseStatus.isMultiStatus !== true &&
     !op.responseStatus.isVoid
   ) {
-    const responses = op.rawOperation.responses as
-      Record<string, ResponseObject | ReferenceObject> | undefined
-    if (responses !== undefined) {
-      // The priority-ordered 2xx response scan mirrors the one in fastify-service.ts
-      // getReturnInfo. Both emitters must independently walk the same responses object:
-      // fastify-service.ts resolves type names, this emitter synthesizes Zod expressions.
-      // They cannot share a helper without coupling two separate generation passes.
-      // fallow-ignore-next-line code-duplication
-      const priority = [
-        '200',
-        '201',
-        ...Object.keys(responses).filter(
-          (k) => /^2\d\d$/.test(k) && k !== '200' && k !== '201' && k !== '204'
-        ),
-      ]
-      for (const code of priority) {
-        const response = responses[code]
-        if (response === undefined || isRef(response)) continue
-        const content = (response as ResponseObject).content as
-          Record<string, { schema?: OpenAPIV3_1.SchemaObject | ReferenceObject }> | undefined
-        if (content === undefined) continue
-        const jsonContent = content['application/json']
-        if (jsonContent?.schema === undefined) continue
-        // Only synthesize for inline schemas: $ref responses are handled via named schema lookup.
-        if (!isRef(jsonContent.schema)) {
-          responseSchemaExpr = synthesizeResponseSchemaExpr(jsonContent.schema)
-        }
-        break
-      }
+    // Only synthesize for inline schemas: $ref responses are handled via named schema lookup.
+    const primary = findPrimaryJsonResponseSchema(op.rawOperation)
+    if (primary !== undefined && !isRef(primary)) {
+      responseSchemaExpr = synthesizeResponseSchemaExpr(primary)
     }
   }
 

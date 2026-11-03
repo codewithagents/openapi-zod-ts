@@ -39,6 +39,10 @@ import {
 } from './problem-details.js'
 // Fastify emitter: delegates to the dedicated type-provider module.
 export { generateFastifyRouter } from './fastify-type-provider.js'
+import {
+  findPrimaryJsonResponseSchema,
+  synthesizeResponseSchemaExpr,
+} from './fastify-type-provider.js'
 
 type OperationObject = OpenAPIV3_1.OperationObject
 type ReferenceObject = OpenAPIV3_1.ReferenceObject
@@ -610,6 +614,8 @@ interface RouteOperation {
    * In this case responseTypeName holds the items type name, not the array wrapper.
    */
   responseIsArray?: boolean
+  /** Primary 2xx application/json response schema (may be a $ref); used by emit_response_validation. */
+  primaryResponseSchema?: OpenAPIV3_1.SchemaObject | ReferenceObject
 }
 
 function collectOperations(spec: OpenAPIV3_1.Document): RouteOperation[] {
@@ -646,11 +652,68 @@ function collectOperations(spec: OpenAPIV3_1.Document): RouteOperation[] {
         responseStatus,
         responseTypeName: responseTypeInfo?.typeName,
         responseIsArray: responseTypeInfo?.isArray,
+        primaryResponseSchema: findPrimaryJsonResponseSchema(operation),
       })
     }
   }
 
   return operations
+}
+
+// ── Response validation (emit_response_validation) ───────────────────────────
+
+/**
+ * Zod expression the Hono/Express router validates a JSON service result against when
+ * emit_response_validation is on, mirroring the Fastify schema.response semantics:
+ *
+ * 1. A named schema from input_schema for a $ref / array-of-$ref response (`PetSchema`,
+ *    `z.array(PetSchema)`).
+ * 2. Otherwise an inline response schema synthesized by the shared synthesizer.
+ * 3. Otherwise (a $ref with no named schema, or a shape the synthesizer cannot express)
+ *    undefined: Fastify would attach z.unknown(), which accepts anything, so no check is
+ *    emitted at all.
+ *
+ * Only plain JSON responses are validated: void, multi-status envelopes, text/plain and
+ * application/octet-stream responses are skipped (as on Fastify).
+ */
+function responseValidationExpr(
+  op: RouteOperation,
+  schemaNames: Set<string> | undefined,
+  emitResponseValidation: boolean | undefined
+): string | undefined {
+  if (emitResponseValidation !== true) return undefined
+  const rs = op.responseStatus
+  if (rs.isVoid || rs.isMultiStatus === true) return undefined
+  if (
+    rs.responseContentType === 'text/plain' ||
+    rs.responseContentType === 'application/octet-stream'
+  ) {
+    return undefined
+  }
+  if (op.responseTypeName !== undefined && schemaNames?.has(`${op.responseTypeName}Schema`)) {
+    const name = `${op.responseTypeName}Schema`
+    return op.responseIsArray === true ? `z.array(${name})` : name
+  }
+  if (op.primaryResponseSchema === undefined || isRef(op.primaryResponseSchema)) return undefined
+  const expr = synthesizeResponseSchemaExpr(op.primaryResponseSchema)
+  return expr === 'z.unknown()' ? undefined : expr
+}
+
+/** Response schema names actually referenced by the response-validation blocks. */
+function collectResponseValidationSchemaNames(
+  operations: RouteOperation[],
+  options: RouterOptions | undefined
+): Set<string> {
+  const used = new Set<string>()
+  if (options?.emitResponseValidation !== true || options.schemaNames === undefined) return used
+  for (const op of operations) {
+    const expr = responseValidationExpr(op, options.schemaNames, true)
+    if (expr !== undefined && op.responseTypeName !== undefined) {
+      const name = `${op.responseTypeName}Schema`
+      if (options.schemaNames.has(name)) used.add(name)
+    }
+  }
+  return used
 }
 
 // ── Shared options interface ──────────────────────────────────────────────────
@@ -668,6 +731,12 @@ interface RouterOptions {
    * `application/problem+json` bodies; 'default' (or unset) keeps `{ error, issues? }`.
    */
   errorFormat?: ErrorFormat
+  /**
+   * When true, safeParse each JSON service result against its response schema before sending
+   * (a named schema from input_schema, else a synthesized inline schema). On failure the
+   * router responds 500 without the result. Same fallback semantics as the Fastify emitter.
+   */
+  emitResponseValidation?: boolean
   /**
    * When set, matches the `contextType` from ServiceOptions. The generated router
    * handlers extract a context value from the framework's native channel and pass
@@ -693,6 +762,8 @@ interface GeneratorSetup {
   sortedBodyTypes: string[]
   usedSchemaNames: Set<string>
   usedResponseSchemaNames: Set<string>
+  /** Schema names to import from input_schema: body schemas + response-validation schemas. */
+  importSchemaNames: Set<string>
   needsZod: boolean
 }
 
@@ -746,13 +817,25 @@ function collectGeneratorSetup(
         op.responseTypeName !== undefined &&
         usedResponseSchemaNames.has(`${op.responseTypeName}Schema`)
     )
+  // emit_response_validation: z.array(...) wrappers and synthesized inline schemas need z;
+  // a bare named schema (PetSchema.safeParse) does not.
+  const responseValidationNeedsZod = operations.some((op) =>
+    responseValidationExpr(op, options?.schemaNames, options?.emitResponseValidation)?.startsWith(
+      'z.'
+    )
+  )
   const needsZod =
     (usedSchemaNames.size > 0 && options?.schemaImportPath !== undefined) ||
     operationsNeedZodForParams(operations) ||
     (usedResponseSchemaNames.size > 0 &&
       options?.schemaImportPath !== undefined &&
-      hasArrayResponseSchema)
-  return { sortedBodyTypes, usedSchemaNames, usedResponseSchemaNames, needsZod }
+      hasArrayResponseSchema) ||
+    responseValidationNeedsZod
+  const importSchemaNames = new Set([
+    ...usedSchemaNames,
+    ...collectResponseValidationSchemaNames(operations, options),
+  ])
+  return { sortedBodyTypes, usedSchemaNames, usedResponseSchemaNames, importSchemaNames, needsZod }
 }
 
 // ── Hono route handler ────────────────────────────────────────────────────────
@@ -763,7 +846,8 @@ function buildRouteHandler(
   indent: string,
   schemaNames?: Set<string>,
   contextType?: string,
-  errorFormat?: ErrorFormat
+  errorFormat?: ErrorFormat,
+  emitResponseValidation?: boolean
 ): string {
   const lines: string[] = []
   lines.push(`${indent}app.${op.httpMethod}(${JSON.stringify(op.honoPath)}, async (c) => {`)
@@ -987,6 +1071,18 @@ function buildRouteHandler(
         `${indent}    return new Response(_result as BodyInit, { status: ${op.responseStatus.status}, headers: { 'content-type': 'application/octet-stream' } })`
       )
     }
+  } else if (responseValidationExpr(op, schemaNames, emitResponseValidation) !== undefined) {
+    // emit_response_validation: send only a result that matches the response schema
+    // (parsed data, so undeclared keys are stripped); otherwise 500 without the result.
+    const rvExpr = responseValidationExpr(op, schemaNames, emitResponseValidation)!
+    const statusArg = op.responseStatus.status === 200 ? '' : `, ${op.responseStatus.status}`
+    lines.push(`${indent}    const _rv = ${rvExpr}.safeParse(await ${serviceCall})`)
+    lines.push(`${indent}    if (!_rv.success) {`)
+    lines.push(
+      `${indent}      ${honoErrorReturn(500, 'Response validation failed', undefined, errorFormat)}`
+    )
+    lines.push(`${indent}    }`)
+    lines.push(`${indent}    return c.json(_rv.data${statusArg})`)
   } else if (op.responseStatus.status === 200) {
     lines.push(`${indent}    return c.json(await ${serviceCall})`)
   } else {
@@ -1011,7 +1107,8 @@ function buildExpressRouteHandler(
   indent: string,
   schemaNames?: Set<string>,
   contextType?: string,
-  errorFormat?: ErrorFormat
+  errorFormat?: ErrorFormat,
+  emitResponseValidation?: boolean
 ): string {
   const lines: string[] = []
   lines.push(
@@ -1193,6 +1290,19 @@ function buildExpressRouteHandler(
         `${indent}    res.status(${op.responseStatus.status}).setHeader('Content-Type', 'application/octet-stream').send(Buffer.from(await ${serviceCall}))`
       )
     }
+  } else if (responseValidationExpr(op, schemaNames, emitResponseValidation) !== undefined) {
+    // emit_response_validation: send only a result that matches the response schema
+    // (parsed data, so undeclared keys are stripped); otherwise 500 without the result.
+    const rvExpr = responseValidationExpr(op, schemaNames, emitResponseValidation)!
+    const statusPrefix =
+      op.responseStatus.status === 200 ? 'res' : `res.status(${op.responseStatus.status})`
+    lines.push(`${indent}    const _rv = ${rvExpr}.safeParse(await ${serviceCall})`)
+    lines.push(`${indent}    if (!_rv.success) {`)
+    lines.push(
+      `${indent}      ${expressErrorReturn(500, 'Response validation failed', undefined, errorFormat)}`
+    )
+    lines.push(`${indent}    }`)
+    lines.push(`${indent}    ${statusPrefix}.json(_rv.data)`)
   } else if (op.responseStatus.status === 200) {
     lines.push(`${indent}    res.json(await ${serviceCall})`)
   } else {
@@ -1235,8 +1345,12 @@ export function generateExpressRouter(
 ): GeneratedFile {
   const serviceName = deriveServiceName(spec)
   const operations = collectOperations(spec)
-  const { sortedBodyTypes, usedSchemaNames, needsZod } = collectGeneratorSetup(operations, options)
-  // usedResponseSchemaNames is Fastify-only; not used in Express generator.
+  const { sortedBodyTypes, importSchemaNames, needsZod } = collectGeneratorSetup(
+    operations,
+    options
+  )
+  // usedResponseSchemaNames is Fastify-only; Express imports response schemas only for the
+  // emit_response_validation blocks (see collectResponseValidationSchemaNames).
 
   const lines: string[] = []
   lines.push('// This file is auto-generated. Do not edit manually.')
@@ -1255,8 +1369,8 @@ export function generateExpressRouter(
   if (needsZod) {
     lines.push(`import { z } from 'zod'`)
   }
-  if (usedSchemaNames.size > 0 && options?.schemaImportPath !== undefined) {
-    const specifiers = formatSchemaImportSpecifiers(usedSchemaNames, options.schemaImportAliases)
+  if (importSchemaNames.size > 0 && options?.schemaImportPath !== undefined) {
+    const specifiers = formatSchemaImportSpecifiers(importSchemaNames, options.schemaImportAliases)
     lines.push(`import { ${specifiers} } from '${options.schemaImportPath}'`)
   }
   const expressErrorsPath = options?.errorsImportPath ?? './_shared/errors.js'
@@ -1285,7 +1399,16 @@ export function generateExpressRouter(
   lines.push('')
 
   for (const op of operations) {
-    lines.push(buildExpressRouteHandler(op, '  ', options?.schemaNames, ctx, options?.errorFormat))
+    lines.push(
+      buildExpressRouteHandler(
+        op,
+        '  ',
+        options?.schemaNames,
+        ctx,
+        options?.errorFormat,
+        options?.emitResponseValidation
+      )
+    )
     lines.push('')
   }
 
@@ -1305,7 +1428,10 @@ export function generateExpressRouter(
 export function generateRouter(spec: OpenAPIV3_1.Document, options?: RouterOptions): GeneratedFile {
   const serviceName = deriveServiceName(spec)
   const operations = collectOperations(spec)
-  const { sortedBodyTypes, usedSchemaNames, needsZod } = collectGeneratorSetup(operations, options)
+  const { sortedBodyTypes, importSchemaNames, needsZod } = collectGeneratorSetup(
+    operations,
+    options
+  )
 
   const lines: string[] = []
   lines.push('// This file is auto-generated. Do not edit manually.')
@@ -1325,8 +1451,8 @@ export function generateRouter(spec: OpenAPIV3_1.Document, options?: RouterOptio
   if (needsZod) {
     lines.push(`import { z } from 'zod'`)
   }
-  if (usedSchemaNames.size > 0 && options?.schemaImportPath !== undefined) {
-    const specifiers = formatSchemaImportSpecifiers(usedSchemaNames, options.schemaImportAliases)
+  if (importSchemaNames.size > 0 && options?.schemaImportPath !== undefined) {
+    const specifiers = formatSchemaImportSpecifiers(importSchemaNames, options.schemaImportAliases)
     lines.push(`import { ${specifiers} } from '${options.schemaImportPath}'`)
   }
   const honoErrorsPath = options?.errorsImportPath ?? './_shared/errors.js'
@@ -1341,7 +1467,16 @@ export function generateRouter(spec: OpenAPIV3_1.Document, options?: RouterOptio
   lines.push('')
 
   for (const op of operations) {
-    lines.push(buildRouteHandler(op, '  ', options?.schemaNames, ctx, options?.errorFormat))
+    lines.push(
+      buildRouteHandler(
+        op,
+        '  ',
+        options?.schemaNames,
+        ctx,
+        options?.errorFormat,
+        options?.emitResponseValidation
+      )
+    )
     lines.push('')
   }
 

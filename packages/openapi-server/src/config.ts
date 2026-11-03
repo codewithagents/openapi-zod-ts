@@ -27,9 +27,15 @@ export interface ServerConfig {
    */
   context_type?: string
   /**
-   * Fastify only. When true, the generated router emits inline Zod response schema
-   * expressions in schema.response for operations with flat inline response schemas.
-   * Operations with $ref, allOf, oneOf, anyOf, or nested schemas fall back to z.unknown().
+   * When true, the generated router validates JSON service results against the response
+   * schema before sending: the named schema from input_schema for $ref / array-of-$ref
+   * responses, otherwise a Zod expression synthesized from a flat inline response schema
+   * ($ref, allOf, oneOf, anyOf, or nested schemas fall back to z.unknown(), i.e. unchecked).
+   *
+   * - Hono / Express: safeParse the result; send the parsed data, or respond 500 without the
+   *   result on failure (a problem+json body when error_format is 'problem+json').
+   * - Fastify: named schemas are always attached to schema.response; this flag additionally
+   *   attaches the synthesized inline schemas.
    *
    * Default: false. For best coverage, wire input_schema with your Zod schema file and let
    * the generator use the exact schemas you own.
