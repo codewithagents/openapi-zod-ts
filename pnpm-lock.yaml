@@ -298,8 +298,8 @@ importers:
   packages/openapi-server:
     dependencies:
       '@fastify/formbody':
-        specifier: ^8
-        version: 8.0.2
+        specifier: ^8 || ^9
+        version: 9.0.1
       '@fastify/multipart':
         specifier: ^10
         version: 10.0.0
@@ -1399,9 +1399,6 @@ packages:
 
   '@fastify/fast-json-stringify-compiler@5.1.1':
     resolution: {integrity: sha512-pyxRKk7UpUnnrztP9pF4+ZYxusEQ4LifTyzRdiXmyql1QezNHxO02D25MVU2o4kMeAMYWAjG6RKRlojgkbiDAw==}
-
-  '@fastify/formbody@8.0.2':
-    resolution: {integrity: sha512-84v5J2KrkXzjgBpYnaNRPqwgMsmY7ZDjuj0YVuMR3NXCJRCgKEZy/taSP1wUYGn0onfxJpLyRGDLa+NMaDJtnA==}
 
   '@fastify/formbody@9.0.1':
     resolution: {integrity: sha512-QaUet4NQavwnl6iPYMaf5hJC2N7kRPOmC58RhDiFThfg7Hcc8X2LdpcEfmaOEBimq5z7yZLy1e1q+PIv3o3tFQ==}
@@ -5792,11 +5789,6 @@ snapshots:
   '@fastify/fast-json-stringify-compiler@5.1.1':
     dependencies:
       fast-json-stringify: 7.2.1
-
-  '@fastify/formbody@8.0.2':
-    dependencies:
-      fast-querystring: 1.1.2
-      fastify-plugin: 5.1.0
 
   '@fastify/formbody@9.0.1':
     dependencies:
