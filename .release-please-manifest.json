@@ -1,7 +1,7 @@
 {
   "packages/api-errors": "1.2.1",
-  "packages/openapi-zod-ts": "2.3.1",
-  "packages/openapi-react-query": "3.12.3",
-  "packages/openapi-server": "2.2.2",
-  "packages/openapi-msw": "0.2.2"
+  "packages/openapi-zod-ts": "2.4.0",
+  "packages/openapi-react-query": "3.13.0",
+  "packages/openapi-server": "2.3.0",
+  "packages/openapi-msw": "0.3.0"
 }

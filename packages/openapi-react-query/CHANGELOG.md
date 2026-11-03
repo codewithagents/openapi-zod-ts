@@ -1,5 +1,25 @@
 # Changelog
 
+## [3.13.0](https://github.com/codewithagents/openapi-zod-ts/compare/openapi-react-query-v3.12.3...openapi-react-query-v3.13.0) (2026-11-03)
+
+
+### Features
+
+* **openapi-msw:** emit per-schema fixture builders ([bfc1ef5](https://github.com/codewithagents/openapi-zod-ts/commit/bfc1ef5f89859e88425d29304fd2ed4a557c8525))
+* **openapi-react-query:** generate useXxxQueries for dynamic parallel queries ([7b3dd83](https://github.com/codewithagents/openapi-zod-ts/commit/7b3dd83453e04b55992e8b4a336cfdf8989ed4a6))
+* **openapi-react-query:** opt-in optimistic update scaffolding ([7b3dd83](https://github.com/codewithagents/openapi-zod-ts/commit/7b3dd83453e04b55992e8b4a336cfdf8989ed4a6))
+* **openapi-react-query:** opt-in typed per-status errors ([7b3dd83](https://github.com/codewithagents/openapi-zod-ts/commit/7b3dd83453e04b55992e8b4a336cfdf8989ed4a6))
+* **openapi-react-query:** typed select transforms ([7b3dd83](https://github.com/codewithagents/openapi-zod-ts/commit/7b3dd83453e04b55992e8b4a336cfdf8989ed4a6))
+* **openapi-zod-ts:** export per-operation error type aliases ([7b3dd83](https://github.com/codewithagents/openapi-zod-ts/commit/7b3dd83453e04b55992e8b4a336cfdf8989ed4a6))
+* **openapi-zod-ts:** opt-in tag-based client splitting ([f9a80e2](https://github.com/codewithagents/openapi-zod-ts/commit/f9a80e2307c7c38fee6dab684daf5226c120b647))
+* **openapi-zod-ts:** parse text/event-stream responses ([f9a80e2](https://github.com/codewithagents/openapi-zod-ts/commit/f9a80e2307c7c38fee6dab684daf5226c120b647))
+
+
+### Bug Fixes
+
+* **openapi-msw:** anchor handler paths to an origin so they match in Node ([bfc1ef5](https://github.com/codewithagents/openapi-zod-ts/commit/bfc1ef5f89859e88425d29304fd2ed4a557c8525))
+* **openapi-msw:** escape spec-derived literals fully in generated code ([bfc1ef5](https://github.com/codewithagents/openapi-zod-ts/commit/bfc1ef5f89859e88425d29304fd2ed4a557c8525))
+
 ## [3.12.3](https://github.com/codewithagents/openapi-zod-ts/compare/openapi-react-query-v3.12.2...openapi-react-query-v3.12.3) (2026-11-03)
 
 
