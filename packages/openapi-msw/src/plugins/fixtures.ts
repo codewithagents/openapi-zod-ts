@@ -146,6 +146,21 @@ function emitValueBuilder(t: FixtureTarget, required: string, full: string): str
   ].join('\n')
 }
 
+const CYCLIC_GUARD = [
+  ``,
+  `// Recursion guard for schemas on a reference cycle: one nested level, then null.`,
+  `let cycleDepth = 0`,
+  `function cyclic<T>(make: () => T): T | null {`,
+  `  if (cycleDepth > 0) return null`,
+  `  cycleDepth++`,
+  `  try {`,
+  `    return make()`,
+  `  } finally {`,
+  `    cycleDepth--`,
+  `  }`,
+  `}`,
+]
+
 function emitBuilder(target: FixtureTarget, plan: FixturePlan, ctx: FakerExprContext): string {
   const required = builderExpr(target, plan, { ...ctx, requiredOnly: true }, false)
   const full = builderExpr(target, plan, ctx, true)
@@ -222,18 +237,6 @@ export function generateFixtures(
       `  return { ...(base as object), ...(overrides as object | undefined) } as T`,
       `}`,
       ``,
-      `// Recursion guard for schemas on a reference cycle: one nested level, then null.`,
-      `let cycleDepth = 0`,
-      `function cyclic<T>(make: () => T): T | null {`,
-      `  if (cycleDepth > 0) return null`,
-      `  cycleDepth++`,
-      `  try {`,
-      `    return make()`,
-      `  } finally {`,
-      `    cycleDepth--`,
-      `  }`,
-      `}`,
-      ``,
       `// .full() fills optional properties for FULL_DEPTH nested builder levels, then nested`,
       `// builders fall back to required-only, so wide schema graphs stay bounded in size.`,
       `const FULL_DEPTH = 2`,
@@ -247,7 +250,11 @@ export function generateFixtures(
       `  }`,
       `}`
     )
-    for (const target of targets) lines.push(``, emitBuilder(target, plan, ctx))
+    const builders = targets.map((target) => emitBuilder(target, plan, ctx))
+    // Only specs with a reference cycle call cyclic(); emitting it otherwise leaves an
+    // unused function in the generated file.
+    if (builders.some((b) => b.includes('cyclic(() =>'))) lines.push(...CYCLIC_GUARD)
+    for (const builder of builders) lines.push(``, builder)
   }
 
   return { filename: 'fixtures.ts', content: lines.join('\n') }

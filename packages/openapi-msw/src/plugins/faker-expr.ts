@@ -28,9 +28,35 @@ export interface FakerExprContext {
   refExpr?: (schemaName: string) => string | undefined
 }
 
-/** Single-quoted TS string literal (escapes backslashes and single quotes). */
+const UNSAFE_LITERAL_CHARS: Record<string, string> = {
+  '<': '\\u003C',
+  '>': '\\u003E',
+  '\b': '\\b',
+  '\f': '\\f',
+  '\n': '\\n',
+  '\r': '\\r',
+  '\t': '\\t',
+  '\0': '\\u0000',
+  '\u2028': '\\u2028',
+  '\u2029': '\\u2029',
+}
+
+/**
+ * Serialise a spec-derived value (enum value, property key, path, import specifier) as a
+ * JS literal for generated source. JSON.stringify escapes quotes and backslashes; the extra
+ * pass escapes line terminators and angle brackets so no spec content can terminate the
+ * literal or the surrounding code, whatever context the generated file ends up in.
+ */
+export function toJsLiteral(value: unknown): string {
+  return (JSON.stringify(value) ?? 'undefined').replace(
+    /[<>\b\f\n\r\t\0\u2028\u2029]/g,
+    (ch) => UNSAFE_LITERAL_CHARS[ch] ?? ch
+  )
+}
+
+/** String literal for generated source (see toJsLiteral). */
 export function quote(value: string): string {
-  return `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
+  return toJsLiteral(value)
 }
 
 // ── Schema resolution ──────────────────────────────────────────────────────────
@@ -63,7 +89,7 @@ export function resolveSchema(
 // ── Faker expression builders ──────────────────────────────────────────────────
 
 function fakerEnum(values: unknown[]): string {
-  const literals = values.map((v) => JSON.stringify(v)).join(', ')
+  const literals = values.map((v) => toJsLiteral(v)).join(', ')
   return `faker.helpers.arrayElement([${literals}])`
 }
 
@@ -136,7 +162,7 @@ function fakerObjectProperties(
     if (isOmitted(key, propSchema, required, ctx)) continue
     // Pass depth unchanged: property access does not count toward $ref depth
     const expr = schemaToFaker(propSchema, ctx, visited, depth)
-    entries.push(`${JSON.stringify(key)}: (${expr})`)
+    entries.push(`${toJsLiteral(key)}: (${expr})`)
   }
   return entries.length === 0 ? '{}' : `{ ${entries.join(', ')} }`
 }

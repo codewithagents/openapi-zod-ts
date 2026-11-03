@@ -38,18 +38,6 @@ function merge<T>(base: T, overrides: Partial<T> | undefined): T {
   return { ...(base as object), ...(overrides as object | undefined) } as T
 }
 
-// Recursion guard for schemas on a reference cycle: one nested level, then null.
-let cycleDepth = 0
-function cyclic<T>(make: () => T): T | null {
-  if (cycleDepth > 0) return null
-  cycleDepth++
-  try {
-    return make()
-  } finally {
-    cycleDepth--
-  }
-}
-
 // .full() fills optional properties for FULL_DEPTH nested builder levels, then nested
 // builders fall back to required-only, so wide schema graphs stay bounded in size.
 const FULL_DEPTH = 2

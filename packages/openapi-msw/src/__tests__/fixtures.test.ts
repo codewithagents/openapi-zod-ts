@@ -99,8 +99,8 @@ describe('generateFixtures: generated text', () => {
   })
 
   it('imports model types from modelsImport and uses a private aliased Faker', () => {
-    expect(content).toContain("from './models.js'")
-    expect(content).toMatch(/import type \{[^}]*\bPet\b[^}]*\} from '\.\/models\.js'/)
+    expect(content).toContain('from "./models.js"')
+    expect(content).toMatch(/import type \{[^}]*\bPet\b[^}]*\} from "\.\/models\.js"/)
     expect(content).toContain("import { Faker as _Faker, base, en } from '@faker-js/faker'")
     expect(content).toContain('const faker = new _Faker({ locale: [en, base] })')
     expect(content).toContain('faker.seed([42, key, variant])')
@@ -108,7 +108,7 @@ describe('generateFixtures: generated text', () => {
 
   it('honours a custom modelsImport', () => {
     const c = generateFixtures(spec, { ...OPTS, modelsImport: '../api/models.js' }).content
-    expect(c).toContain("from '../api/models.js'")
+    expect(c).toContain('from "../api/models.js"')
   })
 
   it('emits a<Name> / an<Name> builders typed against the models', () => {
@@ -229,7 +229,7 @@ describe('generated fixtures at runtime', () => {
     const first = mod['anEvent']!()
     await new Promise((r) => setTimeout(r, 5))
     expect(mod['anEvent']!()).toEqual(first)
-    expect(content).toContain("faker.setDefaultRefDate('2025-01-01T00:00:00.000Z')")
+    expect(content).toContain('faker.setDefaultRefDate("2025-01-01T00:00:00.000Z")')
   })
 
   it('a different variant gives a different value', () => {
