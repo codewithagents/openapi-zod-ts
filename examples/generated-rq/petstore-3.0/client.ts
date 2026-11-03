@@ -97,10 +97,17 @@ export async function addPet(body: Pet, config?: Partial<ClientConfig>): Promise
   return res.json()
 }
 
+/** Documented error responses of `addPet`, for narrowing on `error.status`. */
+export type AddPetError = ApiError<400, unknown> | ApiError<422, unknown>
+
 export async function updatePet(body: Pet, config?: Partial<ClientConfig>): Promise<Pet> {
   const res = await _request('PUT', '/pet', { body }, config)
   return res.json()
 }
+
+/** Documented error responses of `updatePet`, for narrowing on `error.status`. */
+export type UpdatePetError =
+  ApiError<400, unknown> | ApiError<404, unknown> | ApiError<422, unknown>
 
 export async function findPetsByStatus(
   params: {
@@ -113,6 +120,9 @@ export async function findPetsByStatus(
   const res = await _request('GET', '/pet/findByStatus', { searchParams }, config)
   return res.json()
 }
+
+/** Documented error responses of `findPetsByStatus`, for narrowing on `error.status`. */
+export type FindPetsByStatusError = ApiError<400, unknown>
 
 export async function findPetsByTags(
   params: {
@@ -128,10 +138,16 @@ export async function findPetsByTags(
   return res.json()
 }
 
+/** Documented error responses of `findPetsByTags`, for narrowing on `error.status`. */
+export type FindPetsByTagsError = ApiError<400, unknown>
+
 export async function getPetById(petId: number, config?: Partial<ClientConfig>): Promise<Pet> {
   const res = await _request('GET', `/pet/${encodeURIComponent(petId)}`, {}, config)
   return res.json()
 }
+
+/** Documented error responses of `getPetById`, for narrowing on `error.status`. */
+export type GetPetByIdError = ApiError<400, unknown> | ApiError<404, unknown>
 
 export async function updatePetWithForm(
   petId: number,
@@ -148,6 +164,9 @@ export async function updatePetWithForm(
   return res.json()
 }
 
+/** Documented error responses of `updatePetWithForm`, for narrowing on `error.status`. */
+export type UpdatePetWithFormError = ApiError<400, unknown>
+
 export async function deletePet(
   petId: number,
   params?: {
@@ -160,6 +179,9 @@ export async function deletePet(
   }
   await _request('DELETE', `/pet/${encodeURIComponent(petId)}`, { extraHeaders }, config)
 }
+
+/** Documented error responses of `deletePet`, for narrowing on `error.status`. */
+export type DeletePetError = ApiError<400, unknown>
 
 export async function uploadFile(
   petId: number,
@@ -180,6 +202,9 @@ export async function uploadFile(
   return res.json()
 }
 
+/** Documented error responses of `uploadFile`, for narrowing on `error.status`. */
+export type UploadFileError = ApiError<400, unknown> | ApiError<404, unknown>
+
 export async function getInventory(
   config?: Partial<ClientConfig>
 ): Promise<Record<string, number>> {
@@ -192,6 +217,9 @@ export async function placeOrder(body: Order, config?: Partial<ClientConfig>): P
   return res.json()
 }
 
+/** Documented error responses of `placeOrder`, for narrowing on `error.status`. */
+export type PlaceOrderError = ApiError<400, unknown> | ApiError<422, unknown>
+
 export async function getOrderById(
   orderId: number,
   config?: Partial<ClientConfig>
@@ -200,9 +228,15 @@ export async function getOrderById(
   return res.json()
 }
 
+/** Documented error responses of `getOrderById`, for narrowing on `error.status`. */
+export type GetOrderByIdError = ApiError<400, unknown> | ApiError<404, unknown>
+
 export async function deleteOrder(orderId: number, config?: Partial<ClientConfig>): Promise<void> {
   await _request('DELETE', `/store/order/${encodeURIComponent(orderId)}`, {}, config)
 }
+
+/** Documented error responses of `deleteOrder`, for narrowing on `error.status`. */
+export type DeleteOrderError = ApiError<400, unknown> | ApiError<404, unknown>
 
 export async function createUser(body: User, config?: Partial<ClientConfig>): Promise<User> {
   const res = await _request('POST', '/user', { body }, config)
@@ -231,6 +265,9 @@ export async function loginUser(
   return res.json()
 }
 
+/** Documented error responses of `loginUser`, for narrowing on `error.status`. */
+export type LoginUserError = ApiError<400, unknown>
+
 export async function logoutUser(config?: Partial<ClientConfig>): Promise<void> {
   await _request('GET', '/user/logout', {}, config)
 }
@@ -243,6 +280,9 @@ export async function getUserByName(
   return res.json()
 }
 
+/** Documented error responses of `getUserByName`, for narrowing on `error.status`. */
+export type GetUserByNameError = ApiError<400, unknown> | ApiError<404, unknown>
+
 export async function updateUser(
   username: string,
   body: User,
@@ -251,6 +291,12 @@ export async function updateUser(
   await _request('PUT', `/user/${encodeURIComponent(username)}`, { body }, config)
 }
 
+/** Documented error responses of `updateUser`, for narrowing on `error.status`. */
+export type UpdateUserError = ApiError<400, unknown> | ApiError<404, unknown>
+
 export async function deleteUser(username: string, config?: Partial<ClientConfig>): Promise<void> {
   await _request('DELETE', `/user/${encodeURIComponent(username)}`, {}, config)
 }
+
+/** Documented error responses of `deleteUser`, for narrowing on `error.status`. */
+export type DeleteUserError = ApiError<400, unknown> | ApiError<404, unknown>

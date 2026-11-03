@@ -12,6 +12,7 @@ import {
   resolveBodyRefToWritableName,
 } from '../utils/writable-variants.js'
 import type { GeneratedFile } from './types.js'
+import { generateTypes } from './types.js'
 
 type OperationObject = OpenAPIV3_1.OperationObject
 type ParameterObject = OpenAPIV3_1.ParameterObject
@@ -889,6 +890,109 @@ function getThrowsTags(operation: OperationObject): string[] {
   return tags
 }
 
+/**
+ * Render the body type of one documented error response. Responses without a
+ * JSON schema use `fallback` (the configured error_body_type, else `unknown`).
+ */
+function errorResponseBodyType(
+  response: ResponseObject | ReferenceObject,
+  spec: OpenAPIV3_1.Document,
+  importsOut: Set<string>,
+  fallback: string
+): string {
+  const resolved = isRef(response)
+    ? (resolveJsonPointer(spec, (response as ReferenceObject).$ref) as ResponseObject | undefined)
+    : (response as ResponseObject)
+  const content = resolved?.content as
+    Record<string, { schema?: SchemaObject | ReferenceObject }> | undefined
+  if (content === undefined) return fallback
+  const picked = pickResponseContent(content)
+  if (picked === null || picked.kind !== 'json' || picked.entry.schema === undefined) {
+    return fallback
+  }
+  collectComponentRefNames(picked.entry.schema, spec, importsOut)
+  return inlineSchemaToTs(picked.entry.schema, spec)
+}
+
+/**
+ * Build the union of `ApiError<Status, Body>` members for every explicit 4xx/5xx
+ * response an operation documents (ranges like `4XX` and `default` are skipped:
+ * they have no literal status). Returns undefined when nothing is documented.
+ */
+function operationErrorUnion(
+  operation: OperationObject,
+  spec: OpenAPIV3_1.Document,
+  importsOut: Set<string>,
+  fallbackBodyType = 'unknown'
+): string | undefined {
+  const responses = operation.responses as
+    Record<string, ResponseObject | ReferenceObject> | undefined
+  if (responses === undefined) return undefined
+  const codes = Object.keys(responses)
+    .filter((code) => /^[45]\d\d$/.test(code))
+    .sort()
+  if (codes.length === 0) return undefined
+  return codes
+    .map((code) => {
+      const body = errorResponseBodyType(responses[code]!, spec, importsOut, fallbackBodyType)
+      return `ApiError<${code}, ${body}>`
+    })
+    .join(' | ')
+}
+
+/** Names exported from client-config.ts / client.ts that an error alias must not shadow. */
+const ERROR_ALIAS_RESERVED_NAMES = [
+  'ApiError',
+  'ClientConfig',
+  'configureClient',
+  'getConfig',
+  'LaravelValidationError',
+  '_FetchResponse',
+]
+
+/**
+ * Per-operation error type aliases (#195), keyed by client function name.
+ *
+ * For every operation that documents at least one explicit 4xx/5xx response,
+ * client.ts exports `export type <Op>Error = ApiError<404, NotFound> | ...` so
+ * callers (and the React Query hooks) can narrow on `error.status`. Alias names
+ * are `PascalCase(funcName) + 'Error'`, deduplicated against every type the
+ * barrel re-exports (models.ts, client-config.ts) so `export *` stays unambiguous.
+ *
+ * Exported so `@codewithagents/openapi-react-query` resolves the same names.
+ */
+export function buildOperationErrorTypeNames(spec: OpenAPIV3_1.Document): Map<string, string> {
+  const names = new Map<string, string>()
+  const paths = spec.paths as Record<string, Record<string, OperationObject>> | undefined
+  if (paths === undefined) return names
+  const modelNames = generateTypes(spec).content.matchAll(
+    /^export (?:type|interface|const|enum) ([A-Za-z_$][\w$]*)/gm
+  )
+  const usedAliasNames = new Set<string>([
+    ...ERROR_ALIAS_RESERVED_NAMES,
+    ...Array.from(modelNames, (m) => m[1]!),
+  ])
+  const usedFuncNames = new Set<string>(CLIENT_INTERNAL_NAMES)
+  const scratch = new Set<string>()
+  for (const [path, pathItem] of Object.entries(paths)) {
+    for (const method of SUPPORTED_METHODS) {
+      const operation = pathItem[method] as OperationObject | undefined
+      if (operation === undefined) continue
+      const funcName = uniquifyName(operationFuncName(operation, method, path), usedFuncNames)
+      if (operationErrorUnion(operation, spec, scratch) === undefined) continue
+      const base = `${funcName.charAt(0).toUpperCase()}${funcName.slice(1)}Error`
+      names.set(funcName, uniquifyName(base, usedAliasNames))
+    }
+  }
+  return names
+}
+
+function operationFuncName(operation: OperationObject, method: string, path: string): string {
+  return operation.operationId !== undefined
+    ? sanitizeOperationId(operation.operationId)
+    : deriveOperationName(method, path)
+}
+
 /** Get the $ref schema name from an operation's JSON request body, if any. */
 function getRequestBodySchemaName(operation: OperationObject): string | undefined {
   const requestBody = operation.requestBody as RequestBodyObject | ReferenceObject | undefined
@@ -1716,6 +1820,7 @@ export function generateClient(
   // The CLIENT_INTERNAL_NAMES set is defined at module level and exported so that
   // the hooks generator can reuse the same set (single source of truth).
   const usedFuncNames = new Set<string>(CLIENT_INTERNAL_NAMES)
+  const errorTypeNames = buildOperationErrorTypeNames(spec)
 
   if (paths !== undefined) {
     for (const [path, pathItem] of Object.entries(paths)) {
@@ -1726,13 +1831,7 @@ export function generateClient(
         hasAnyEndpoints = true
 
         // Derive function name and ensure it is unique across all operations.
-        let funcName: string
-        if (operation.operationId !== undefined) {
-          funcName = sanitizeOperationId(operation.operationId)
-        } else {
-          funcName = deriveOperationName(method, path)
-        }
-        funcName = uniquifyName(funcName, usedFuncNames)
+        const funcName = uniquifyName(operationFuncName(operation, method, path), usedFuncNames)
 
         const pathParams = getPathParams(pathItem, operation, spec)
         const queryParams = getQueryParams(pathItem, operation, spec)
@@ -1809,6 +1908,19 @@ export function generateClient(
           responseSchemaName
         )
         functionBlocks.push(fnCode)
+
+        // Per-operation error alias (#195): additive, only for documented 4xx/5xx.
+        const errorTypeName = errorTypeNames.get(funcName)
+        if (errorTypeName !== undefined) {
+          const fallbackBodyType =
+            options?.errorBodyType === 'laravel'
+              ? 'LaravelValidationError'
+              : (options?.errorBodyType ?? 'unknown')
+          const union = operationErrorUnion(operation, spec, collectedTypeNames, fallbackBodyType)!
+          functionBlocks.push(
+            `/** Documented error responses of \`${funcName}\`, for narrowing on \`error.status\`. */\nexport type ${errorTypeName} = ${union}`
+          )
+        }
       }
     }
   }

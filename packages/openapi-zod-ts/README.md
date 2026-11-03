@@ -392,6 +392,21 @@ try {
 }
 ```
 
+Every operation that documents explicit `4xx` / `5xx` responses also gets a per-operation error type alias exported from `client.ts`, a union of `ApiError<Status, Body>` members built from the spec:
+
+```typescript
+// generated
+export type GetTaskByIdError = ApiError<404, NotFound> | ApiError<422, ValidationProblem>
+
+// usage: narrowing on status narrows the body
+function describe(err: GetTaskByIdError) {
+  if (err.status === 422) return err.body.errors // ValidationProblem
+  return err.body.message // NotFound
+}
+```
+
+The alias name is `PascalCase(functionName) + 'Error'`, suffixed `_2`, `_3`, ... if it would collide with a model name. Status ranges (`4XX`) and `default` responses are not included, and responses without a JSON schema use `unknown` (or your `error_body_type`). The alias lists only *documented* statuses, so an undocumented status at runtime is still a plain `ApiError`; use it where the spec is trustworthy.
+
 ---
 
 ## Zod validation (`input_schema`)

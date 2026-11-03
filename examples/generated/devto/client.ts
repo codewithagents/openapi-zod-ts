@@ -138,6 +138,9 @@ export async function getAgentSessions(
   return z.array(AgentSessionIndexSchema).parse(await res.json())
 }
 
+/** Documented error responses of `getAgentSessions`, for narrowing on `error.status`. */
+export type GetAgentSessionsError = ApiError<401, unknown>
+
 export async function createAgentSession(
   body: { title?: string; curated_data: string; s3_key?: string; tool_name?: string },
   config?: Partial<ClientConfig>
@@ -146,6 +149,9 @@ export async function createAgentSession(
   return AgentSessionIndexSchema.parse(await res.json())
 }
 
+/** Documented error responses of `createAgentSession`, for narrowing on `error.status`. */
+export type CreateAgentSessionError = ApiError<401, unknown> | ApiError<422, unknown>
+
 export async function getAgentSessionById(
   id: string,
   config?: Partial<ClientConfig>
@@ -153,6 +159,9 @@ export async function getAgentSessionById(
   const res = await _request('GET', `/api/agent_sessions/${encodeURIComponent(id)}`, {}, config)
   return AgentSessionShowSchema.parse(await res.json())
 }
+
+/** Documented error responses of `getAgentSessionById`, for narrowing on `error.status`. */
+export type GetAgentSessionByIdError = ApiError<401, unknown> | ApiError<404, unknown>
 
 export async function getArticles(
   params?: {
@@ -187,6 +196,9 @@ export async function createArticle(body: Article, config?: Partial<ClientConfig
   await _request('POST', '/api/articles', { body }, config)
 }
 
+/** Documented error responses of `createArticle`, for narrowing on `error.status`. */
+export type CreateArticleError = ApiError<401, unknown> | ApiError<422, unknown>
+
 export async function getLatestArticles(
   params?: {
     page?: number
@@ -209,6 +221,9 @@ export async function getArticleById(
   return res.json()
 }
 
+/** Documented error responses of `getArticleById`, for narrowing on `error.status`. */
+export type GetArticleByIdError = ApiError<404, unknown>
+
 export async function updateArticle(
   id: number,
   body: Article,
@@ -217,6 +232,10 @@ export async function updateArticle(
   ArticleSchema.parse(body)
   await _request('PUT', `/api/articles/${encodeURIComponent(id)}`, { body }, config)
 }
+
+/** Documented error responses of `updateArticle`, for narrowing on `error.status`. */
+export type UpdateArticleError =
+  ApiError<401, unknown> | ApiError<404, unknown> | ApiError<422, unknown>
 
 export async function getArticleByPath(
   username: string,
@@ -232,6 +251,9 @@ export async function getArticleByPath(
   return res.json()
 }
 
+/** Documented error responses of `getArticleByPath`, for narrowing on `error.status`. */
+export type GetArticleByPathError = ApiError<404, unknown>
+
 export async function getUserArticles(
   params?: {
     page?: number
@@ -245,6 +267,9 @@ export async function getUserArticles(
   const res = await _request('GET', '/api/articles/me', { searchParams }, config)
   return z.array(ArticleIndexSchema).parse(await res.json())
 }
+
+/** Documented error responses of `getUserArticles`, for narrowing on `error.status`. */
+export type GetUserArticlesError = ApiError<401, unknown>
 
 export async function getUserPublishedArticles(
   params?: {
@@ -260,6 +285,9 @@ export async function getUserPublishedArticles(
   return z.array(ArticleIndexSchema).parse(await res.json())
 }
 
+/** Documented error responses of `getUserPublishedArticles`, for narrowing on `error.status`. */
+export type GetUserPublishedArticlesError = ApiError<401, unknown>
+
 export async function getUserUnpublishedArticles(
   params?: {
     page?: number
@@ -274,6 +302,9 @@ export async function getUserUnpublishedArticles(
   return z.array(ArticleIndexSchema).parse(await res.json())
 }
 
+/** Documented error responses of `getUserUnpublishedArticles`, for narrowing on `error.status`. */
+export type GetUserUnpublishedArticlesError = ApiError<401, unknown>
+
 export async function getUserAllArticles(
   params?: {
     page?: number
@@ -287,6 +318,9 @@ export async function getUserAllArticles(
   const res = await _request('GET', '/api/articles/me/all', { searchParams }, config)
   return z.array(ArticleIndexSchema).parse(await res.json())
 }
+
+/** Documented error responses of `getUserAllArticles`, for narrowing on `error.status`. */
+export type GetUserAllArticlesError = ApiError<401, unknown>
 
 export async function unpublishArticle(
   id: number,
@@ -305,6 +339,9 @@ export async function unpublishArticle(
   )
 }
 
+/** Documented error responses of `unpublishArticle`, for narrowing on `error.status`. */
+export type UnpublishArticleError = ApiError<401, unknown> | ApiError<404, unknown>
+
 export async function getSegments(
   params?: {
     perPage?: number
@@ -317,9 +354,15 @@ export async function getSegments(
   return z.array(SegmentSchema).parse(await res.json())
 }
 
+/** Documented error responses of `getSegments`, for narrowing on `error.status`. */
+export type GetSegmentsError = ApiError<401, unknown>
+
 export async function createSegment(config?: Partial<ClientConfig>): Promise<void> {
   await _request('POST', '/api/segments', {}, config)
 }
+
+/** Documented error responses of `createSegment`, for narrowing on `error.status`. */
+export type CreateSegmentError = ApiError<401, unknown>
 
 export async function getSegment(
   id: number,
@@ -329,9 +372,16 @@ export async function getSegment(
   return res.json()
 }
 
+/** Documented error responses of `getSegment`, for narrowing on `error.status`. */
+export type GetSegmentError = ApiError<401, unknown> | ApiError<404, unknown>
+
 export async function deleteSegment(id: number, config?: Partial<ClientConfig>): Promise<void> {
   await _request('DELETE', `/api/segments/${encodeURIComponent(id)}`, {}, config)
 }
+
+/** Documented error responses of `deleteSegment`, for narrowing on `error.status`. */
+export type DeleteSegmentError =
+  ApiError<401, unknown> | ApiError<404, unknown> | ApiError<409, unknown>
 
 export async function getUsersInSegment(
   id: number,
@@ -351,6 +401,9 @@ export async function getUsersInSegment(
   return z.array(UserSchema).parse(await res.json())
 }
 
+/** Documented error responses of `getUsersInSegment`, for narrowing on `error.status`. */
+export type GetUsersInSegmentError = ApiError<401, unknown> | ApiError<404, unknown>
+
 export async function addUsersToSegment(
   id: number,
   body: SegmentUserIds,
@@ -359,6 +412,10 @@ export async function addUsersToSegment(
   SegmentUserIdsSchema.parse(body)
   await _request('PUT', `/api/segments/${encodeURIComponent(id)}/add_users`, { body }, config)
 }
+
+/** Documented error responses of `addUsersToSegment`, for narrowing on `error.status`. */
+export type AddUsersToSegmentError =
+  ApiError<401, unknown> | ApiError<404, unknown> | ApiError<422, unknown>
 
 export async function removeUsersFromSegment(
   id: number,
@@ -369,10 +426,17 @@ export async function removeUsersFromSegment(
   await _request('PUT', `/api/segments/${encodeURIComponent(id)}/remove_users`, { body }, config)
 }
 
+/** Documented error responses of `removeUsersFromSegment`, for narrowing on `error.status`. */
+export type RemoveUsersFromSegmentError =
+  ApiError<401, unknown> | ApiError<404, unknown> | ApiError<422, unknown>
+
 export async function getApiBillboards(config?: Partial<ClientConfig>): Promise<Billboard[]> {
   const res = await _request('GET', '/api/billboards', {}, config)
   return z.array(BillboardSchema).parse(await res.json())
 }
+
+/** Documented error responses of `getApiBillboards`, for narrowing on `error.status`. */
+export type GetApiBillboardsError = ApiError<401, unknown>
 
 export async function createApiBillboards(
   body: Record<string, unknown>,
@@ -382,12 +446,18 @@ export async function createApiBillboards(
   return res.json()
 }
 
+/** Documented error responses of `createApiBillboards`, for narrowing on `error.status`. */
+export type CreateApiBillboardsError = ApiError<401, unknown> | ApiError<422, unknown>
+
 export async function getApiBillboardsById(
   id: number,
   config?: Partial<ClientConfig>
 ): Promise<void> {
   await _request('GET', `/api/billboards/${encodeURIComponent(id)}`, {}, config)
 }
+
+/** Documented error responses of `getApiBillboardsById`, for narrowing on `error.status`. */
+export type GetApiBillboardsByIdError = ApiError<401, unknown> | ApiError<404, unknown>
 
 export async function updateApiBillboardsById(
   id: number,
@@ -398,12 +468,18 @@ export async function updateApiBillboardsById(
   return res.json()
 }
 
+/** Documented error responses of `updateApiBillboardsById`, for narrowing on `error.status`. */
+export type UpdateApiBillboardsByIdError = ApiError<401, unknown> | ApiError<404, unknown>
+
 export async function updateApiBillboardsByIdUnpublish(
   id: number,
   config?: Partial<ClientConfig>
 ): Promise<void> {
   await _request('PUT', `/api/billboards/${encodeURIComponent(id)}/unpublish`, {}, config)
 }
+
+/** Documented error responses of `updateApiBillboardsByIdUnpublish`, for narrowing on `error.status`. */
+export type UpdateApiBillboardsByIdUnpublishError = ApiError<401, unknown> | ApiError<404, unknown>
 
 export async function getCommentsByArticleId(
   params?: {
@@ -423,14 +499,23 @@ export async function getCommentsByArticleId(
   return z.array(CommentSchema).parse(await res.json())
 }
 
+/** Documented error responses of `getCommentsByArticleId`, for narrowing on `error.status`. */
+export type GetCommentsByArticleIdError = ApiError<404, unknown>
+
 export async function getCommentById(id: number, config?: Partial<ClientConfig>): Promise<void> {
   await _request('GET', `/api/comments/${encodeURIComponent(id)}`, {}, config)
 }
+
+/** Documented error responses of `getCommentById`, for narrowing on `error.status`. */
+export type GetCommentByIdError = ApiError<404, unknown>
 
 export async function getFollowedTags(config?: Partial<ClientConfig>): Promise<FollowedTag[]> {
   const res = await _request('GET', '/api/follows/tags', {}, config)
   return z.array(FollowedTagSchema).parse(await res.json())
 }
+
+/** Documented error responses of `getFollowedTags`, for narrowing on `error.status`. */
+export type GetFollowedTagsError = ApiError<401, unknown>
 
 export async function getFollowers(
   params?: {
@@ -448,6 +533,9 @@ export async function getFollowers(
   return res.json()
 }
 
+/** Documented error responses of `getFollowers`, for narrowing on `error.status`. */
+export type GetFollowersError = ApiError<401, unknown>
+
 export async function getOrganization(
   username: string,
   config?: Partial<ClientConfig>
@@ -460,6 +548,9 @@ export async function getOrganization(
   )
   return res.json()
 }
+
+/** Documented error responses of `getOrganization`, for narrowing on `error.status`. */
+export type GetOrganizationError = ApiError<404, unknown>
 
 export async function getOrgUsers(
   organizationIdOrUsername: string,
@@ -481,6 +572,9 @@ export async function getOrgUsers(
   return z.array(UserSchema).parse(await res.json())
 }
 
+/** Documented error responses of `getOrgUsers`, for narrowing on `error.status`. */
+export type GetOrgUsersError = ApiError<404, unknown>
+
 export async function getOrgArticles(
   organizationIdOrUsername: string,
   params?: {
@@ -500,6 +594,9 @@ export async function getOrgArticles(
   )
   return z.array(ArticleIndexSchema).parse(await res.json())
 }
+
+/** Documented error responses of `getOrgArticles`, for narrowing on `error.status`. */
+export type GetOrgArticlesError = ApiError<404, unknown>
 
 export async function getOrganizations(
   params?: {
@@ -523,6 +620,9 @@ export async function createOrganization(
   await _request('POST', '/api/organizations', { body }, config)
 }
 
+/** Documented error responses of `createOrganization`, for narrowing on `error.status`. */
+export type CreateOrganizationError = ApiError<401, unknown> | ApiError<422, unknown>
+
 export async function getOrganizationById(
   id: number,
   config?: Partial<ClientConfig>
@@ -530,6 +630,9 @@ export async function getOrganizationById(
   const res = await _request('GET', `/api/organizations/${encodeURIComponent(id)}`, {}, config)
   return res.json()
 }
+
+/** Documented error responses of `getOrganizationById`, for narrowing on `error.status`. */
+export type GetOrganizationByIdError = ApiError<404, unknown>
 
 export async function updateApiOrganizationsById(
   id: number,
@@ -540,12 +643,19 @@ export async function updateApiOrganizationsById(
   await _request('PUT', `/api/organizations/${encodeURIComponent(id)}`, { body }, config)
 }
 
+/** Documented error responses of `updateApiOrganizationsById`, for narrowing on `error.status`. */
+export type UpdateApiOrganizationsByIdError =
+  ApiError<401, unknown> | ApiError<404, unknown> | ApiError<422, unknown>
+
 export async function deleteApiOrganizationsById(
   id: number,
   config?: Partial<ClientConfig>
 ): Promise<void> {
   await _request('DELETE', `/api/organizations/${encodeURIComponent(id)}`, {}, config)
 }
+
+/** Documented error responses of `deleteApiOrganizationsById`, for narrowing on `error.status`. */
+export type DeleteApiOrganizationsByIdError = ApiError<401, unknown>
 
 export async function getApiPages(config?: Partial<ClientConfig>): Promise<Page[]> {
   const res = await _request('GET', '/api/pages', {}, config)
@@ -567,6 +677,9 @@ export async function createApiPages(
   await _request('POST', '/api/pages', { body }, config)
 }
 
+/** Documented error responses of `createApiPages`, for narrowing on `error.status`. */
+export type CreateApiPagesError = ApiError<401, unknown> | ApiError<422, unknown>
+
 export async function getApiPagesById(id: number, config?: Partial<ClientConfig>): Promise<Page> {
   const res = await _request('GET', `/api/pages/${encodeURIComponent(id)}`, {}, config)
   return PageSchema.parse(await res.json())
@@ -582,6 +695,9 @@ export async function updateApiPagesById(
   return PageSchema.parse(await res.json())
 }
 
+/** Documented error responses of `updateApiPagesById`, for narrowing on `error.status`. */
+export type UpdateApiPagesByIdError = ApiError<401, unknown> | ApiError<422, unknown>
+
 export async function deleteApiPagesById(
   id: number,
   config?: Partial<ClientConfig>
@@ -589,6 +705,9 @@ export async function deleteApiPagesById(
   const res = await _request('DELETE', `/api/pages/${encodeURIComponent(id)}`, {}, config)
   return PageSchema.parse(await res.json())
 }
+
+/** Documented error responses of `deleteApiPagesById`, for narrowing on `error.status`. */
+export type DeleteApiPagesByIdError = ApiError<401, unknown> | ApiError<422, unknown>
 
 export async function getPodcastEpisodes(
   params?: {
@@ -606,6 +725,9 @@ export async function getPodcastEpisodes(
   return z.array(PodcastEpisodeIndexSchema).parse(await res.json())
 }
 
+/** Documented error responses of `getPodcastEpisodes`, for narrowing on `error.status`. */
+export type GetPodcastEpisodesError = ApiError<404, unknown>
+
 export async function getProfileImage(
   username: string,
   config?: Partial<ClientConfig>
@@ -618,6 +740,9 @@ export async function getProfileImage(
   )
   return res.json()
 }
+
+/** Documented error responses of `getProfileImage`, for narrowing on `error.status`. */
+export type GetProfileImageError = ApiError<404, unknown>
 
 export async function createApiReactionsToggle(
   params: {
@@ -635,6 +760,9 @@ export async function createApiReactionsToggle(
   await _request('POST', '/api/reactions/toggle', { searchParams }, config)
 }
 
+/** Documented error responses of `createApiReactionsToggle`, for narrowing on `error.status`. */
+export type CreateApiReactionsToggleError = ApiError<401, unknown>
+
 export async function createApiReactions(
   params: {
     category: 'like' | 'unicorn' | 'exploding_head' | 'raised_hands' | 'fire'
@@ -651,6 +779,9 @@ export async function createApiReactions(
   await _request('POST', '/api/reactions', { searchParams }, config)
 }
 
+/** Documented error responses of `createApiReactions`, for narrowing on `error.status`. */
+export type CreateApiReactionsError = ApiError<401, unknown>
+
 export async function getReadinglist(
   params?: {
     page?: number
@@ -664,6 +795,9 @@ export async function getReadinglist(
   const res = await _request('GET', '/api/readinglist', { searchParams }, config)
   return z.array(ArticleIndexSchema).parse(await res.json())
 }
+
+/** Documented error responses of `getReadinglist`, for narrowing on `error.status`. */
+export type GetReadinglistError = ApiError<401, unknown>
 
 export async function getSurveys(
   params?: {
@@ -681,6 +815,9 @@ export async function getSurveys(
   return z.array(SurveySchema).parse(await res.json())
 }
 
+/** Documented error responses of `getSurveys`, for narrowing on `error.status`. */
+export type GetSurveysError = ApiError<401, unknown>
+
 export async function getSurveyByIdOrSlug(
   idOrSlug: string,
   config?: Partial<ClientConfig>
@@ -688,6 +825,9 @@ export async function getSurveyByIdOrSlug(
   const res = await _request('GET', `/api/surveys/${encodeURIComponent(idOrSlug)}`, {}, config)
   return SurveyWithPollsSchema.parse(await res.json())
 }
+
+/** Documented error responses of `getSurveyByIdOrSlug`, for narrowing on `error.status`. */
+export type GetSurveyByIdOrSlugError = ApiError<401, unknown> | ApiError<404, unknown>
 
 export async function getSurveyPollVotes(
   idOrSlug: string,
@@ -709,6 +849,9 @@ export async function getSurveyPollVotes(
   return z.array(PollVoteSchema).parse(await res.json())
 }
 
+/** Documented error responses of `getSurveyPollVotes`, for narrowing on `error.status`. */
+export type GetSurveyPollVotesError = ApiError<401, unknown> | ApiError<404, unknown>
+
 export async function getSurveyPollTextResponses(
   idOrSlug: string,
   params?: {
@@ -729,6 +872,9 @@ export async function getSurveyPollTextResponses(
   return z.array(PollTextResponseSchema).parse(await res.json())
 }
 
+/** Documented error responses of `getSurveyPollTextResponses`, for narrowing on `error.status`. */
+export type GetSurveyPollTextResponsesError = ApiError<401, unknown> | ApiError<404, unknown>
+
 export async function getTags(
   params?: {
     page?: number
@@ -747,34 +893,58 @@ export async function suspendUser(id: number, config?: Partial<ClientConfig>): P
   await _request('PUT', `/api/users/${encodeURIComponent(id)}/suspend`, {}, config)
 }
 
+/** Documented error responses of `suspendUser`, for narrowing on `error.status`. */
+export type SuspendUserError = ApiError<401, unknown> | ApiError<404, unknown>
+
 export async function limitUser(id: number, config?: Partial<ClientConfig>): Promise<void> {
   await _request('PUT', `/api/users/${encodeURIComponent(id)}/limited`, {}, config)
 }
+
+/** Documented error responses of `limitUser`, for narrowing on `error.status`. */
+export type LimitUserError = ApiError<401, unknown> | ApiError<404, unknown>
 
 export async function unLimitUser(id: number, config?: Partial<ClientConfig>): Promise<void> {
   await _request('DELETE', `/api/users/${encodeURIComponent(id)}/limited`, {}, config)
 }
 
+/** Documented error responses of `unLimitUser`, for narrowing on `error.status`. */
+export type UnLimitUserError = ApiError<401, unknown> | ApiError<404, unknown>
+
 export async function spamUser(id: number, config?: Partial<ClientConfig>): Promise<void> {
   await _request('PUT', `/api/users/${encodeURIComponent(id)}/spam`, {}, config)
 }
+
+/** Documented error responses of `spamUser`, for narrowing on `error.status`. */
+export type SpamUserError = ApiError<401, unknown> | ApiError<404, unknown>
 
 export async function unSpamUser(id: number, config?: Partial<ClientConfig>): Promise<void> {
   await _request('DELETE', `/api/users/${encodeURIComponent(id)}/spam`, {}, config)
 }
 
+/** Documented error responses of `unSpamUser`, for narrowing on `error.status`. */
+export type UnSpamUserError = ApiError<401, unknown> | ApiError<404, unknown>
+
 export async function trustUser(id: number, config?: Partial<ClientConfig>): Promise<void> {
   await _request('PUT', `/api/users/${encodeURIComponent(id)}/trusted`, {}, config)
 }
+
+/** Documented error responses of `trustUser`, for narrowing on `error.status`. */
+export type TrustUserError = ApiError<401, unknown> | ApiError<404, unknown>
 
 export async function unTrustUser(id: number, config?: Partial<ClientConfig>): Promise<void> {
   await _request('DELETE', `/api/users/${encodeURIComponent(id)}/trusted`, {}, config)
 }
 
+/** Documented error responses of `unTrustUser`, for narrowing on `error.status`. */
+export type UnTrustUserError = ApiError<401, unknown> | ApiError<404, unknown>
+
 export async function getUserMe(config?: Partial<ClientConfig>): Promise<Record<string, unknown>> {
   const res = await _request('GET', '/api/users/me', {}, config)
   return res.json()
 }
+
+/** Documented error responses of `getUserMe`, for narrowing on `error.status`. */
+export type GetUserMeError = ApiError<401, unknown>
 
 export async function getUser(
   id: string,
@@ -788,6 +958,9 @@ export async function unpublishUser(id: number, config?: Partial<ClientConfig>):
   await _request('PUT', `/api/users/${encodeURIComponent(id)}/unpublish`, {}, config)
 }
 
+/** Documented error responses of `unpublishUser`, for narrowing on `error.status`. */
+export type UnpublishUserError = ApiError<401, unknown> | ApiError<404, unknown>
+
 export async function postAdminUsersCreate(
   body: UserInviteParam,
   config?: Partial<ClientConfig>
@@ -795,6 +968,9 @@ export async function postAdminUsersCreate(
   UserInviteParamSchema.parse(body)
   await _request('POST', '/api/admin/users', { body }, config)
 }
+
+/** Documented error responses of `postAdminUsersCreate`, for narrowing on `error.status`. */
+export type PostAdminUsersCreateError = ApiError<401, unknown> | ApiError<422, unknown>
 
 export async function videos(
   params?: {
