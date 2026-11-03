@@ -382,6 +382,16 @@ function buildKeyFactory(resource: string, entries: KeyEntry[]): string {
 // ── queryOptions factory generation ───────────────────────────────────────────
 
 /**
+ * The raw response type of a client function (the queryFn's resolved value).
+ * Every query hook / factory also takes a `TData` generic defaulting to this
+ * type, so a caller's `select` transform narrows the hook's `data` type
+ * (#195). The default keeps existing call sites source compatible.
+ */
+function queryDataType(funcName: string): string {
+  return `Awaited<ReturnType<typeof ${funcName}>>`
+}
+
+/**
  * Derives the factory function name for a GET operation.
  * e.g. funcName "listTasks" -> "listTasksQueryOptions"
  */
@@ -426,6 +436,7 @@ function buildQueryOptionsFactory(
   gcTime: number
 ): string {
   const lines: string[] = []
+  const dataType = queryDataType(op.funcName)
 
   const hasQueryParams = keyEntry.hasQueryParams
   const paramsRequired = keyEntry.hasRequiredQueryParams
@@ -443,7 +454,7 @@ function buildQueryOptionsFactory(
     sigParts.push(`${paramsToken}: Parameters<typeof ${op.funcName}>[${pathParams.length}]`)
   }
   sigParts.push(
-    `options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof ${op.funcName}>>, ApiError>, 'queryKey' | 'queryFn'>`
+    `options?: Omit<UseQueryOptions<${dataType}, ApiError, TData>, 'queryKey' | 'queryFn'>`
   )
 
   const queryKeyCall = buildQueryKeyCall(
@@ -463,10 +474,10 @@ function buildQueryOptionsFactory(
   if (op.deprecated) {
     lines.push(`/** @deprecated */`)
   }
-  lines.push(`export function ${factoryName}(`)
+  lines.push(`export function ${factoryName}<TData = ${dataType}>(`)
   lines.push(`  ${sigParts.join(',\n  ')},`)
   lines.push(`) {`)
-  lines.push(`  return queryOptions<Awaited<ReturnType<typeof ${op.funcName}>>, ApiError>({`)
+  lines.push(`  return queryOptions<${dataType}, ApiError, TData>({`)
   lines.push(`    queryKey: ${queryKeyCall},`)
   lines.push(`    queryFn: () => ${queryFnCall},`)
   lines.push(`    staleTime: ${staleTime},`)
@@ -488,6 +499,7 @@ function buildQueryHook(
   gcTime: number
 ): string {
   const lines: string[] = []
+  const dataType = queryDataType(op.funcName)
 
   const hasQueryParams = keyEntry.hasQueryParams
   const paramsRequired = keyEntry.hasRequiredQueryParams
@@ -506,7 +518,7 @@ function buildQueryHook(
     sigParts.push(`${paramsToken}: Parameters<typeof ${op.funcName}>[${pathParams.length}]`)
   }
   sigParts.push(
-    `options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof ${op.funcName}>>, ApiError>, 'queryKey' | 'queryFn'>`
+    `options?: Omit<UseQueryOptions<${dataType}, ApiError, TData>, 'queryKey' | 'queryFn'>`
   )
 
   // Build queryKey call (with non-null assertions for path params, since hook has enabled guard)
@@ -526,10 +538,10 @@ function buildQueryHook(
   if (op.deprecated) {
     lines.push(`/** @deprecated */`)
   }
-  lines.push(`export function ${op.hookName}(`)
+  lines.push(`export function ${op.hookName}<TData = ${dataType}>(`)
   lines.push(`  ${sigParts.join(',\n  ')},`)
   lines.push(`) {`)
-  lines.push(`  return useQuery<Awaited<ReturnType<typeof ${op.funcName}>>, ApiError>({`)
+  lines.push(`  return useQuery<${dataType}, ApiError, TData>({`)
   lines.push(`    queryKey: ${queryKeyCall},`)
   lines.push(`    queryFn: () => ${queryFnCall},`)
   lines.push(`    staleTime: ${staleTime},`)
@@ -552,6 +564,7 @@ function buildSuspenseQueryHook(
   gcTime: number
 ): string {
   const lines: string[] = []
+  const dataType = queryDataType(op.funcName)
 
   const hasQueryParams = keyEntry.hasQueryParams
   const paramsRequired = keyEntry.hasRequiredQueryParams
@@ -568,7 +581,7 @@ function buildSuspenseQueryHook(
     sigParts.push(`${paramsToken}: Parameters<typeof ${op.funcName}>[${pathParams.length}]`)
   }
   sigParts.push(
-    `options?: Omit<UseSuspenseQueryOptions<Awaited<ReturnType<typeof ${op.funcName}>>, ApiError>, 'queryKey' | 'queryFn'>`
+    `options?: Omit<UseSuspenseQueryOptions<${dataType}, ApiError, TData>, 'queryKey' | 'queryFn'>`
   )
 
   // Build queryKey call (no non-null assertions — suspense params are always required strings)
@@ -590,10 +603,10 @@ function buildSuspenseQueryHook(
   if (op.deprecated) {
     lines.push(`/** @deprecated */`)
   }
-  lines.push(`export function ${suspenseHookName}(`)
+  lines.push(`export function ${suspenseHookName}<TData = ${dataType}>(`)
   lines.push(`  ${sigParts.join(',\n  ')},`)
   lines.push(`) {`)
-  lines.push(`  return useSuspenseQuery<Awaited<ReturnType<typeof ${op.funcName}>>, ApiError>({`)
+  lines.push(`  return useSuspenseQuery<${dataType}, ApiError, TData>({`)
   lines.push(`    queryKey: ${queryKeyCall},`)
   lines.push(`    queryFn: () => ${queryFnCall},`)
   lines.push(`    staleTime: ${staleTime},`)
@@ -643,6 +656,7 @@ function buildInfiniteQueryHook(
   const lines: string[] = []
   const { funcName, hasQueryParams, hasRequiredQueryParams, deprecated } = op
   const infiniteHookName = `use${capitalize(funcName)}Infinite`
+  const dataType = queryDataType(funcName)
 
   const sigParts: string[] = []
   if (hasQueryParams) {
@@ -650,7 +664,7 @@ function buildInfiniteQueryHook(
     sigParts.push(`${paramsToken}: Parameters<typeof ${funcName}>[0]`)
   }
   sigParts.push(
-    `options?: Omit<UseInfiniteQueryOptions<Awaited<ReturnType<typeof ${funcName}>>, ApiError, InfiniteData<Awaited<ReturnType<typeof ${funcName}>>>, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>`
+    `options?: Omit<UseInfiniteQueryOptions<${dataType}, ApiError, TData, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>`
   )
 
   const queryKeyCall = buildInfiniteQueryKeyCall(keyFactoryName, keyEntry, hasQueryParams)
@@ -666,12 +680,10 @@ function buildInfiniteQueryHook(
   if (deprecated) {
     lines.push(`/** @deprecated */`)
   }
-  lines.push(`export function ${infiniteHookName}(`)
+  lines.push(`export function ${infiniteHookName}<TData = InfiniteData<${dataType}>>(`)
   lines.push(`  ${sigParts.join(',\n  ')},`)
   lines.push(`) {`)
-  lines.push(
-    `  return useInfiniteQuery<Awaited<ReturnType<typeof ${funcName}>>, ApiError, InfiniteData<Awaited<ReturnType<typeof ${funcName}>>>, QueryKey, unknown>({`
-  )
+  lines.push(`  return useInfiniteQuery<${dataType}, ApiError, TData, QueryKey, unknown>({`)
   lines.push(`    queryKey: ${queryKeyCall},`)
   lines.push(`    queryFn: ${queryFnBody},`)
   lines.push(`    initialPageParam: undefined,`)

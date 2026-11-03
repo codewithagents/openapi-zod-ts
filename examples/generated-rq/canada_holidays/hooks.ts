@@ -31,13 +31,13 @@ export const specKeys = {
 
 // ── Query options factories ──────────────────────────────────
 
-export function rootQueryOptions(
+export function rootQueryOptions<TData = Awaited<ReturnType<typeof root>>>(
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof root>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof root>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof root>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof root>>, ApiError, TData>({
     queryKey: apiKeys.list(),
     queryFn: () => root(),
     staleTime: 0,
@@ -46,14 +46,14 @@ export function rootQueryOptions(
   })
 }
 
-export function holidaysQueryOptions(
+export function holidaysQueryOptions<TData = Awaited<ReturnType<typeof holidays>>>(
   params?: Parameters<typeof holidays>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof holidays>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof holidays>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof holidays>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof holidays>>, ApiError, TData>({
     queryKey: holidayKeys.list(params),
     queryFn: () => holidays(params),
     staleTime: 0,
@@ -62,15 +62,15 @@ export function holidaysQueryOptions(
   })
 }
 
-export function holidayQueryOptions(
+export function holidayQueryOptions<TData = Awaited<ReturnType<typeof holiday>>>(
   holidayId: Parameters<typeof holiday>[0],
   params?: Parameters<typeof holiday>[1],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof holiday>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof holiday>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof holiday>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof holiday>>, ApiError, TData>({
     queryKey: holidayKeys.detail(holidayId, params),
     queryFn: () => holiday(holidayId, params),
     staleTime: 0,
@@ -79,14 +79,14 @@ export function holidayQueryOptions(
   })
 }
 
-export function provincesQueryOptions(
+export function provincesQueryOptions<TData = Awaited<ReturnType<typeof provinces>>>(
   params?: Parameters<typeof provinces>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof provinces>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof provinces>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof provinces>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof provinces>>, ApiError, TData>({
     queryKey: provinceKeys.list(params),
     queryFn: () => provinces(params),
     staleTime: 0,
@@ -95,15 +95,15 @@ export function provincesQueryOptions(
   })
 }
 
-export function provinceQueryOptions(
+export function provinceQueryOptions<TData = Awaited<ReturnType<typeof province>>>(
   provinceId: Parameters<typeof province>[0],
   params?: Parameters<typeof province>[1],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof province>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof province>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof province>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof province>>, ApiError, TData>({
     queryKey: provinceKeys.detail(provinceId, params),
     queryFn: () => province(provinceId, params),
     staleTime: 0,
@@ -112,13 +112,13 @@ export function provinceQueryOptions(
   })
 }
 
-export function specQueryOptions(
+export function specQueryOptions<TData = Awaited<ReturnType<typeof spec>>>(
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof spec>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof spec>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof spec>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof spec>>, ApiError, TData>({
     queryKey: specKeys.list(),
     queryFn: () => spec(),
     staleTime: 0,
@@ -129,13 +129,13 @@ export function specQueryOptions(
 
 // ── Queries ──────────────────────────────────────────────────
 
-export function useRoot(
+export function useRoot<TData = Awaited<ReturnType<typeof root>>>(
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof root>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof root>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof root>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof root>>, ApiError, TData>({
     queryKey: apiKeys.list(),
     queryFn: () => root(),
     staleTime: 0,
@@ -144,14 +144,14 @@ export function useRoot(
   })
 }
 
-export function useHolidays(
+export function useHolidays<TData = Awaited<ReturnType<typeof holidays>>>(
   params?: Parameters<typeof holidays>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof holidays>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof holidays>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof holidays>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof holidays>>, ApiError, TData>({
     queryKey: holidayKeys.list(params),
     queryFn: () => holidays(params),
     staleTime: 0,
@@ -160,15 +160,15 @@ export function useHolidays(
   })
 }
 
-export function useHoliday(
+export function useHoliday<TData = Awaited<ReturnType<typeof holiday>>>(
   holidayId: Parameters<typeof holiday>[0] | undefined | null,
   params?: Parameters<typeof holiday>[1],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof holiday>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof holiday>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof holiday>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof holiday>>, ApiError, TData>({
     queryKey: holidayKeys.detail(holidayId!, params),
     queryFn: () => holiday(holidayId!, params),
     staleTime: 0,
@@ -178,14 +178,14 @@ export function useHoliday(
   })
 }
 
-export function useProvinces(
+export function useProvinces<TData = Awaited<ReturnType<typeof provinces>>>(
   params?: Parameters<typeof provinces>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof provinces>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof provinces>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof provinces>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof provinces>>, ApiError, TData>({
     queryKey: provinceKeys.list(params),
     queryFn: () => provinces(params),
     staleTime: 0,
@@ -194,15 +194,15 @@ export function useProvinces(
   })
 }
 
-export function useProvince(
+export function useProvince<TData = Awaited<ReturnType<typeof province>>>(
   provinceId: Parameters<typeof province>[0] | undefined | null,
   params?: Parameters<typeof province>[1],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof province>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof province>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof province>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof province>>, ApiError, TData>({
     queryKey: provinceKeys.detail(provinceId!, params),
     queryFn: () => province(provinceId!, params),
     staleTime: 0,
@@ -212,13 +212,13 @@ export function useProvince(
   })
 }
 
-export function useSpec(
+export function useSpec<TData = Awaited<ReturnType<typeof spec>>>(
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof spec>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof spec>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof spec>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof spec>>, ApiError, TData>({
     queryKey: specKeys.list(),
     queryFn: () => spec(),
     staleTime: 0,

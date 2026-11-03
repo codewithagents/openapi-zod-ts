@@ -45,14 +45,14 @@ export const ticketKeys = {
 
 // ── Query options factories ──────────────────────────────────
 
-export function getMuseumHoursQueryOptions(
+export function getMuseumHoursQueryOptions<TData = Awaited<ReturnType<typeof getMuseumHours>>>(
   params?: Parameters<typeof getMuseumHours>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getMuseumHours>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getMuseumHours>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getMuseumHours>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getMuseumHours>>, ApiError, TData>({
     queryKey: museumHourKeys.list(params),
     queryFn: () => getMuseumHours(params),
     staleTime: 0,
@@ -61,14 +61,16 @@ export function getMuseumHoursQueryOptions(
   })
 }
 
-export function listSpecialEventsQueryOptions(
+export function listSpecialEventsQueryOptions<
+  TData = Awaited<ReturnType<typeof listSpecialEvents>>,
+>(
   params?: Parameters<typeof listSpecialEvents>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof listSpecialEvents>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof listSpecialEvents>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof listSpecialEvents>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof listSpecialEvents>>, ApiError, TData>({
     queryKey: specialEventKeys.list(params),
     queryFn: () => listSpecialEvents(params),
     staleTime: 0,
@@ -77,14 +79,14 @@ export function listSpecialEventsQueryOptions(
   })
 }
 
-export function getSpecialEventQueryOptions(
+export function getSpecialEventQueryOptions<TData = Awaited<ReturnType<typeof getSpecialEvent>>>(
   eventId: Parameters<typeof getSpecialEvent>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getSpecialEvent>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getSpecialEvent>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getSpecialEvent>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getSpecialEvent>>, ApiError, TData>({
     queryKey: specialEventKeys.detail(eventId),
     queryFn: () => getSpecialEvent(eventId),
     staleTime: 0,
@@ -93,14 +95,14 @@ export function getSpecialEventQueryOptions(
   })
 }
 
-export function getTicketCodeQueryOptions(
+export function getTicketCodeQueryOptions<TData = Awaited<ReturnType<typeof getTicketCode>>>(
   ticketId: Parameters<typeof getTicketCode>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getTicketCode>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getTicketCode>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getTicketCode>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getTicketCode>>, ApiError, TData>({
     queryKey: ticketKeys.detail(ticketId),
     queryFn: () => getTicketCode(ticketId),
     staleTime: 0,
@@ -111,14 +113,14 @@ export function getTicketCodeQueryOptions(
 
 // ── Queries ──────────────────────────────────────────────────
 
-export function useGetMuseumHours(
+export function useGetMuseumHours<TData = Awaited<ReturnType<typeof getMuseumHours>>>(
   params?: Parameters<typeof getMuseumHours>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getMuseumHours>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getMuseumHours>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getMuseumHours>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getMuseumHours>>, ApiError, TData>({
     queryKey: museumHourKeys.list(params),
     queryFn: () => getMuseumHours(params),
     staleTime: 0,
@@ -127,13 +129,15 @@ export function useGetMuseumHours(
   })
 }
 
-export function useGetMuseumHoursInfinite(
+export function useGetMuseumHoursInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getMuseumHours>>>,
+>(
   params?: Parameters<typeof getMuseumHours>[0],
   options?: Omit<
     UseInfiniteQueryOptions<
       Awaited<ReturnType<typeof getMuseumHours>>,
       ApiError,
-      InfiniteData<Awaited<ReturnType<typeof getMuseumHours>>>,
+      TData,
       QueryKey,
       unknown
     >,
@@ -143,7 +147,7 @@ export function useGetMuseumHoursInfinite(
   return useInfiniteQuery<
     Awaited<ReturnType<typeof getMuseumHours>>,
     ApiError,
-    InfiniteData<Awaited<ReturnType<typeof getMuseumHours>>>,
+    TData,
     QueryKey,
     unknown
   >({
@@ -158,14 +162,14 @@ export function useGetMuseumHoursInfinite(
   })
 }
 
-export function useListSpecialEvents(
+export function useListSpecialEvents<TData = Awaited<ReturnType<typeof listSpecialEvents>>>(
   params?: Parameters<typeof listSpecialEvents>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof listSpecialEvents>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof listSpecialEvents>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof listSpecialEvents>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof listSpecialEvents>>, ApiError, TData>({
     queryKey: specialEventKeys.list(params),
     queryFn: () => listSpecialEvents(params),
     staleTime: 0,
@@ -174,13 +178,15 @@ export function useListSpecialEvents(
   })
 }
 
-export function useListSpecialEventsInfinite(
+export function useListSpecialEventsInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof listSpecialEvents>>>,
+>(
   params?: Parameters<typeof listSpecialEvents>[0],
   options?: Omit<
     UseInfiniteQueryOptions<
       Awaited<ReturnType<typeof listSpecialEvents>>,
       ApiError,
-      InfiniteData<Awaited<ReturnType<typeof listSpecialEvents>>>,
+      TData,
       QueryKey,
       unknown
     >,
@@ -190,7 +196,7 @@ export function useListSpecialEventsInfinite(
   return useInfiniteQuery<
     Awaited<ReturnType<typeof listSpecialEvents>>,
     ApiError,
-    InfiniteData<Awaited<ReturnType<typeof listSpecialEvents>>>,
+    TData,
     QueryKey,
     unknown
   >({
@@ -205,14 +211,14 @@ export function useListSpecialEventsInfinite(
   })
 }
 
-export function useGetSpecialEvent(
+export function useGetSpecialEvent<TData = Awaited<ReturnType<typeof getSpecialEvent>>>(
   eventId: Parameters<typeof getSpecialEvent>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getSpecialEvent>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getSpecialEvent>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getSpecialEvent>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getSpecialEvent>>, ApiError, TData>({
     queryKey: specialEventKeys.detail(eventId!),
     queryFn: () => getSpecialEvent(eventId!),
     staleTime: 0,
@@ -222,14 +228,14 @@ export function useGetSpecialEvent(
   })
 }
 
-export function useGetTicketCode(
+export function useGetTicketCode<TData = Awaited<ReturnType<typeof getTicketCode>>>(
   ticketId: Parameters<typeof getTicketCode>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getTicketCode>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getTicketCode>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getTicketCode>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getTicketCode>>, ApiError, TData>({
     queryKey: ticketKeys.detail(ticketId!),
     queryFn: () => getTicketCode(ticketId!),
     staleTime: 0,

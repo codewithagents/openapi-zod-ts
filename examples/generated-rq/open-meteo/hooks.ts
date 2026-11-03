@@ -12,14 +12,14 @@ export const v1Keys = {
 
 // ── Query options factories ──────────────────────────────────
 
-export function getV1ForecastQueryOptions(
+export function getV1ForecastQueryOptions<TData = Awaited<ReturnType<typeof getV1Forecast>>>(
   params: Parameters<typeof getV1Forecast>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getV1Forecast>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getV1Forecast>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getV1Forecast>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getV1Forecast>>, ApiError, TData>({
     queryKey: v1Keys.list(params),
     queryFn: () => getV1Forecast(params),
     staleTime: 0,
@@ -30,14 +30,14 @@ export function getV1ForecastQueryOptions(
 
 // ── Queries ──────────────────────────────────────────────────
 
-export function useGetV1Forecast(
+export function useGetV1Forecast<TData = Awaited<ReturnType<typeof getV1Forecast>>>(
   params: Parameters<typeof getV1Forecast>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getV1Forecast>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getV1Forecast>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getV1Forecast>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getV1Forecast>>, ApiError, TData>({
     queryKey: v1Keys.list(params),
     queryFn: () => getV1Forecast(params),
     staleTime: 0,

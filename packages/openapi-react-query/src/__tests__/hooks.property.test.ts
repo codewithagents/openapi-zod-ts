@@ -158,7 +158,7 @@ describe('property-based tests — generateHooks invariants', () => {
             { operationId?: string } | undefined
           if (!op?.operationId) continue
           const hookName = 'use' + op.operationId[0]!.toUpperCase() + op.operationId.slice(1)
-          expect(content).toContain(`export function ${hookName}(`)
+          expect(content).toContain(`export function ${hookName}<TData = `)
         }
       }),
       { numRuns: 300 }

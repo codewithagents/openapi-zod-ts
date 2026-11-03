@@ -16,11 +16,11 @@ export const postKeys = {
 
 // ── Query options factories ──────────────────────────────────
 
-export function listPostsQueryOptions(
+export function listPostsQueryOptions<TData = Awaited<ReturnType<typeof listPosts>>>(
   params?: Parameters<typeof listPosts>[0],
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listPosts>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listPosts>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return queryOptions<Awaited<ReturnType<typeof listPosts>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof listPosts>>, ApiError, TData>({
     queryKey: postKeys.list(params),
     queryFn: () => listPosts(params),
     staleTime: 0,
@@ -29,11 +29,11 @@ export function listPostsQueryOptions(
   })
 }
 
-export function getPostQueryOptions(
+export function getPostQueryOptions<TData = Awaited<ReturnType<typeof getPost>>>(
   id: Parameters<typeof getPost>[0],
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getPost>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getPost>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getPost>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getPost>>, ApiError, TData>({
     queryKey: postKeys.detail(id),
     queryFn: () => getPost(id),
     staleTime: 0,
@@ -44,11 +44,11 @@ export function getPostQueryOptions(
 
 // ── Queries ──────────────────────────────────────────────────
 
-export function useListPosts(
+export function useListPosts<TData = Awaited<ReturnType<typeof listPosts>>>(
   params?: Parameters<typeof listPosts>[0],
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listPosts>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listPosts>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return useQuery<Awaited<ReturnType<typeof listPosts>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof listPosts>>, ApiError, TData>({
     queryKey: postKeys.list(params),
     queryFn: () => listPosts(params),
     staleTime: 0,
@@ -57,11 +57,11 @@ export function useListPosts(
   })
 }
 
-export function useListPostsInfinite(
+export function useListPostsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof listPosts>>>>(
   params?: Parameters<typeof listPosts>[0],
-  options?: Omit<UseInfiniteQueryOptions<Awaited<ReturnType<typeof listPosts>>, ApiError, InfiniteData<Awaited<ReturnType<typeof listPosts>>>, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>,
+  options?: Omit<UseInfiniteQueryOptions<Awaited<ReturnType<typeof listPosts>>, ApiError, TData, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>,
 ) {
-  return useInfiniteQuery<Awaited<ReturnType<typeof listPosts>>, ApiError, InfiniteData<Awaited<ReturnType<typeof listPosts>>>, QueryKey, unknown>({
+  return useInfiniteQuery<Awaited<ReturnType<typeof listPosts>>, ApiError, TData, QueryKey, unknown>({
     queryKey: [...postKeys.list(params), 'infinite'],
     queryFn: ({ pageParam }) => listPosts({ ...params, "cursor": pageParam as never }),
     initialPageParam: undefined,
@@ -73,11 +73,11 @@ export function useListPostsInfinite(
   })
 }
 
-export function useGetPost(
+export function useGetPost<TData = Awaited<ReturnType<typeof getPost>>>(
   id: Parameters<typeof getPost>[0] | undefined | null,
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getPost>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getPost>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return useQuery<Awaited<ReturnType<typeof getPost>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getPost>>, ApiError, TData>({
     queryKey: postKeys.detail(id!),
     queryFn: () => getPost(id!),
     staleTime: 0,
@@ -116,11 +116,11 @@ export const taskKeys = {
 
 // ── Query options factories ──────────────────────────────────
 
-export function listTasksQueryOptions(
+export function listTasksQueryOptions<TData = Awaited<ReturnType<typeof listTasks>>>(
   params?: Parameters<typeof listTasks>[0],
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return queryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>({
     queryKey: taskKeys.list(params),
     queryFn: () => listTasks(params),
     staleTime: 0,
@@ -129,11 +129,11 @@ export function listTasksQueryOptions(
   })
 }
 
-export function getTaskQueryOptions(
+export function getTaskQueryOptions<TData = Awaited<ReturnType<typeof getTask>>>(
   id: Parameters<typeof getTask>[0],
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>({
     queryKey: taskKeys.detail(id),
     queryFn: () => getTask(id),
     staleTime: 0,
@@ -144,11 +144,11 @@ export function getTaskQueryOptions(
 
 // ── Queries ──────────────────────────────────────────────────
 
-export function useListTasks(
+export function useListTasks<TData = Awaited<ReturnType<typeof listTasks>>>(
   params?: Parameters<typeof listTasks>[0],
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return useQuery<Awaited<ReturnType<typeof listTasks>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>({
     queryKey: taskKeys.list(params),
     queryFn: () => listTasks(params),
     staleTime: 0,
@@ -157,11 +157,11 @@ export function useListTasks(
   })
 }
 
-export function useListTasksInfinite(
+export function useListTasksInfinite<TData = InfiniteData<Awaited<ReturnType<typeof listTasks>>>>(
   params?: Parameters<typeof listTasks>[0],
-  options?: Omit<UseInfiniteQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, InfiniteData<Awaited<ReturnType<typeof listTasks>>>, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>,
+  options?: Omit<UseInfiniteQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>,
 ) {
-  return useInfiniteQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, InfiniteData<Awaited<ReturnType<typeof listTasks>>>, QueryKey, unknown>({
+  return useInfiniteQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, TData, QueryKey, unknown>({
     queryKey: [...taskKeys.list(params), 'infinite'],
     queryFn: ({ pageParam }) => listTasks({ ...params, "page": pageParam as never }),
     initialPageParam: undefined,
@@ -173,11 +173,11 @@ export function useListTasksInfinite(
   })
 }
 
-export function useGetTask(
+export function useGetTask<TData = Awaited<ReturnType<typeof getTask>>>(
   id: Parameters<typeof getTask>[0] | undefined | null,
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return useQuery<Awaited<ReturnType<typeof getTask>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getTask>>, ApiError, TData>({
     queryKey: taskKeys.detail(id!),
     queryFn: () => getTask(id!),
     staleTime: 0,
@@ -251,11 +251,11 @@ export const taskKeys = {
 
 // ── Query options factories ──────────────────────────────────
 
-export function listTasksQueryOptions(
+export function listTasksQueryOptions<TData = Awaited<ReturnType<typeof listTasks>>>(
   params?: Parameters<typeof listTasks>[0],
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return queryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>({
     queryKey: taskKeys.list(params),
     queryFn: () => listTasks(params),
     staleTime: 60000,
@@ -264,11 +264,11 @@ export function listTasksQueryOptions(
   })
 }
 
-export function getTaskQueryOptions(
+export function getTaskQueryOptions<TData = Awaited<ReturnType<typeof getTask>>>(
   id: Parameters<typeof getTask>[0],
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>({
     queryKey: taskKeys.detail(id),
     queryFn: () => getTask(id),
     staleTime: 60000,
@@ -279,11 +279,11 @@ export function getTaskQueryOptions(
 
 // ── Queries ──────────────────────────────────────────────────
 
-export function useListTasks(
+export function useListTasks<TData = Awaited<ReturnType<typeof listTasks>>>(
   params?: Parameters<typeof listTasks>[0],
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return useQuery<Awaited<ReturnType<typeof listTasks>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>({
     queryKey: taskKeys.list(params),
     queryFn: () => listTasks(params),
     staleTime: 60000,
@@ -292,11 +292,11 @@ export function useListTasks(
   })
 }
 
-export function useSuspenseListTasks(
+export function useSuspenseListTasks<TData = Awaited<ReturnType<typeof listTasks>>>(
   params?: Parameters<typeof listTasks>[0],
-  options?: Omit<UseSuspenseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseSuspenseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return useSuspenseQuery<Awaited<ReturnType<typeof listTasks>>, ApiError>({
+  return useSuspenseQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>({
     queryKey: taskKeys.list(params),
     queryFn: () => listTasks(params),
     staleTime: 60000,
@@ -305,11 +305,11 @@ export function useSuspenseListTasks(
   })
 }
 
-export function useListTasksInfinite(
+export function useListTasksInfinite<TData = InfiniteData<Awaited<ReturnType<typeof listTasks>>>>(
   params?: Parameters<typeof listTasks>[0],
-  options?: Omit<UseInfiniteQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, InfiniteData<Awaited<ReturnType<typeof listTasks>>>, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>,
+  options?: Omit<UseInfiniteQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>,
 ) {
-  return useInfiniteQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, InfiniteData<Awaited<ReturnType<typeof listTasks>>>, QueryKey, unknown>({
+  return useInfiniteQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, TData, QueryKey, unknown>({
     queryKey: [...taskKeys.list(params), 'infinite'],
     queryFn: ({ pageParam }) => listTasks({ ...params, "page": pageParam as never }),
     initialPageParam: undefined,
@@ -321,11 +321,11 @@ export function useListTasksInfinite(
   })
 }
 
-export function useGetTask(
+export function useGetTask<TData = Awaited<ReturnType<typeof getTask>>>(
   id: Parameters<typeof getTask>[0] | undefined | null,
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return useQuery<Awaited<ReturnType<typeof getTask>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getTask>>, ApiError, TData>({
     queryKey: taskKeys.detail(id!),
     queryFn: () => getTask(id!),
     staleTime: 60000,
@@ -335,11 +335,11 @@ export function useGetTask(
   })
 }
 
-export function useSuspenseGetTask(
+export function useSuspenseGetTask<TData = Awaited<ReturnType<typeof getTask>>>(
   id: Parameters<typeof getTask>[0],
-  options?: Omit<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return useSuspenseQuery<Awaited<ReturnType<typeof getTask>>, ApiError>({
+  return useSuspenseQuery<Awaited<ReturnType<typeof getTask>>, ApiError, TData>({
     queryKey: taskKeys.detail(id),
     queryFn: () => getTask(id),
     staleTime: 60000,
@@ -412,11 +412,11 @@ export const taskKeys = {
 
 // ── Query options factories ──────────────────────────────────
 
-export function listTasksQueryOptions(
+export function listTasksQueryOptions<TData = Awaited<ReturnType<typeof listTasks>>>(
   params?: Parameters<typeof listTasks>[0],
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return queryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>({
     queryKey: taskKeys.list(params),
     queryFn: () => listTasks(params),
     staleTime: 0,
@@ -425,11 +425,11 @@ export function listTasksQueryOptions(
   })
 }
 
-export function getTaskQueryOptions(
+export function getTaskQueryOptions<TData = Awaited<ReturnType<typeof getTask>>>(
   id: Parameters<typeof getTask>[0],
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>({
     queryKey: taskKeys.detail(id),
     queryFn: () => getTask(id),
     staleTime: 0,
@@ -440,11 +440,11 @@ export function getTaskQueryOptions(
 
 // ── Queries ──────────────────────────────────────────────────
 
-export function useListTasks(
+export function useListTasks<TData = Awaited<ReturnType<typeof listTasks>>>(
   params?: Parameters<typeof listTasks>[0],
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return useQuery<Awaited<ReturnType<typeof listTasks>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>({
     queryKey: taskKeys.list(params),
     queryFn: () => listTasks(params),
     staleTime: 0,
@@ -453,11 +453,11 @@ export function useListTasks(
   })
 }
 
-export function useListTasksInfinite(
+export function useListTasksInfinite<TData = InfiniteData<Awaited<ReturnType<typeof listTasks>>>>(
   params?: Parameters<typeof listTasks>[0],
-  options?: Omit<UseInfiniteQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, InfiniteData<Awaited<ReturnType<typeof listTasks>>>, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>,
+  options?: Omit<UseInfiniteQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>,
 ) {
-  return useInfiniteQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, InfiniteData<Awaited<ReturnType<typeof listTasks>>>, QueryKey, unknown>({
+  return useInfiniteQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, TData, QueryKey, unknown>({
     queryKey: [...taskKeys.list(params), 'infinite'],
     queryFn: ({ pageParam }) => listTasks({ ...params, "page": pageParam as never }),
     initialPageParam: undefined,
@@ -469,11 +469,11 @@ export function useListTasksInfinite(
   })
 }
 
-export function useGetTask(
+export function useGetTask<TData = Awaited<ReturnType<typeof getTask>>>(
   id: Parameters<typeof getTask>[0] | undefined | null,
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return useQuery<Awaited<ReturnType<typeof getTask>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getTask>>, ApiError, TData>({
     queryKey: taskKeys.detail(id!),
     queryFn: () => getTask(id!),
     staleTime: 0,
@@ -530,11 +530,11 @@ export const taskKeys = {
 
 // ── Query options factories ──────────────────────────────────
 
-export function listTasksQueryOptions(
+export function listTasksQueryOptions<TData = Awaited<ReturnType<typeof listTasks>>>(
   params?: Parameters<typeof listTasks>[0],
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return queryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>({
     queryKey: taskKeys.list(params),
     queryFn: () => listTasks(params),
     staleTime: 60000,
@@ -543,11 +543,11 @@ export function listTasksQueryOptions(
   })
 }
 
-export function getTaskQueryOptions(
+export function getTaskQueryOptions<TData = Awaited<ReturnType<typeof getTask>>>(
   id: Parameters<typeof getTask>[0],
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>({
     queryKey: taskKeys.detail(id),
     queryFn: () => getTask(id),
     staleTime: 60000,
@@ -558,11 +558,11 @@ export function getTaskQueryOptions(
 
 // ── Queries ──────────────────────────────────────────────────
 
-export function useListTasks(
+export function useListTasks<TData = Awaited<ReturnType<typeof listTasks>>>(
   params?: Parameters<typeof listTasks>[0],
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return useQuery<Awaited<ReturnType<typeof listTasks>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>({
     queryKey: taskKeys.list(params),
     queryFn: () => listTasks(params),
     staleTime: 60000,
@@ -571,11 +571,11 @@ export function useListTasks(
   })
 }
 
-export function useListTasksInfinite(
+export function useListTasksInfinite<TData = InfiniteData<Awaited<ReturnType<typeof listTasks>>>>(
   params?: Parameters<typeof listTasks>[0],
-  options?: Omit<UseInfiniteQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, InfiniteData<Awaited<ReturnType<typeof listTasks>>>, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>,
+  options?: Omit<UseInfiniteQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>,
 ) {
-  return useInfiniteQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, InfiniteData<Awaited<ReturnType<typeof listTasks>>>, QueryKey, unknown>({
+  return useInfiniteQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, TData, QueryKey, unknown>({
     queryKey: [...taskKeys.list(params), 'infinite'],
     queryFn: ({ pageParam }) => listTasks({ ...params, "page": pageParam as never }),
     initialPageParam: undefined,
@@ -587,11 +587,11 @@ export function useListTasksInfinite(
   })
 }
 
-export function useGetTask(
+export function useGetTask<TData = Awaited<ReturnType<typeof getTask>>>(
   id: Parameters<typeof getTask>[0] | undefined | null,
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return useQuery<Awaited<ReturnType<typeof getTask>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getTask>>, ApiError, TData>({
     queryKey: taskKeys.detail(id!),
     queryFn: () => getTask(id!),
     staleTime: 60000,
@@ -648,11 +648,11 @@ export const taskKeys = {
 
 // ── Query options factories ──────────────────────────────────
 
-export function listTasksQueryOptions(
+export function listTasksQueryOptions<TData = Awaited<ReturnType<typeof listTasks>>>(
   params?: Parameters<typeof listTasks>[0],
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return queryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>({
     queryKey: taskKeys.list(params),
     queryFn: () => listTasks(params),
     staleTime: 0,
@@ -661,11 +661,11 @@ export function listTasksQueryOptions(
   })
 }
 
-export function getTaskQueryOptions(
+export function getTaskQueryOptions<TData = Awaited<ReturnType<typeof getTask>>>(
   id: Parameters<typeof getTask>[0],
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>({
     queryKey: taskKeys.detail(id),
     queryFn: () => getTask(id),
     staleTime: 0,
@@ -676,11 +676,11 @@ export function getTaskQueryOptions(
 
 // ── Queries ──────────────────────────────────────────────────
 
-export function useListTasks(
+export function useListTasks<TData = Awaited<ReturnType<typeof listTasks>>>(
   params?: Parameters<typeof listTasks>[0],
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return useQuery<Awaited<ReturnType<typeof listTasks>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>({
     queryKey: taskKeys.list(params),
     queryFn: () => listTasks(params),
     staleTime: 0,
@@ -689,11 +689,11 @@ export function useListTasks(
   })
 }
 
-export function useSuspenseListTasks(
+export function useSuspenseListTasks<TData = Awaited<ReturnType<typeof listTasks>>>(
   params?: Parameters<typeof listTasks>[0],
-  options?: Omit<UseSuspenseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseSuspenseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return useSuspenseQuery<Awaited<ReturnType<typeof listTasks>>, ApiError>({
+  return useSuspenseQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>({
     queryKey: taskKeys.list(params),
     queryFn: () => listTasks(params),
     staleTime: 0,
@@ -702,11 +702,11 @@ export function useSuspenseListTasks(
   })
 }
 
-export function useListTasksInfinite(
+export function useListTasksInfinite<TData = InfiniteData<Awaited<ReturnType<typeof listTasks>>>>(
   params?: Parameters<typeof listTasks>[0],
-  options?: Omit<UseInfiniteQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, InfiniteData<Awaited<ReturnType<typeof listTasks>>>, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>,
+  options?: Omit<UseInfiniteQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>,
 ) {
-  return useInfiniteQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, InfiniteData<Awaited<ReturnType<typeof listTasks>>>, QueryKey, unknown>({
+  return useInfiniteQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, TData, QueryKey, unknown>({
     queryKey: [...taskKeys.list(params), 'infinite'],
     queryFn: ({ pageParam }) => listTasks({ ...params, "page": pageParam as never }),
     initialPageParam: undefined,
@@ -718,11 +718,11 @@ export function useListTasksInfinite(
   })
 }
 
-export function useGetTask(
+export function useGetTask<TData = Awaited<ReturnType<typeof getTask>>>(
   id: Parameters<typeof getTask>[0] | undefined | null,
-  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return useQuery<Awaited<ReturnType<typeof getTask>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getTask>>, ApiError, TData>({
     queryKey: taskKeys.detail(id!),
     queryFn: () => getTask(id!),
     staleTime: 0,
@@ -732,11 +732,11 @@ export function useGetTask(
   })
 }
 
-export function useSuspenseGetTask(
+export function useSuspenseGetTask<TData = Awaited<ReturnType<typeof getTask>>>(
   id: Parameters<typeof getTask>[0],
-  options?: Omit<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>, 'queryKey' | 'queryFn'>,
+  options?: Omit<UseSuspenseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>, 'queryKey' | 'queryFn'>,
 ) {
-  return useSuspenseQuery<Awaited<ReturnType<typeof getTask>>, ApiError>({
+  return useSuspenseQuery<Awaited<ReturnType<typeof getTask>>, ApiError, TData>({
     queryKey: taskKeys.detail(id),
     queryFn: () => getTask(id),
     staleTime: 0,

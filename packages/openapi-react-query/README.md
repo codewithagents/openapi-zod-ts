@@ -161,6 +161,23 @@ All types are derived from the generated client, no duplication:
 - Data type: `Awaited<ReturnType<typeof listTasks>>`
 - Variables type: `Parameters<typeof createTask>[0]`
 
+## Typed `select` transforms
+
+Every query hook, `queryOptions` factory, `useSuspense*` hook and `useXxxInfinite` hook takes a `TData` generic that defaults to the response type. A `select` transform therefore changes the type of `data`:
+
+```ts
+const { data } = useGetTask(id, { select: (task) => task.title })
+//      ^? string | undefined
+
+const { data: count } = useListTasks({}, { select: (page) => page.items.length })
+//      ^? number | undefined
+
+// The queryOptions factory carries the select type into useQuery / useQueries
+useQuery(getTaskQueryOptions(id, { select: (task) => task.id }))
+```
+
+Without `select`, `data` is still the raw response type, so existing call sites (including explicit `UseQueryResult<Task, ApiError>` annotations) keep compiling.
+
 ## Next.js App Router SSR prefetch
 
 The generated `queryOptions` factories work in React Server Components (RSC) without any client-boundary workarounds. Prefetch on the server, then pass the dehydrated cache to the client:

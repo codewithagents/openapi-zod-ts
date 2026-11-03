@@ -31,14 +31,14 @@ export const taskKeys = {
 
 // ── Query options factories ──────────────────────────────────
 
-export function listTasksQueryOptions(
+export function listTasksQueryOptions<TData = Awaited<ReturnType<typeof listTasks>>>(
   params?: Parameters<typeof listTasks>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>({
     queryKey: taskKeys.list(params),
     queryFn: () => listTasks(params),
     staleTime: 30000,
@@ -47,14 +47,14 @@ export function listTasksQueryOptions(
   })
 }
 
-export function getTaskQueryOptions(
+export function getTaskQueryOptions<TData = Awaited<ReturnType<typeof getTask>>>(
   id: Parameters<typeof getTask>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>({
     queryKey: taskKeys.detail(id),
     queryFn: () => getTask(id),
     staleTime: 30000,
@@ -65,14 +65,14 @@ export function getTaskQueryOptions(
 
 // ── Queries ──────────────────────────────────────────────────
 
-export function useListTasks(
+export function useListTasks<TData = Awaited<ReturnType<typeof listTasks>>>(
   params?: Parameters<typeof listTasks>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof listTasks>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>({
     queryKey: taskKeys.list(params),
     queryFn: () => listTasks(params),
     staleTime: 30000,
@@ -81,13 +81,13 @@ export function useListTasks(
   })
 }
 
-export function useListTasksInfinite(
+export function useListTasksInfinite<TData = InfiniteData<Awaited<ReturnType<typeof listTasks>>>>(
   params?: Parameters<typeof listTasks>[0],
   options?: Omit<
     UseInfiniteQueryOptions<
       Awaited<ReturnType<typeof listTasks>>,
       ApiError,
-      InfiniteData<Awaited<ReturnType<typeof listTasks>>>,
+      TData,
       QueryKey,
       unknown
     >,
@@ -97,7 +97,7 @@ export function useListTasksInfinite(
   return useInfiniteQuery<
     Awaited<ReturnType<typeof listTasks>>,
     ApiError,
-    InfiniteData<Awaited<ReturnType<typeof listTasks>>>,
+    TData,
     QueryKey,
     unknown
   >({
@@ -112,14 +112,14 @@ export function useListTasksInfinite(
   })
 }
 
-export function useGetTask(
+export function useGetTask<TData = Awaited<ReturnType<typeof getTask>>>(
   id: Parameters<typeof getTask>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getTask>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getTask>>, ApiError, TData>({
     queryKey: taskKeys.detail(id!),
     queryFn: () => getTask(id!),
     staleTime: 30000,

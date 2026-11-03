@@ -235,14 +235,14 @@ export const eventKeys = {
 
 // ── Query options factories ──────────────────────────────────
 
-export function getEmailsQueryOptions(
+export function getEmailsQueryOptions<TData = Awaited<ReturnType<typeof getEmails>>>(
   params?: Parameters<typeof getEmails>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getEmails>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getEmails>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getEmails>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getEmails>>, ApiError, TData>({
     queryKey: emailKeys.getEmails(params),
     queryFn: () => getEmails(params),
     staleTime: 0,
@@ -251,14 +251,16 @@ export function getEmailsQueryOptions(
   })
 }
 
-export function getEmailsByEmailIdQueryOptions(
+export function getEmailsByEmailIdQueryOptions<
+  TData = Awaited<ReturnType<typeof getEmailsByEmailId>>,
+>(
   emailId: Parameters<typeof getEmailsByEmailId>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getEmailsByEmailId>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getEmailsByEmailId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getEmailsByEmailId>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getEmailsByEmailId>>, ApiError, TData>({
     queryKey: emailKeys.getEmailsByEmailId(emailId),
     queryFn: () => getEmailsByEmailId(emailId),
     staleTime: 0,
@@ -267,15 +269,17 @@ export function getEmailsByEmailIdQueryOptions(
   })
 }
 
-export function getEmailsByEmailIdAttachmentsQueryOptions(
+export function getEmailsByEmailIdAttachmentsQueryOptions<
+  TData = Awaited<ReturnType<typeof getEmailsByEmailIdAttachments>>,
+>(
   emailId: Parameters<typeof getEmailsByEmailIdAttachments>[0],
   params?: Parameters<typeof getEmailsByEmailIdAttachments>[1],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getEmailsByEmailIdAttachments>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getEmailsByEmailIdAttachments>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getEmailsByEmailIdAttachments>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getEmailsByEmailIdAttachments>>, ApiError, TData>({
     queryKey: emailKeys.getEmailsByEmailIdAttachments(emailId, params),
     queryFn: () => getEmailsByEmailIdAttachments(emailId, params),
     staleTime: 0,
@@ -284,20 +288,24 @@ export function getEmailsByEmailIdAttachmentsQueryOptions(
   })
 }
 
-export function getEmailsByEmailIdAttachmentsByAttachmentIdQueryOptions(
+export function getEmailsByEmailIdAttachmentsByAttachmentIdQueryOptions<
+  TData = Awaited<ReturnType<typeof getEmailsByEmailIdAttachmentsByAttachmentId>>,
+>(
   emailId: Parameters<typeof getEmailsByEmailIdAttachmentsByAttachmentId>[0],
   attachmentId: Parameters<typeof getEmailsByEmailIdAttachmentsByAttachmentId>[1],
   options?: Omit<
     UseQueryOptions<
       Awaited<ReturnType<typeof getEmailsByEmailIdAttachmentsByAttachmentId>>,
-      ApiError
+      ApiError,
+      TData
     >,
     'queryKey' | 'queryFn'
   >
 ) {
   return queryOptions<
     Awaited<ReturnType<typeof getEmailsByEmailIdAttachmentsByAttachmentId>>,
-    ApiError
+    ApiError,
+    TData
   >({
     queryKey: emailKeys.getEmailsByEmailIdAttachmentsByAttachmentId(emailId, attachmentId),
     queryFn: () => getEmailsByEmailIdAttachmentsByAttachmentId(emailId, attachmentId),
@@ -307,14 +315,16 @@ export function getEmailsByEmailIdAttachmentsByAttachmentIdQueryOptions(
   })
 }
 
-export function getEmailsReceivingQueryOptions(
+export function getEmailsReceivingQueryOptions<
+  TData = Awaited<ReturnType<typeof getEmailsReceiving>>,
+>(
   params?: Parameters<typeof getEmailsReceiving>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getEmailsReceiving>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getEmailsReceiving>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getEmailsReceiving>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getEmailsReceiving>>, ApiError, TData>({
     queryKey: emailKeys.getEmailsReceiving(params),
     queryFn: () => getEmailsReceiving(params),
     staleTime: 0,
@@ -323,14 +333,16 @@ export function getEmailsReceivingQueryOptions(
   })
 }
 
-export function getEmailsReceivingByEmailIdQueryOptions(
+export function getEmailsReceivingByEmailIdQueryOptions<
+  TData = Awaited<ReturnType<typeof getEmailsReceivingByEmailId>>,
+>(
   emailId: Parameters<typeof getEmailsReceivingByEmailId>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getEmailsReceivingByEmailId>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getEmailsReceivingByEmailId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getEmailsReceivingByEmailId>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getEmailsReceivingByEmailId>>, ApiError, TData>({
     queryKey: emailKeys.getEmailsReceivingByEmailId(emailId),
     queryFn: () => getEmailsReceivingByEmailId(emailId),
     staleTime: 0,
@@ -339,39 +351,51 @@ export function getEmailsReceivingByEmailIdQueryOptions(
   })
 }
 
-export function getEmailsReceivingByEmailIdAttachmentsQueryOptions(
+export function getEmailsReceivingByEmailIdAttachmentsQueryOptions<
+  TData = Awaited<ReturnType<typeof getEmailsReceivingByEmailIdAttachments>>,
+>(
   emailId: Parameters<typeof getEmailsReceivingByEmailIdAttachments>[0],
   params?: Parameters<typeof getEmailsReceivingByEmailIdAttachments>[1],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getEmailsReceivingByEmailIdAttachments>>, ApiError>,
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getEmailsReceivingByEmailIdAttachments>>,
+      ApiError,
+      TData
+    >,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getEmailsReceivingByEmailIdAttachments>>, ApiError>(
-    {
-      queryKey: emailKeys.getEmailsReceivingByEmailIdAttachments(emailId, params),
-      queryFn: () => getEmailsReceivingByEmailIdAttachments(emailId, params),
-      staleTime: 0,
-      gcTime: 300000,
-      ...options,
-    }
-  )
+  return queryOptions<
+    Awaited<ReturnType<typeof getEmailsReceivingByEmailIdAttachments>>,
+    ApiError,
+    TData
+  >({
+    queryKey: emailKeys.getEmailsReceivingByEmailIdAttachments(emailId, params),
+    queryFn: () => getEmailsReceivingByEmailIdAttachments(emailId, params),
+    staleTime: 0,
+    gcTime: 300000,
+    ...options,
+  })
 }
 
-export function getEmailsReceivingByEmailIdAttachmentsByAttachmentIdQueryOptions(
+export function getEmailsReceivingByEmailIdAttachmentsByAttachmentIdQueryOptions<
+  TData = Awaited<ReturnType<typeof getEmailsReceivingByEmailIdAttachmentsByAttachmentId>>,
+>(
   emailId: Parameters<typeof getEmailsReceivingByEmailIdAttachmentsByAttachmentId>[0],
   attachmentId: Parameters<typeof getEmailsReceivingByEmailIdAttachmentsByAttachmentId>[1],
   options?: Omit<
     UseQueryOptions<
       Awaited<ReturnType<typeof getEmailsReceivingByEmailIdAttachmentsByAttachmentId>>,
-      ApiError
+      ApiError,
+      TData
     >,
     'queryKey' | 'queryFn'
   >
 ) {
   return queryOptions<
     Awaited<ReturnType<typeof getEmailsReceivingByEmailIdAttachmentsByAttachmentId>>,
-    ApiError
+    ApiError,
+    TData
   >({
     queryKey: emailKeys.getEmailsReceivingByEmailIdAttachmentsByAttachmentId(emailId, attachmentId),
     queryFn: () => getEmailsReceivingByEmailIdAttachmentsByAttachmentId(emailId, attachmentId),
@@ -381,14 +405,14 @@ export function getEmailsReceivingByEmailIdAttachmentsByAttachmentIdQueryOptions
   })
 }
 
-export function getDomainsQueryOptions(
+export function getDomainsQueryOptions<TData = Awaited<ReturnType<typeof getDomains>>>(
   params?: Parameters<typeof getDomains>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getDomains>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getDomains>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getDomains>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getDomains>>, ApiError, TData>({
     queryKey: domainKeys.list(params),
     queryFn: () => getDomains(params),
     staleTime: 0,
@@ -397,14 +421,16 @@ export function getDomainsQueryOptions(
   })
 }
 
-export function getDomainsByDomainIdQueryOptions(
+export function getDomainsByDomainIdQueryOptions<
+  TData = Awaited<ReturnType<typeof getDomainsByDomainId>>,
+>(
   domainId: Parameters<typeof getDomainsByDomainId>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getDomainsByDomainId>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getDomainsByDomainId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getDomainsByDomainId>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getDomainsByDomainId>>, ApiError, TData>({
     queryKey: domainKeys.detail(domainId),
     queryFn: () => getDomainsByDomainId(domainId),
     staleTime: 0,
@@ -413,14 +439,14 @@ export function getDomainsByDomainIdQueryOptions(
   })
 }
 
-export function getApiKeysQueryOptions(
+export function getApiKeysQueryOptions<TData = Awaited<ReturnType<typeof getApiKeys>>>(
   params?: Parameters<typeof getApiKeys>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getApiKeys>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getApiKeys>>, ApiError, TData>({
     queryKey: apiKeyKeys.list(params),
     queryFn: () => getApiKeys(params),
     staleTime: 0,
@@ -429,14 +455,14 @@ export function getApiKeysQueryOptions(
   })
 }
 
-export function getTemplatesQueryOptions(
+export function getTemplatesQueryOptions<TData = Awaited<ReturnType<typeof getTemplates>>>(
   params?: Parameters<typeof getTemplates>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getTemplates>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getTemplates>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getTemplates>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getTemplates>>, ApiError, TData>({
     queryKey: templateKeys.list(params),
     queryFn: () => getTemplates(params),
     staleTime: 0,
@@ -445,14 +471,14 @@ export function getTemplatesQueryOptions(
   })
 }
 
-export function getTemplatesByIdQueryOptions(
+export function getTemplatesByIdQueryOptions<TData = Awaited<ReturnType<typeof getTemplatesById>>>(
   id: Parameters<typeof getTemplatesById>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getTemplatesById>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getTemplatesById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getTemplatesById>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getTemplatesById>>, ApiError, TData>({
     queryKey: templateKeys.detail(id),
     queryFn: () => getTemplatesById(id),
     staleTime: 0,
@@ -462,13 +488,13 @@ export function getTemplatesByIdQueryOptions(
 }
 
 /** @deprecated */
-export function getAudiencesQueryOptions(
+export function getAudiencesQueryOptions<TData = Awaited<ReturnType<typeof getAudiences>>>(
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getAudiences>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getAudiences>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getAudiences>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getAudiences>>, ApiError, TData>({
     queryKey: audienceKeys.list(),
     queryFn: () => getAudiences(),
     staleTime: 0,
@@ -478,14 +504,14 @@ export function getAudiencesQueryOptions(
 }
 
 /** @deprecated */
-export function getAudiencesByIdQueryOptions(
+export function getAudiencesByIdQueryOptions<TData = Awaited<ReturnType<typeof getAudiencesById>>>(
   id: Parameters<typeof getAudiencesById>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getAudiencesById>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getAudiencesById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getAudiencesById>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getAudiencesById>>, ApiError, TData>({
     queryKey: audienceKeys.detail(id),
     queryFn: () => getAudiencesById(id),
     staleTime: 0,
@@ -494,14 +520,14 @@ export function getAudiencesByIdQueryOptions(
   })
 }
 
-export function getContactsQueryOptions(
+export function getContactsQueryOptions<TData = Awaited<ReturnType<typeof getContacts>>>(
   params?: Parameters<typeof getContacts>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getContacts>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getContacts>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getContacts>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getContacts>>, ApiError, TData>({
     queryKey: contactKeys.list(params),
     queryFn: () => getContacts(params),
     staleTime: 0,
@@ -510,14 +536,14 @@ export function getContactsQueryOptions(
   })
 }
 
-export function getContactsByIdQueryOptions(
+export function getContactsByIdQueryOptions<TData = Awaited<ReturnType<typeof getContactsById>>>(
   id: Parameters<typeof getContactsById>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getContactsById>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getContactsById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getContactsById>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getContactsById>>, ApiError, TData>({
     queryKey: contactKeys.getContactsById(id),
     queryFn: () => getContactsById(id),
     staleTime: 0,
@@ -526,14 +552,14 @@ export function getContactsByIdQueryOptions(
   })
 }
 
-export function getBroadcastsQueryOptions(
+export function getBroadcastsQueryOptions<TData = Awaited<ReturnType<typeof getBroadcasts>>>(
   params?: Parameters<typeof getBroadcasts>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getBroadcasts>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getBroadcasts>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getBroadcasts>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getBroadcasts>>, ApiError, TData>({
     queryKey: broadcastKeys.list(params),
     queryFn: () => getBroadcasts(params),
     staleTime: 0,
@@ -542,14 +568,16 @@ export function getBroadcastsQueryOptions(
   })
 }
 
-export function getBroadcastsByIdQueryOptions(
+export function getBroadcastsByIdQueryOptions<
+  TData = Awaited<ReturnType<typeof getBroadcastsById>>,
+>(
   id: Parameters<typeof getBroadcastsById>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getBroadcastsById>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getBroadcastsById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getBroadcastsById>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getBroadcastsById>>, ApiError, TData>({
     queryKey: broadcastKeys.detail(id),
     queryFn: () => getBroadcastsById(id),
     staleTime: 0,
@@ -558,14 +586,14 @@ export function getBroadcastsByIdQueryOptions(
   })
 }
 
-export function getWebhooksQueryOptions(
+export function getWebhooksQueryOptions<TData = Awaited<ReturnType<typeof getWebhooks>>>(
   params?: Parameters<typeof getWebhooks>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getWebhooks>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getWebhooks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getWebhooks>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getWebhooks>>, ApiError, TData>({
     queryKey: webhookKeys.list(params),
     queryFn: () => getWebhooks(params),
     staleTime: 0,
@@ -574,14 +602,16 @@ export function getWebhooksQueryOptions(
   })
 }
 
-export function getWebhooksByWebhookIdQueryOptions(
+export function getWebhooksByWebhookIdQueryOptions<
+  TData = Awaited<ReturnType<typeof getWebhooksByWebhookId>>,
+>(
   webhookId: Parameters<typeof getWebhooksByWebhookId>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getWebhooksByWebhookId>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getWebhooksByWebhookId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getWebhooksByWebhookId>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getWebhooksByWebhookId>>, ApiError, TData>({
     queryKey: webhookKeys.detail(webhookId),
     queryFn: () => getWebhooksByWebhookId(webhookId),
     staleTime: 0,
@@ -590,14 +620,14 @@ export function getWebhooksByWebhookIdQueryOptions(
   })
 }
 
-export function getSegmentsQueryOptions(
+export function getSegmentsQueryOptions<TData = Awaited<ReturnType<typeof getSegments>>>(
   params?: Parameters<typeof getSegments>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getSegments>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getSegments>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getSegments>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getSegments>>, ApiError, TData>({
     queryKey: segmentKeys.list(params),
     queryFn: () => getSegments(params),
     staleTime: 0,
@@ -606,14 +636,14 @@ export function getSegmentsQueryOptions(
   })
 }
 
-export function getSegmentsByIdQueryOptions(
+export function getSegmentsByIdQueryOptions<TData = Awaited<ReturnType<typeof getSegmentsById>>>(
   id: Parameters<typeof getSegmentsById>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getSegmentsById>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getSegmentsById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getSegmentsById>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getSegmentsById>>, ApiError, TData>({
     queryKey: segmentKeys.detail(id),
     queryFn: () => getSegmentsById(id),
     staleTime: 0,
@@ -622,14 +652,14 @@ export function getSegmentsByIdQueryOptions(
   })
 }
 
-export function getTopicsQueryOptions(
+export function getTopicsQueryOptions<TData = Awaited<ReturnType<typeof getTopics>>>(
   params?: Parameters<typeof getTopics>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getTopics>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getTopics>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getTopics>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getTopics>>, ApiError, TData>({
     queryKey: topicKeys.list(params),
     queryFn: () => getTopics(params),
     staleTime: 0,
@@ -638,14 +668,14 @@ export function getTopicsQueryOptions(
   })
 }
 
-export function getTopicsByIdQueryOptions(
+export function getTopicsByIdQueryOptions<TData = Awaited<ReturnType<typeof getTopicsById>>>(
   id: Parameters<typeof getTopicsById>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getTopicsById>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getTopicsById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getTopicsById>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getTopicsById>>, ApiError, TData>({
     queryKey: topicKeys.detail(id),
     queryFn: () => getTopicsById(id),
     staleTime: 0,
@@ -654,14 +684,16 @@ export function getTopicsByIdQueryOptions(
   })
 }
 
-export function getContactPropertiesQueryOptions(
+export function getContactPropertiesQueryOptions<
+  TData = Awaited<ReturnType<typeof getContactProperties>>,
+>(
   params?: Parameters<typeof getContactProperties>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getContactProperties>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getContactProperties>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getContactProperties>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getContactProperties>>, ApiError, TData>({
     queryKey: contactPropertyKeys.list(params),
     queryFn: () => getContactProperties(params),
     staleTime: 0,
@@ -670,14 +702,16 @@ export function getContactPropertiesQueryOptions(
   })
 }
 
-export function getContactPropertiesByIdQueryOptions(
+export function getContactPropertiesByIdQueryOptions<
+  TData = Awaited<ReturnType<typeof getContactPropertiesById>>,
+>(
   id: Parameters<typeof getContactPropertiesById>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getContactPropertiesById>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getContactPropertiesById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getContactPropertiesById>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getContactPropertiesById>>, ApiError, TData>({
     queryKey: contactPropertyKeys.detail(id),
     queryFn: () => getContactPropertiesById(id),
     staleTime: 0,
@@ -686,15 +720,17 @@ export function getContactPropertiesByIdQueryOptions(
   })
 }
 
-export function getContactsByContactIdSegmentsQueryOptions(
+export function getContactsByContactIdSegmentsQueryOptions<
+  TData = Awaited<ReturnType<typeof getContactsByContactIdSegments>>,
+>(
   contactId: Parameters<typeof getContactsByContactIdSegments>[0],
   params?: Parameters<typeof getContactsByContactIdSegments>[1],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getContactsByContactIdSegments>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getContactsByContactIdSegments>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getContactsByContactIdSegments>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getContactsByContactIdSegments>>, ApiError, TData>({
     queryKey: contactKeys.getContactsByContactIdSegments(contactId, params),
     queryFn: () => getContactsByContactIdSegments(contactId, params),
     staleTime: 0,
@@ -703,15 +739,17 @@ export function getContactsByContactIdSegmentsQueryOptions(
   })
 }
 
-export function getContactsByContactIdTopicsQueryOptions(
+export function getContactsByContactIdTopicsQueryOptions<
+  TData = Awaited<ReturnType<typeof getContactsByContactIdTopics>>,
+>(
   contactId: Parameters<typeof getContactsByContactIdTopics>[0],
   params?: Parameters<typeof getContactsByContactIdTopics>[1],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getContactsByContactIdTopics>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getContactsByContactIdTopics>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getContactsByContactIdTopics>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getContactsByContactIdTopics>>, ApiError, TData>({
     queryKey: contactKeys.getContactsByContactIdTopics(contactId, params),
     queryFn: () => getContactsByContactIdTopics(contactId, params),
     staleTime: 0,
@@ -720,14 +758,14 @@ export function getContactsByContactIdTopicsQueryOptions(
   })
 }
 
-export function getLogsQueryOptions(
+export function getLogsQueryOptions<TData = Awaited<ReturnType<typeof getLogs>>>(
   params?: Parameters<typeof getLogs>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getLogs>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getLogs>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getLogs>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getLogs>>, ApiError, TData>({
     queryKey: logKeys.list(params),
     queryFn: () => getLogs(params),
     staleTime: 0,
@@ -736,14 +774,14 @@ export function getLogsQueryOptions(
   })
 }
 
-export function getLogsByLogIdQueryOptions(
+export function getLogsByLogIdQueryOptions<TData = Awaited<ReturnType<typeof getLogsByLogId>>>(
   logId: Parameters<typeof getLogsByLogId>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getLogsByLogId>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getLogsByLogId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getLogsByLogId>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getLogsByLogId>>, ApiError, TData>({
     queryKey: logKeys.detail(logId),
     queryFn: () => getLogsByLogId(logId),
     staleTime: 0,
@@ -752,14 +790,14 @@ export function getLogsByLogIdQueryOptions(
   })
 }
 
-export function getAutomationsQueryOptions(
+export function getAutomationsQueryOptions<TData = Awaited<ReturnType<typeof getAutomations>>>(
   params?: Parameters<typeof getAutomations>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getAutomations>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getAutomations>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getAutomations>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getAutomations>>, ApiError, TData>({
     queryKey: automationKeys.list(params),
     queryFn: () => getAutomations(params),
     staleTime: 0,
@@ -768,14 +806,16 @@ export function getAutomationsQueryOptions(
   })
 }
 
-export function getAutomationsByAutomationIdQueryOptions(
+export function getAutomationsByAutomationIdQueryOptions<
+  TData = Awaited<ReturnType<typeof getAutomationsByAutomationId>>,
+>(
   automationId: Parameters<typeof getAutomationsByAutomationId>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getAutomationsByAutomationId>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getAutomationsByAutomationId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getAutomationsByAutomationId>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getAutomationsByAutomationId>>, ApiError, TData>({
     queryKey: automationKeys.getAutomationsByAutomationId(automationId),
     queryFn: () => getAutomationsByAutomationId(automationId),
     staleTime: 0,
@@ -784,15 +824,21 @@ export function getAutomationsByAutomationIdQueryOptions(
   })
 }
 
-export function getAutomationsByAutomationIdRunsQueryOptions(
+export function getAutomationsByAutomationIdRunsQueryOptions<
+  TData = Awaited<ReturnType<typeof getAutomationsByAutomationIdRuns>>,
+>(
   automationId: Parameters<typeof getAutomationsByAutomationIdRuns>[0],
   params?: Parameters<typeof getAutomationsByAutomationIdRuns>[1],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getAutomationsByAutomationIdRuns>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getAutomationsByAutomationIdRuns>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getAutomationsByAutomationIdRuns>>, ApiError>({
+  return queryOptions<
+    Awaited<ReturnType<typeof getAutomationsByAutomationIdRuns>>,
+    ApiError,
+    TData
+  >({
     queryKey: automationKeys.getAutomationsByAutomationIdRuns(automationId, params),
     queryFn: () => getAutomationsByAutomationIdRuns(automationId, params),
     staleTime: 0,
@@ -801,17 +847,24 @@ export function getAutomationsByAutomationIdRunsQueryOptions(
   })
 }
 
-export function getAutomationsByAutomationIdRunsByRunIdQueryOptions(
+export function getAutomationsByAutomationIdRunsByRunIdQueryOptions<
+  TData = Awaited<ReturnType<typeof getAutomationsByAutomationIdRunsByRunId>>,
+>(
   automationId: Parameters<typeof getAutomationsByAutomationIdRunsByRunId>[0],
   runId: Parameters<typeof getAutomationsByAutomationIdRunsByRunId>[1],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getAutomationsByAutomationIdRunsByRunId>>, ApiError>,
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAutomationsByAutomationIdRunsByRunId>>,
+      ApiError,
+      TData
+    >,
     'queryKey' | 'queryFn'
   >
 ) {
   return queryOptions<
     Awaited<ReturnType<typeof getAutomationsByAutomationIdRunsByRunId>>,
-    ApiError
+    ApiError,
+    TData
   >({
     queryKey: automationKeys.getAutomationsByAutomationIdRunsByRunId(automationId, runId),
     queryFn: () => getAutomationsByAutomationIdRunsByRunId(automationId, runId),
@@ -821,14 +874,14 @@ export function getAutomationsByAutomationIdRunsByRunIdQueryOptions(
   })
 }
 
-export function getEventsQueryOptions(
+export function getEventsQueryOptions<TData = Awaited<ReturnType<typeof getEvents>>>(
   params?: Parameters<typeof getEvents>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getEvents>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getEvents>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getEvents>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getEvents>>, ApiError, TData>({
     queryKey: eventKeys.list(params),
     queryFn: () => getEvents(params),
     staleTime: 0,
@@ -837,14 +890,16 @@ export function getEventsQueryOptions(
   })
 }
 
-export function getEventsByIdentifierQueryOptions(
+export function getEventsByIdentifierQueryOptions<
+  TData = Awaited<ReturnType<typeof getEventsByIdentifier>>,
+>(
   identifier: Parameters<typeof getEventsByIdentifier>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getEventsByIdentifier>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getEventsByIdentifier>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getEventsByIdentifier>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getEventsByIdentifier>>, ApiError, TData>({
     queryKey: eventKeys.detail(identifier),
     queryFn: () => getEventsByIdentifier(identifier),
     staleTime: 0,
@@ -855,14 +910,14 @@ export function getEventsByIdentifierQueryOptions(
 
 // ── Queries ──────────────────────────────────────────────────
 
-export function useGetEmails(
+export function useGetEmails<TData = Awaited<ReturnType<typeof getEmails>>>(
   params?: Parameters<typeof getEmails>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getEmails>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getEmails>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getEmails>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getEmails>>, ApiError, TData>({
     queryKey: emailKeys.getEmails(params),
     queryFn: () => getEmails(params),
     staleTime: 0,
@@ -871,13 +926,13 @@ export function useGetEmails(
   })
 }
 
-export function useGetEmailsInfinite(
+export function useGetEmailsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getEmails>>>>(
   params?: Parameters<typeof getEmails>[0],
   options?: Omit<
     UseInfiniteQueryOptions<
       Awaited<ReturnType<typeof getEmails>>,
       ApiError,
-      InfiniteData<Awaited<ReturnType<typeof getEmails>>>,
+      TData,
       QueryKey,
       unknown
     >,
@@ -887,7 +942,7 @@ export function useGetEmailsInfinite(
   return useInfiniteQuery<
     Awaited<ReturnType<typeof getEmails>>,
     ApiError,
-    InfiniteData<Awaited<ReturnType<typeof getEmails>>>,
+    TData,
     QueryKey,
     unknown
   >({
@@ -902,14 +957,14 @@ export function useGetEmailsInfinite(
   })
 }
 
-export function useGetEmailsByEmailId(
+export function useGetEmailsByEmailId<TData = Awaited<ReturnType<typeof getEmailsByEmailId>>>(
   emailId: Parameters<typeof getEmailsByEmailId>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getEmailsByEmailId>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getEmailsByEmailId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getEmailsByEmailId>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getEmailsByEmailId>>, ApiError, TData>({
     queryKey: emailKeys.getEmailsByEmailId(emailId!),
     queryFn: () => getEmailsByEmailId(emailId!),
     staleTime: 0,
@@ -919,15 +974,17 @@ export function useGetEmailsByEmailId(
   })
 }
 
-export function useGetEmailsByEmailIdAttachments(
+export function useGetEmailsByEmailIdAttachments<
+  TData = Awaited<ReturnType<typeof getEmailsByEmailIdAttachments>>,
+>(
   emailId: Parameters<typeof getEmailsByEmailIdAttachments>[0] | undefined | null,
   params?: Parameters<typeof getEmailsByEmailIdAttachments>[1],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getEmailsByEmailIdAttachments>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getEmailsByEmailIdAttachments>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getEmailsByEmailIdAttachments>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getEmailsByEmailIdAttachments>>, ApiError, TData>({
     queryKey: emailKeys.getEmailsByEmailIdAttachments(emailId!, params),
     queryFn: () => getEmailsByEmailIdAttachments(emailId!, params),
     staleTime: 0,
@@ -937,21 +994,25 @@ export function useGetEmailsByEmailIdAttachments(
   })
 }
 
-export function useGetEmailsByEmailIdAttachmentsByAttachmentId(
+export function useGetEmailsByEmailIdAttachmentsByAttachmentId<
+  TData = Awaited<ReturnType<typeof getEmailsByEmailIdAttachmentsByAttachmentId>>,
+>(
   emailId: Parameters<typeof getEmailsByEmailIdAttachmentsByAttachmentId>[0] | undefined | null,
   attachmentId:
     Parameters<typeof getEmailsByEmailIdAttachmentsByAttachmentId>[1] | undefined | null,
   options?: Omit<
     UseQueryOptions<
       Awaited<ReturnType<typeof getEmailsByEmailIdAttachmentsByAttachmentId>>,
-      ApiError
+      ApiError,
+      TData
     >,
     'queryKey' | 'queryFn'
   >
 ) {
   return useQuery<
     Awaited<ReturnType<typeof getEmailsByEmailIdAttachmentsByAttachmentId>>,
-    ApiError
+    ApiError,
+    TData
   >({
     queryKey: emailKeys.getEmailsByEmailIdAttachmentsByAttachmentId(emailId!, attachmentId!),
     queryFn: () => getEmailsByEmailIdAttachmentsByAttachmentId(emailId!, attachmentId!),
@@ -962,14 +1023,14 @@ export function useGetEmailsByEmailIdAttachmentsByAttachmentId(
   })
 }
 
-export function useGetEmailsReceiving(
+export function useGetEmailsReceiving<TData = Awaited<ReturnType<typeof getEmailsReceiving>>>(
   params?: Parameters<typeof getEmailsReceiving>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getEmailsReceiving>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getEmailsReceiving>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getEmailsReceiving>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getEmailsReceiving>>, ApiError, TData>({
     queryKey: emailKeys.getEmailsReceiving(params),
     queryFn: () => getEmailsReceiving(params),
     staleTime: 0,
@@ -978,13 +1039,15 @@ export function useGetEmailsReceiving(
   })
 }
 
-export function useGetEmailsReceivingInfinite(
+export function useGetEmailsReceivingInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getEmailsReceiving>>>,
+>(
   params?: Parameters<typeof getEmailsReceiving>[0],
   options?: Omit<
     UseInfiniteQueryOptions<
       Awaited<ReturnType<typeof getEmailsReceiving>>,
       ApiError,
-      InfiniteData<Awaited<ReturnType<typeof getEmailsReceiving>>>,
+      TData,
       QueryKey,
       unknown
     >,
@@ -994,7 +1057,7 @@ export function useGetEmailsReceivingInfinite(
   return useInfiniteQuery<
     Awaited<ReturnType<typeof getEmailsReceiving>>,
     ApiError,
-    InfiniteData<Awaited<ReturnType<typeof getEmailsReceiving>>>,
+    TData,
     QueryKey,
     unknown
   >({
@@ -1009,14 +1072,16 @@ export function useGetEmailsReceivingInfinite(
   })
 }
 
-export function useGetEmailsReceivingByEmailId(
+export function useGetEmailsReceivingByEmailId<
+  TData = Awaited<ReturnType<typeof getEmailsReceivingByEmailId>>,
+>(
   emailId: Parameters<typeof getEmailsReceivingByEmailId>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getEmailsReceivingByEmailId>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getEmailsReceivingByEmailId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getEmailsReceivingByEmailId>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getEmailsReceivingByEmailId>>, ApiError, TData>({
     queryKey: emailKeys.getEmailsReceivingByEmailId(emailId!),
     queryFn: () => getEmailsReceivingByEmailId(emailId!),
     staleTime: 0,
@@ -1026,15 +1091,25 @@ export function useGetEmailsReceivingByEmailId(
   })
 }
 
-export function useGetEmailsReceivingByEmailIdAttachments(
+export function useGetEmailsReceivingByEmailIdAttachments<
+  TData = Awaited<ReturnType<typeof getEmailsReceivingByEmailIdAttachments>>,
+>(
   emailId: Parameters<typeof getEmailsReceivingByEmailIdAttachments>[0] | undefined | null,
   params?: Parameters<typeof getEmailsReceivingByEmailIdAttachments>[1],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getEmailsReceivingByEmailIdAttachments>>, ApiError>,
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getEmailsReceivingByEmailIdAttachments>>,
+      ApiError,
+      TData
+    >,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getEmailsReceivingByEmailIdAttachments>>, ApiError>({
+  return useQuery<
+    Awaited<ReturnType<typeof getEmailsReceivingByEmailIdAttachments>>,
+    ApiError,
+    TData
+  >({
     queryKey: emailKeys.getEmailsReceivingByEmailIdAttachments(emailId!, params),
     queryFn: () => getEmailsReceivingByEmailIdAttachments(emailId!, params),
     staleTime: 0,
@@ -1044,7 +1119,9 @@ export function useGetEmailsReceivingByEmailIdAttachments(
   })
 }
 
-export function useGetEmailsReceivingByEmailIdAttachmentsByAttachmentId(
+export function useGetEmailsReceivingByEmailIdAttachmentsByAttachmentId<
+  TData = Awaited<ReturnType<typeof getEmailsReceivingByEmailIdAttachmentsByAttachmentId>>,
+>(
   emailId:
     Parameters<typeof getEmailsReceivingByEmailIdAttachmentsByAttachmentId>[0] | undefined | null,
   attachmentId:
@@ -1052,14 +1129,16 @@ export function useGetEmailsReceivingByEmailIdAttachmentsByAttachmentId(
   options?: Omit<
     UseQueryOptions<
       Awaited<ReturnType<typeof getEmailsReceivingByEmailIdAttachmentsByAttachmentId>>,
-      ApiError
+      ApiError,
+      TData
     >,
     'queryKey' | 'queryFn'
   >
 ) {
   return useQuery<
     Awaited<ReturnType<typeof getEmailsReceivingByEmailIdAttachmentsByAttachmentId>>,
-    ApiError
+    ApiError,
+    TData
   >({
     queryKey: emailKeys.getEmailsReceivingByEmailIdAttachmentsByAttachmentId(
       emailId!,
@@ -1073,14 +1152,14 @@ export function useGetEmailsReceivingByEmailIdAttachmentsByAttachmentId(
   })
 }
 
-export function useGetDomains(
+export function useGetDomains<TData = Awaited<ReturnType<typeof getDomains>>>(
   params?: Parameters<typeof getDomains>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getDomains>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getDomains>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getDomains>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getDomains>>, ApiError, TData>({
     queryKey: domainKeys.list(params),
     queryFn: () => getDomains(params),
     staleTime: 0,
@@ -1089,13 +1168,13 @@ export function useGetDomains(
   })
 }
 
-export function useGetDomainsInfinite(
+export function useGetDomainsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getDomains>>>>(
   params?: Parameters<typeof getDomains>[0],
   options?: Omit<
     UseInfiniteQueryOptions<
       Awaited<ReturnType<typeof getDomains>>,
       ApiError,
-      InfiniteData<Awaited<ReturnType<typeof getDomains>>>,
+      TData,
       QueryKey,
       unknown
     >,
@@ -1105,7 +1184,7 @@ export function useGetDomainsInfinite(
   return useInfiniteQuery<
     Awaited<ReturnType<typeof getDomains>>,
     ApiError,
-    InfiniteData<Awaited<ReturnType<typeof getDomains>>>,
+    TData,
     QueryKey,
     unknown
   >({
@@ -1120,14 +1199,14 @@ export function useGetDomainsInfinite(
   })
 }
 
-export function useGetDomainsByDomainId(
+export function useGetDomainsByDomainId<TData = Awaited<ReturnType<typeof getDomainsByDomainId>>>(
   domainId: Parameters<typeof getDomainsByDomainId>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getDomainsByDomainId>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getDomainsByDomainId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getDomainsByDomainId>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getDomainsByDomainId>>, ApiError, TData>({
     queryKey: domainKeys.detail(domainId!),
     queryFn: () => getDomainsByDomainId(domainId!),
     staleTime: 0,
@@ -1137,14 +1216,14 @@ export function useGetDomainsByDomainId(
   })
 }
 
-export function useGetApiKeys(
+export function useGetApiKeys<TData = Awaited<ReturnType<typeof getApiKeys>>>(
   params?: Parameters<typeof getApiKeys>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getApiKeys>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getApiKeys>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getApiKeys>>, ApiError, TData>({
     queryKey: apiKeyKeys.list(params),
     queryFn: () => getApiKeys(params),
     staleTime: 0,
@@ -1153,13 +1232,13 @@ export function useGetApiKeys(
   })
 }
 
-export function useGetApiKeysInfinite(
+export function useGetApiKeysInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getApiKeys>>>>(
   params?: Parameters<typeof getApiKeys>[0],
   options?: Omit<
     UseInfiniteQueryOptions<
       Awaited<ReturnType<typeof getApiKeys>>,
       ApiError,
-      InfiniteData<Awaited<ReturnType<typeof getApiKeys>>>,
+      TData,
       QueryKey,
       unknown
     >,
@@ -1169,7 +1248,7 @@ export function useGetApiKeysInfinite(
   return useInfiniteQuery<
     Awaited<ReturnType<typeof getApiKeys>>,
     ApiError,
-    InfiniteData<Awaited<ReturnType<typeof getApiKeys>>>,
+    TData,
     QueryKey,
     unknown
   >({
@@ -1184,14 +1263,14 @@ export function useGetApiKeysInfinite(
   })
 }
 
-export function useGetTemplates(
+export function useGetTemplates<TData = Awaited<ReturnType<typeof getTemplates>>>(
   params?: Parameters<typeof getTemplates>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getTemplates>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getTemplates>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getTemplates>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getTemplates>>, ApiError, TData>({
     queryKey: templateKeys.list(params),
     queryFn: () => getTemplates(params),
     staleTime: 0,
@@ -1200,13 +1279,15 @@ export function useGetTemplates(
   })
 }
 
-export function useGetTemplatesInfinite(
+export function useGetTemplatesInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getTemplates>>>,
+>(
   params?: Parameters<typeof getTemplates>[0],
   options?: Omit<
     UseInfiniteQueryOptions<
       Awaited<ReturnType<typeof getTemplates>>,
       ApiError,
-      InfiniteData<Awaited<ReturnType<typeof getTemplates>>>,
+      TData,
       QueryKey,
       unknown
     >,
@@ -1216,7 +1297,7 @@ export function useGetTemplatesInfinite(
   return useInfiniteQuery<
     Awaited<ReturnType<typeof getTemplates>>,
     ApiError,
-    InfiniteData<Awaited<ReturnType<typeof getTemplates>>>,
+    TData,
     QueryKey,
     unknown
   >({
@@ -1231,14 +1312,14 @@ export function useGetTemplatesInfinite(
   })
 }
 
-export function useGetTemplatesById(
+export function useGetTemplatesById<TData = Awaited<ReturnType<typeof getTemplatesById>>>(
   id: Parameters<typeof getTemplatesById>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getTemplatesById>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getTemplatesById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getTemplatesById>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getTemplatesById>>, ApiError, TData>({
     queryKey: templateKeys.detail(id!),
     queryFn: () => getTemplatesById(id!),
     staleTime: 0,
@@ -1249,13 +1330,13 @@ export function useGetTemplatesById(
 }
 
 /** @deprecated */
-export function useGetAudiences(
+export function useGetAudiences<TData = Awaited<ReturnType<typeof getAudiences>>>(
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getAudiences>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getAudiences>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getAudiences>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getAudiences>>, ApiError, TData>({
     queryKey: audienceKeys.list(),
     queryFn: () => getAudiences(),
     staleTime: 0,
@@ -1265,14 +1346,14 @@ export function useGetAudiences(
 }
 
 /** @deprecated */
-export function useGetAudiencesById(
+export function useGetAudiencesById<TData = Awaited<ReturnType<typeof getAudiencesById>>>(
   id: Parameters<typeof getAudiencesById>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getAudiencesById>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getAudiencesById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getAudiencesById>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getAudiencesById>>, ApiError, TData>({
     queryKey: audienceKeys.detail(id!),
     queryFn: () => getAudiencesById(id!),
     staleTime: 0,
@@ -1282,14 +1363,14 @@ export function useGetAudiencesById(
   })
 }
 
-export function useGetContacts(
+export function useGetContacts<TData = Awaited<ReturnType<typeof getContacts>>>(
   params?: Parameters<typeof getContacts>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getContacts>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getContacts>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getContacts>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getContacts>>, ApiError, TData>({
     queryKey: contactKeys.list(params),
     queryFn: () => getContacts(params),
     staleTime: 0,
@@ -1298,13 +1379,15 @@ export function useGetContacts(
   })
 }
 
-export function useGetContactsInfinite(
+export function useGetContactsInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getContacts>>>,
+>(
   params?: Parameters<typeof getContacts>[0],
   options?: Omit<
     UseInfiniteQueryOptions<
       Awaited<ReturnType<typeof getContacts>>,
       ApiError,
-      InfiniteData<Awaited<ReturnType<typeof getContacts>>>,
+      TData,
       QueryKey,
       unknown
     >,
@@ -1314,7 +1397,7 @@ export function useGetContactsInfinite(
   return useInfiniteQuery<
     Awaited<ReturnType<typeof getContacts>>,
     ApiError,
-    InfiniteData<Awaited<ReturnType<typeof getContacts>>>,
+    TData,
     QueryKey,
     unknown
   >({
@@ -1329,14 +1412,14 @@ export function useGetContactsInfinite(
   })
 }
 
-export function useGetContactsById(
+export function useGetContactsById<TData = Awaited<ReturnType<typeof getContactsById>>>(
   id: Parameters<typeof getContactsById>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getContactsById>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getContactsById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getContactsById>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getContactsById>>, ApiError, TData>({
     queryKey: contactKeys.getContactsById(id!),
     queryFn: () => getContactsById(id!),
     staleTime: 0,
@@ -1346,14 +1429,14 @@ export function useGetContactsById(
   })
 }
 
-export function useGetBroadcasts(
+export function useGetBroadcasts<TData = Awaited<ReturnType<typeof getBroadcasts>>>(
   params?: Parameters<typeof getBroadcasts>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getBroadcasts>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getBroadcasts>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getBroadcasts>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getBroadcasts>>, ApiError, TData>({
     queryKey: broadcastKeys.list(params),
     queryFn: () => getBroadcasts(params),
     staleTime: 0,
@@ -1362,13 +1445,15 @@ export function useGetBroadcasts(
   })
 }
 
-export function useGetBroadcastsInfinite(
+export function useGetBroadcastsInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getBroadcasts>>>,
+>(
   params?: Parameters<typeof getBroadcasts>[0],
   options?: Omit<
     UseInfiniteQueryOptions<
       Awaited<ReturnType<typeof getBroadcasts>>,
       ApiError,
-      InfiniteData<Awaited<ReturnType<typeof getBroadcasts>>>,
+      TData,
       QueryKey,
       unknown
     >,
@@ -1378,7 +1463,7 @@ export function useGetBroadcastsInfinite(
   return useInfiniteQuery<
     Awaited<ReturnType<typeof getBroadcasts>>,
     ApiError,
-    InfiniteData<Awaited<ReturnType<typeof getBroadcasts>>>,
+    TData,
     QueryKey,
     unknown
   >({
@@ -1393,14 +1478,14 @@ export function useGetBroadcastsInfinite(
   })
 }
 
-export function useGetBroadcastsById(
+export function useGetBroadcastsById<TData = Awaited<ReturnType<typeof getBroadcastsById>>>(
   id: Parameters<typeof getBroadcastsById>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getBroadcastsById>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getBroadcastsById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getBroadcastsById>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getBroadcastsById>>, ApiError, TData>({
     queryKey: broadcastKeys.detail(id!),
     queryFn: () => getBroadcastsById(id!),
     staleTime: 0,
@@ -1410,14 +1495,14 @@ export function useGetBroadcastsById(
   })
 }
 
-export function useGetWebhooks(
+export function useGetWebhooks<TData = Awaited<ReturnType<typeof getWebhooks>>>(
   params?: Parameters<typeof getWebhooks>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getWebhooks>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getWebhooks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getWebhooks>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getWebhooks>>, ApiError, TData>({
     queryKey: webhookKeys.list(params),
     queryFn: () => getWebhooks(params),
     staleTime: 0,
@@ -1426,13 +1511,15 @@ export function useGetWebhooks(
   })
 }
 
-export function useGetWebhooksInfinite(
+export function useGetWebhooksInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getWebhooks>>>,
+>(
   params?: Parameters<typeof getWebhooks>[0],
   options?: Omit<
     UseInfiniteQueryOptions<
       Awaited<ReturnType<typeof getWebhooks>>,
       ApiError,
-      InfiniteData<Awaited<ReturnType<typeof getWebhooks>>>,
+      TData,
       QueryKey,
       unknown
     >,
@@ -1442,7 +1529,7 @@ export function useGetWebhooksInfinite(
   return useInfiniteQuery<
     Awaited<ReturnType<typeof getWebhooks>>,
     ApiError,
-    InfiniteData<Awaited<ReturnType<typeof getWebhooks>>>,
+    TData,
     QueryKey,
     unknown
   >({
@@ -1457,14 +1544,16 @@ export function useGetWebhooksInfinite(
   })
 }
 
-export function useGetWebhooksByWebhookId(
+export function useGetWebhooksByWebhookId<
+  TData = Awaited<ReturnType<typeof getWebhooksByWebhookId>>,
+>(
   webhookId: Parameters<typeof getWebhooksByWebhookId>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getWebhooksByWebhookId>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getWebhooksByWebhookId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getWebhooksByWebhookId>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getWebhooksByWebhookId>>, ApiError, TData>({
     queryKey: webhookKeys.detail(webhookId!),
     queryFn: () => getWebhooksByWebhookId(webhookId!),
     staleTime: 0,
@@ -1474,14 +1563,14 @@ export function useGetWebhooksByWebhookId(
   })
 }
 
-export function useGetSegments(
+export function useGetSegments<TData = Awaited<ReturnType<typeof getSegments>>>(
   params?: Parameters<typeof getSegments>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getSegments>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getSegments>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getSegments>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getSegments>>, ApiError, TData>({
     queryKey: segmentKeys.list(params),
     queryFn: () => getSegments(params),
     staleTime: 0,
@@ -1490,13 +1579,15 @@ export function useGetSegments(
   })
 }
 
-export function useGetSegmentsInfinite(
+export function useGetSegmentsInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getSegments>>>,
+>(
   params?: Parameters<typeof getSegments>[0],
   options?: Omit<
     UseInfiniteQueryOptions<
       Awaited<ReturnType<typeof getSegments>>,
       ApiError,
-      InfiniteData<Awaited<ReturnType<typeof getSegments>>>,
+      TData,
       QueryKey,
       unknown
     >,
@@ -1506,7 +1597,7 @@ export function useGetSegmentsInfinite(
   return useInfiniteQuery<
     Awaited<ReturnType<typeof getSegments>>,
     ApiError,
-    InfiniteData<Awaited<ReturnType<typeof getSegments>>>,
+    TData,
     QueryKey,
     unknown
   >({
@@ -1521,14 +1612,14 @@ export function useGetSegmentsInfinite(
   })
 }
 
-export function useGetSegmentsById(
+export function useGetSegmentsById<TData = Awaited<ReturnType<typeof getSegmentsById>>>(
   id: Parameters<typeof getSegmentsById>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getSegmentsById>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getSegmentsById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getSegmentsById>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getSegmentsById>>, ApiError, TData>({
     queryKey: segmentKeys.detail(id!),
     queryFn: () => getSegmentsById(id!),
     staleTime: 0,
@@ -1538,14 +1629,14 @@ export function useGetSegmentsById(
   })
 }
 
-export function useGetTopics(
+export function useGetTopics<TData = Awaited<ReturnType<typeof getTopics>>>(
   params?: Parameters<typeof getTopics>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getTopics>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getTopics>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getTopics>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getTopics>>, ApiError, TData>({
     queryKey: topicKeys.list(params),
     queryFn: () => getTopics(params),
     staleTime: 0,
@@ -1554,13 +1645,13 @@ export function useGetTopics(
   })
 }
 
-export function useGetTopicsInfinite(
+export function useGetTopicsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getTopics>>>>(
   params?: Parameters<typeof getTopics>[0],
   options?: Omit<
     UseInfiniteQueryOptions<
       Awaited<ReturnType<typeof getTopics>>,
       ApiError,
-      InfiniteData<Awaited<ReturnType<typeof getTopics>>>,
+      TData,
       QueryKey,
       unknown
     >,
@@ -1570,7 +1661,7 @@ export function useGetTopicsInfinite(
   return useInfiniteQuery<
     Awaited<ReturnType<typeof getTopics>>,
     ApiError,
-    InfiniteData<Awaited<ReturnType<typeof getTopics>>>,
+    TData,
     QueryKey,
     unknown
   >({
@@ -1585,14 +1676,14 @@ export function useGetTopicsInfinite(
   })
 }
 
-export function useGetTopicsById(
+export function useGetTopicsById<TData = Awaited<ReturnType<typeof getTopicsById>>>(
   id: Parameters<typeof getTopicsById>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getTopicsById>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getTopicsById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getTopicsById>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getTopicsById>>, ApiError, TData>({
     queryKey: topicKeys.detail(id!),
     queryFn: () => getTopicsById(id!),
     staleTime: 0,
@@ -1602,14 +1693,14 @@ export function useGetTopicsById(
   })
 }
 
-export function useGetContactProperties(
+export function useGetContactProperties<TData = Awaited<ReturnType<typeof getContactProperties>>>(
   params?: Parameters<typeof getContactProperties>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getContactProperties>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getContactProperties>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getContactProperties>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getContactProperties>>, ApiError, TData>({
     queryKey: contactPropertyKeys.list(params),
     queryFn: () => getContactProperties(params),
     staleTime: 0,
@@ -1618,13 +1709,15 @@ export function useGetContactProperties(
   })
 }
 
-export function useGetContactPropertiesInfinite(
+export function useGetContactPropertiesInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getContactProperties>>>,
+>(
   params?: Parameters<typeof getContactProperties>[0],
   options?: Omit<
     UseInfiniteQueryOptions<
       Awaited<ReturnType<typeof getContactProperties>>,
       ApiError,
-      InfiniteData<Awaited<ReturnType<typeof getContactProperties>>>,
+      TData,
       QueryKey,
       unknown
     >,
@@ -1634,7 +1727,7 @@ export function useGetContactPropertiesInfinite(
   return useInfiniteQuery<
     Awaited<ReturnType<typeof getContactProperties>>,
     ApiError,
-    InfiniteData<Awaited<ReturnType<typeof getContactProperties>>>,
+    TData,
     QueryKey,
     unknown
   >({
@@ -1649,14 +1742,16 @@ export function useGetContactPropertiesInfinite(
   })
 }
 
-export function useGetContactPropertiesById(
+export function useGetContactPropertiesById<
+  TData = Awaited<ReturnType<typeof getContactPropertiesById>>,
+>(
   id: Parameters<typeof getContactPropertiesById>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getContactPropertiesById>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getContactPropertiesById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getContactPropertiesById>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getContactPropertiesById>>, ApiError, TData>({
     queryKey: contactPropertyKeys.detail(id!),
     queryFn: () => getContactPropertiesById(id!),
     staleTime: 0,
@@ -1666,15 +1761,17 @@ export function useGetContactPropertiesById(
   })
 }
 
-export function useGetContactsByContactIdSegments(
+export function useGetContactsByContactIdSegments<
+  TData = Awaited<ReturnType<typeof getContactsByContactIdSegments>>,
+>(
   contactId: Parameters<typeof getContactsByContactIdSegments>[0] | undefined | null,
   params?: Parameters<typeof getContactsByContactIdSegments>[1],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getContactsByContactIdSegments>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getContactsByContactIdSegments>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getContactsByContactIdSegments>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getContactsByContactIdSegments>>, ApiError, TData>({
     queryKey: contactKeys.getContactsByContactIdSegments(contactId!, params),
     queryFn: () => getContactsByContactIdSegments(contactId!, params),
     staleTime: 0,
@@ -1684,15 +1781,17 @@ export function useGetContactsByContactIdSegments(
   })
 }
 
-export function useGetContactsByContactIdTopics(
+export function useGetContactsByContactIdTopics<
+  TData = Awaited<ReturnType<typeof getContactsByContactIdTopics>>,
+>(
   contactId: Parameters<typeof getContactsByContactIdTopics>[0] | undefined | null,
   params?: Parameters<typeof getContactsByContactIdTopics>[1],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getContactsByContactIdTopics>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getContactsByContactIdTopics>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getContactsByContactIdTopics>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getContactsByContactIdTopics>>, ApiError, TData>({
     queryKey: contactKeys.getContactsByContactIdTopics(contactId!, params),
     queryFn: () => getContactsByContactIdTopics(contactId!, params),
     staleTime: 0,
@@ -1702,14 +1801,14 @@ export function useGetContactsByContactIdTopics(
   })
 }
 
-export function useGetLogs(
+export function useGetLogs<TData = Awaited<ReturnType<typeof getLogs>>>(
   params?: Parameters<typeof getLogs>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getLogs>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getLogs>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getLogs>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getLogs>>, ApiError, TData>({
     queryKey: logKeys.list(params),
     queryFn: () => getLogs(params),
     staleTime: 0,
@@ -1718,26 +1817,20 @@ export function useGetLogs(
   })
 }
 
-export function useGetLogsInfinite(
+export function useGetLogsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getLogs>>>>(
   params?: Parameters<typeof getLogs>[0],
   options?: Omit<
     UseInfiniteQueryOptions<
       Awaited<ReturnType<typeof getLogs>>,
       ApiError,
-      InfiniteData<Awaited<ReturnType<typeof getLogs>>>,
+      TData,
       QueryKey,
       unknown
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
 ) {
-  return useInfiniteQuery<
-    Awaited<ReturnType<typeof getLogs>>,
-    ApiError,
-    InfiniteData<Awaited<ReturnType<typeof getLogs>>>,
-    QueryKey,
-    unknown
-  >({
+  return useInfiniteQuery<Awaited<ReturnType<typeof getLogs>>, ApiError, TData, QueryKey, unknown>({
     queryKey: [...logKeys.list(params), 'infinite'],
     queryFn: ({ pageParam }) => getLogs({ ...params, after: pageParam as never }),
     initialPageParam: undefined,
@@ -1749,14 +1842,14 @@ export function useGetLogsInfinite(
   })
 }
 
-export function useGetLogsByLogId(
+export function useGetLogsByLogId<TData = Awaited<ReturnType<typeof getLogsByLogId>>>(
   logId: Parameters<typeof getLogsByLogId>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getLogsByLogId>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getLogsByLogId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getLogsByLogId>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getLogsByLogId>>, ApiError, TData>({
     queryKey: logKeys.detail(logId!),
     queryFn: () => getLogsByLogId(logId!),
     staleTime: 0,
@@ -1766,14 +1859,14 @@ export function useGetLogsByLogId(
   })
 }
 
-export function useGetAutomations(
+export function useGetAutomations<TData = Awaited<ReturnType<typeof getAutomations>>>(
   params?: Parameters<typeof getAutomations>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getAutomations>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getAutomations>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getAutomations>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getAutomations>>, ApiError, TData>({
     queryKey: automationKeys.list(params),
     queryFn: () => getAutomations(params),
     staleTime: 0,
@@ -1782,13 +1875,15 @@ export function useGetAutomations(
   })
 }
 
-export function useGetAutomationsInfinite(
+export function useGetAutomationsInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getAutomations>>>,
+>(
   params?: Parameters<typeof getAutomations>[0],
   options?: Omit<
     UseInfiniteQueryOptions<
       Awaited<ReturnType<typeof getAutomations>>,
       ApiError,
-      InfiniteData<Awaited<ReturnType<typeof getAutomations>>>,
+      TData,
       QueryKey,
       unknown
     >,
@@ -1798,7 +1893,7 @@ export function useGetAutomationsInfinite(
   return useInfiniteQuery<
     Awaited<ReturnType<typeof getAutomations>>,
     ApiError,
-    InfiniteData<Awaited<ReturnType<typeof getAutomations>>>,
+    TData,
     QueryKey,
     unknown
   >({
@@ -1813,14 +1908,16 @@ export function useGetAutomationsInfinite(
   })
 }
 
-export function useGetAutomationsByAutomationId(
+export function useGetAutomationsByAutomationId<
+  TData = Awaited<ReturnType<typeof getAutomationsByAutomationId>>,
+>(
   automationId: Parameters<typeof getAutomationsByAutomationId>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getAutomationsByAutomationId>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getAutomationsByAutomationId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getAutomationsByAutomationId>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getAutomationsByAutomationId>>, ApiError, TData>({
     queryKey: automationKeys.getAutomationsByAutomationId(automationId!),
     queryFn: () => getAutomationsByAutomationId(automationId!),
     staleTime: 0,
@@ -1830,15 +1927,17 @@ export function useGetAutomationsByAutomationId(
   })
 }
 
-export function useGetAutomationsByAutomationIdRuns(
+export function useGetAutomationsByAutomationIdRuns<
+  TData = Awaited<ReturnType<typeof getAutomationsByAutomationIdRuns>>,
+>(
   automationId: Parameters<typeof getAutomationsByAutomationIdRuns>[0] | undefined | null,
   params?: Parameters<typeof getAutomationsByAutomationIdRuns>[1],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getAutomationsByAutomationIdRuns>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getAutomationsByAutomationIdRuns>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getAutomationsByAutomationIdRuns>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getAutomationsByAutomationIdRuns>>, ApiError, TData>({
     queryKey: automationKeys.getAutomationsByAutomationIdRuns(automationId!, params),
     queryFn: () => getAutomationsByAutomationIdRuns(automationId!, params),
     staleTime: 0,
@@ -1848,15 +1947,25 @@ export function useGetAutomationsByAutomationIdRuns(
   })
 }
 
-export function useGetAutomationsByAutomationIdRunsByRunId(
+export function useGetAutomationsByAutomationIdRunsByRunId<
+  TData = Awaited<ReturnType<typeof getAutomationsByAutomationIdRunsByRunId>>,
+>(
   automationId: Parameters<typeof getAutomationsByAutomationIdRunsByRunId>[0] | undefined | null,
   runId: Parameters<typeof getAutomationsByAutomationIdRunsByRunId>[1] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getAutomationsByAutomationIdRunsByRunId>>, ApiError>,
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAutomationsByAutomationIdRunsByRunId>>,
+      ApiError,
+      TData
+    >,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getAutomationsByAutomationIdRunsByRunId>>, ApiError>({
+  return useQuery<
+    Awaited<ReturnType<typeof getAutomationsByAutomationIdRunsByRunId>>,
+    ApiError,
+    TData
+  >({
     queryKey: automationKeys.getAutomationsByAutomationIdRunsByRunId(automationId!, runId!),
     queryFn: () => getAutomationsByAutomationIdRunsByRunId(automationId!, runId!),
     staleTime: 0,
@@ -1866,14 +1975,14 @@ export function useGetAutomationsByAutomationIdRunsByRunId(
   })
 }
 
-export function useGetEvents(
+export function useGetEvents<TData = Awaited<ReturnType<typeof getEvents>>>(
   params?: Parameters<typeof getEvents>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getEvents>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getEvents>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getEvents>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getEvents>>, ApiError, TData>({
     queryKey: eventKeys.list(params),
     queryFn: () => getEvents(params),
     staleTime: 0,
@@ -1882,13 +1991,13 @@ export function useGetEvents(
   })
 }
 
-export function useGetEventsInfinite(
+export function useGetEventsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getEvents>>>>(
   params?: Parameters<typeof getEvents>[0],
   options?: Omit<
     UseInfiniteQueryOptions<
       Awaited<ReturnType<typeof getEvents>>,
       ApiError,
-      InfiniteData<Awaited<ReturnType<typeof getEvents>>>,
+      TData,
       QueryKey,
       unknown
     >,
@@ -1898,7 +2007,7 @@ export function useGetEventsInfinite(
   return useInfiniteQuery<
     Awaited<ReturnType<typeof getEvents>>,
     ApiError,
-    InfiniteData<Awaited<ReturnType<typeof getEvents>>>,
+    TData,
     QueryKey,
     unknown
   >({
@@ -1913,14 +2022,14 @@ export function useGetEventsInfinite(
   })
 }
 
-export function useGetEventsByIdentifier(
+export function useGetEventsByIdentifier<TData = Awaited<ReturnType<typeof getEventsByIdentifier>>>(
   identifier: Parameters<typeof getEventsByIdentifier>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getEventsByIdentifier>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getEventsByIdentifier>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getEventsByIdentifier>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getEventsByIdentifier>>, ApiError, TData>({
     queryKey: eventKeys.detail(identifier!),
     queryFn: () => getEventsByIdentifier(identifier!),
     staleTime: 0,
