@@ -200,7 +200,9 @@ describe('generated fixtures typecheck against generated models', () => {
       'consumer.ts': consumer,
     })
     expect(diagnostics).toEqual([])
-  })
+    // A full TypeScript program compile; under coverage instrumentation on CI
+    // runners this exceeds vitest's 5s default.
+  }, 30_000)
 })
 
 describe('generated fixtures at runtime', () => {
