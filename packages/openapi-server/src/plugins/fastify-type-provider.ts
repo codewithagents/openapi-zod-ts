@@ -45,6 +45,13 @@ import {
   collectUsedResponseSchemaNames,
 } from './operation-ir.js'
 import { formatSchemaImportSpecifiers } from './schema-prefix.js'
+import {
+  type ErrorFormat,
+  isProblemJson,
+  fastifyErrorReturn,
+  fastifyProblemErrorHandlerLines,
+  fastifyProblemHelperLines,
+} from './problem-details.js'
 
 type OperationObject = OpenAPIV3_1.OperationObject
 type ReferenceObject = OpenAPIV3_1.ReferenceObject
@@ -81,6 +88,8 @@ interface RouterOptions {
   schemaImportPath?: string
   /** Bare schema name -> actual exported name, for spec_prefix (#334). See schema-prefix.ts. */
   schemaImportAliases?: Map<string, string>
+  /** Error body format; 'problem+json' emits RFC 9457 / RFC 7807 bodies. See problem-details.ts. */
+  errorFormat?: ErrorFormat
   /**
    * When true, emit the zero-cast router: body is passed as req.body (no cast),
    * response is sent without a cast, and model imports are skipped. The router
@@ -573,7 +582,8 @@ function buildFastifyTypeProviderHandler(
   schemaNames?: Set<string>,
   contextType?: string,
   zeroCast?: boolean,
-  emitResponseValidation?: boolean
+  emitResponseValidation?: boolean,
+  errorFormat?: ErrorFormat
 ): string {
   const lines: string[] = []
   const inner = `${indent}  `
@@ -738,7 +748,7 @@ function buildFastifyTypeProviderHandler(
     lines.push(`${inner}})`)
     lines.push(`${inner}if (!_ckv.success) {`)
     lines.push(
-      `${inner}  return reply.status(422).send({ error: 'Invalid request cookies', issues: _ckv.error.issues })`
+      `${inner}  ${fastifyErrorReturn(422, 'Invalid request cookies', '_ckv.error.issues', errorFormat)}`
     )
     lines.push(`${inner}}`)
   }
@@ -1033,6 +1043,8 @@ export function generateFastifyRouter(
   lines.push(`import { HttpError } from '${errorsImportPath}'`)
   lines.push(`export { HttpError } from '${errorsImportPath}'`)
   lines.push('')
+  const problemJson = isProblemJson(options?.errorFormat)
+  if (problemJson) lines.push(...fastifyProblemHelperLines())
   // Emit the CreateRouterOptions escape hatch so callers can override compilers/errorHandler
   // and control parser registration without having to re-implement the whole plugin.
   // When context_type is set, the interface is generic and adds the required createContext field.
@@ -1136,31 +1148,40 @@ export function generateFastifyRouter(
   lines.push('    if (options?.errorHandler !== undefined) {')
   lines.push('      app.setErrorHandler(options.errorHandler)')
   lines.push('    } else {')
-  // Emit a small status-code-to-code lookup for the error envelope. This mirrors the
-  // FST_ERR_VALIDATION shape (statusCode, code, error, message) so HttpError responses
-  // are structurally consistent with Fastify's built-in validation errors.
-  lines.push('      const _HTTP_CODES: Record<number, string> = {')
-  lines.push("        400: 'BAD_REQUEST',")
-  lines.push("        401: 'UNAUTHORIZED',")
-  lines.push("        403: 'FORBIDDEN',")
-  lines.push("        404: 'NOT_FOUND',")
-  lines.push("        409: 'CONFLICT',")
-  lines.push("        410: 'GONE',")
-  lines.push("        422: 'UNPROCESSABLE_ENTITY',")
-  lines.push("        429: 'TOO_MANY_REQUESTS',")
-  lines.push("        500: 'INTERNAL_ERROR',")
-  lines.push('      }')
-  lines.push('      app.setErrorHandler((err, _req, reply) => {')
-  lines.push('        if (err instanceof HttpError) {')
-  lines.push("          const _errCode = _HTTP_CODES[err.status] ?? 'APP_ERROR'")
-  lines.push('          const _errReply = reply.status(err.status)')
-  lines.push(
-    '          return _errReply.send({ statusCode: err.status, code: _errCode, error: err.message, message: err.message })'
-  )
-  lines.push('        }')
-  lines.push('        throw err')
-  lines.push('      })')
-  lines.push('    }')
+  if (problemJson) {
+    // error_format: 'problem+json': one handler maps HttpError, validation, serialization and
+    // other 4xx framework errors to application/problem+json; anything else is re-thrown.
+    lines.push('      app.setErrorHandler((err, req, reply) => {')
+    lines.push(...fastifyProblemErrorHandlerLines('        '))
+    lines.push('      })')
+    lines.push('    }')
+  } else {
+    // Emit a small status-code-to-code lookup for the error envelope. This mirrors the
+    // FST_ERR_VALIDATION shape (statusCode, code, error, message) so HttpError responses
+    // are structurally consistent with Fastify's built-in validation errors.
+    lines.push('      const _HTTP_CODES: Record<number, string> = {')
+    lines.push("        400: 'BAD_REQUEST',")
+    lines.push("        401: 'UNAUTHORIZED',")
+    lines.push("        403: 'FORBIDDEN',")
+    lines.push("        404: 'NOT_FOUND',")
+    lines.push("        409: 'CONFLICT',")
+    lines.push("        410: 'GONE',")
+    lines.push("        422: 'UNPROCESSABLE_ENTITY',")
+    lines.push("        429: 'TOO_MANY_REQUESTS',")
+    lines.push("        500: 'INTERNAL_ERROR',")
+    lines.push('      }')
+    lines.push('      app.setErrorHandler((err, _req, reply) => {')
+    lines.push('        if (err instanceof HttpError) {')
+    lines.push("          const _errCode = _HTTP_CODES[err.status] ?? 'APP_ERROR'")
+    lines.push('          const _errReply = reply.status(err.status)')
+    lines.push(
+      '          return _errReply.send({ statusCode: err.status, code: _errCode, error: err.message, message: err.message })'
+    )
+    lines.push('        }')
+    lines.push('        throw err')
+    lines.push('      })')
+    lines.push('    }')
+  }
 
   // Global lifecycle hooks: registered after setErrorHandler, before body parsers.
   // _asHookArray normalizes single-handler and array forms into a plain array.
@@ -1226,7 +1247,8 @@ export function generateFastifyRouter(
         options?.schemaNames,
         ctx,
         zeroCast,
-        options?.emitResponseValidation
+        options?.emitResponseValidation,
+        options?.errorFormat
       )
     )
   }

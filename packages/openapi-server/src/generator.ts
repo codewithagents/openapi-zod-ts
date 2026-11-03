@@ -28,6 +28,8 @@ interface BaseRouterOptions {
   contextType?: string
   /** Relative path from the generated router.ts to the shared _shared/errors.js module. */
   errorsImportPath?: string
+  /** Forward the error_format config ('default' | 'problem+json'). */
+  errorFormat?: 'default' | 'problem+json'
 }
 
 /** Extended options for the Fastify zero-cast path. */
@@ -76,6 +78,7 @@ async function generateOne(
         contextType: config.context_type,
         emitResponseValidation: config.emit_response_validation === true,
         errorsImportPath,
+        errorFormat: config.error_format,
       })
     )
   }
@@ -171,6 +174,7 @@ async function generateSchemaEnhancedRouter(
       contextType: config.context_type,
       emitResponseValidation: config.emit_response_validation === true,
       errorsImportPath,
+      errorFormat: config.error_format,
     })
     const routerPath = join(outputDir, routerFile.filename)
     await writeFile(routerPath, await formatTs(routerFile.content, routerPath), 'utf-8')
@@ -184,6 +188,7 @@ async function generateSchemaEnhancedRouter(
     schemaImportPath: schemaImportPathJs,
     contextType: config.context_type,
     errorsImportPath,
+    errorFormat: config.error_format,
   })
   const routerPath = join(outputDir, routerFile.filename)
   await writeFile(routerPath, await formatTs(routerFile.content, routerPath), 'utf-8')

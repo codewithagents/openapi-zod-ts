@@ -88,6 +88,21 @@ describe('loadConfig', () => {
     await expect(loadConfig(tmpDir)).rejects.toThrow(message)
   })
 
+  it.each(['default', 'problem+json'])('loads error_format %s', async (value) => {
+    writeConfig({ input_openapi: 'openapi.json', output: 'out', error_format: value })
+    expect((await loadConfig(tmpDir)).error_format).toBe(value)
+  })
+
+  it('error_format is undefined when not provided', async () => {
+    writeConfig({ input_openapi: 'openapi.json', output: 'out' })
+    expect((await loadConfig(tmpDir)).error_format).toBeUndefined()
+  })
+
+  it.each(['problem', 'json', 42])('throws on invalid error_format %j', async (value) => {
+    writeConfig({ input_openapi: 'openapi.json', output: 'out', error_format: value })
+    await expect(loadConfig(tmpDir)).rejects.toThrow('"error_format" must be one of')
+  })
+
   it('loads a full config with framework: none', async () => {
     writeConfig({ input_openapi: 'openapi.json', output: 'src/server', framework: 'none' })
     const config = await loadConfig(tmpDir)

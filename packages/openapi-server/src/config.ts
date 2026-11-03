@@ -55,6 +55,18 @@ export interface ServerConfig {
    * Has no effect without `input_schema`. Default: unset (bare names).
    */
   spec_prefix?: string
+  /**
+   * Shape of the error responses the generated router produces (Zod validation failures,
+   * invalid JSON / unsupported media type, HttpError mapping, response-validation failures).
+   *
+   * - 'default' (or unset): the existing `{ error, issues? }` bodies (Fastify: its native
+   *   validation envelope and `{ statusCode, code, error, message }` for HttpError).
+   * - 'problem+json': RFC 9457 / RFC 7807 `application/problem+json` bodies
+   *   `{ type, title, status, detail?, instance, errors? }`, with Zod issues under the
+   *   `errors` extension member. On Fastify this is applied by the generated default
+   *   setErrorHandler (a caller-supplied `errorHandler` still takes precedence).
+   */
+  error_format?: 'default' | 'problem+json'
 }
 
 /** Validate that an optional config field is a non-empty string when present. */
@@ -90,6 +102,10 @@ function parseServerConfig(
       '"spec_prefix" must be a valid TypeScript identifier prefix (letters, digits, _ or $; not starting with a digit)'
     )
   }
+  const errorFormat = raw['error_format']
+  if (errorFormat !== undefined && errorFormat !== 'default' && errorFormat !== 'problem+json') {
+    throw new Error('"error_format" must be one of: "default" or "problem+json"')
+  }
   if (
     raw['emit_response_validation'] !== undefined &&
     typeof raw['emit_response_validation'] !== 'boolean'
@@ -104,6 +120,7 @@ function parseServerConfig(
     emit_response_validation: raw['emit_response_validation'] as boolean | undefined,
     shared_output: raw['shared_output'] as string | undefined,
     spec_prefix: raw['spec_prefix'] as string | undefined,
+    error_format: errorFormat as 'default' | 'problem+json' | undefined,
   }
 }
 

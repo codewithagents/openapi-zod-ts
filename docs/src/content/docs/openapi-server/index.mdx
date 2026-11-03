@@ -145,6 +145,7 @@ npx openapi-server --config ./config/openapi-server.config.json
 | `emit_response_validation` | `boolean`                                    | No       | `false`  | Fastify only. Synthesize inline Zod response schemas for flat inline response shapes. See [response validation](#response-validation-opt-in-emit_response_validation-fastify-only).                                          |
 | `shared_output`            | `string`                                     | No       | derived  | Override directory for the shared `_shared/errors.ts` file. Defaults to a location derived from the output paths.                                                                                                            |
 | `spec_prefix` | `string` | No | n/a | Namespace prefix for schema lookups when several specs share one `input_schema` file: `${spec_prefix}${Type}Schema` (e.g. `PublicApiGetUserSchema`) is imported under the bare `${Type}Schema` name. Unprefixed exports remain a fallback. `openapi-zod-ts` emits bare names only, so the shared prefixed file is user-maintained. |
+| `error_format` | `"default" \| "problem+json"` | No | `"default"` | `"problem+json"` makes router-produced errors (validation failures, 400/415, `HttpError` mapping) RFC 9457 / RFC 7807 `application/problem+json` bodies `{ type, title, status, detail?, instance, errors? }` in Hono, Express and Fastify. |
 
 **Full config example:**
 

@@ -27,6 +27,16 @@ import {
   collectUsedResponseSchemaNames,
 } from './operation-ir.js'
 import { formatSchemaImportSpecifiers } from './schema-prefix.js'
+import {
+  type ErrorFormat,
+  isProblemJson,
+  honoErrorReturn,
+  honoHttpErrorReturn,
+  honoProblemHelperLines,
+  expressErrorReturn,
+  expressHttpErrorReturn,
+  expressProblemHelperLines,
+} from './problem-details.js'
 // Fastify emitter: delegates to the dedicated type-provider module.
 export { generateFastifyRouter } from './fastify-type-provider.js'
 
@@ -654,6 +664,11 @@ interface RouterOptions {
    */
   schemaImportAliases?: Map<string, string>
   /**
+   * Shape of router-produced error responses. 'problem+json' emits RFC 9457 / RFC 7807
+   * `application/problem+json` bodies; 'default' (or unset) keeps `{ error, issues? }`.
+   */
+  errorFormat?: ErrorFormat
+  /**
    * When set, matches the `contextType` from ServiceOptions. The generated router
    * handlers extract a context value from the framework's native channel and pass
    * it as the final argument to every service call.
@@ -747,7 +762,8 @@ function buildRouteHandler(
   op: RouteOperation,
   indent: string,
   schemaNames?: Set<string>,
-  contextType?: string
+  contextType?: string,
+  errorFormat?: ErrorFormat
 ): string {
   const lines: string[] = []
   lines.push(`${indent}app.${op.httpMethod}(${JSON.stringify(op.honoPath)}, async (c) => {`)
@@ -757,7 +773,7 @@ function buildRouteHandler(
     emitPathValidation(lines, op.pathParamValidations, indent, 'hono')
     lines.push(`${indent}  if (!_pv.success) {`)
     lines.push(
-      `${indent}    return c.json({ error: 'Invalid path parameters', issues: _pv.error.issues }, 422)`
+      `${indent}    ${honoErrorReturn(422, 'Invalid path parameters', '_pv.error.issues', errorFormat)}`
     )
     lines.push(`${indent}  }`)
   }
@@ -814,7 +830,7 @@ function buildRouteHandler(
       emitQueryValidation(lines, op.queryParams, indent)
       lines.push(`${indent}  if (!_qv.success) {`)
       lines.push(
-        `${indent}    return c.json({ error: 'Invalid query parameters', issues: _qv.error.issues }, 422)`
+        `${indent}    ${honoErrorReturn(422, 'Invalid query parameters', '_qv.error.issues', errorFormat)}`
       )
       lines.push(`${indent}  }`)
     }
@@ -825,7 +841,7 @@ function buildRouteHandler(
     emitHeaderValidation(lines, op.headerParams, indent, 'hono')
     lines.push(`${indent}  if (!_hv.success) {`)
     lines.push(
-      `${indent}    return c.json({ error: 'Invalid request headers', issues: _hv.error.issues }, 422)`
+      `${indent}    ${honoErrorReturn(422, 'Invalid request headers', '_hv.error.issues', errorFormat)}`
     )
     lines.push(`${indent}  }`)
   }
@@ -836,7 +852,7 @@ function buildRouteHandler(
     emitCookieValidation(lines, op.cookieParams, indent, 'hono')
     lines.push(`${indent}  if (!_ckv.success) {`)
     lines.push(
-      `${indent}    return c.json({ error: 'Invalid request cookies', issues: _ckv.error.issues }, 422)`
+      `${indent}    ${honoErrorReturn(422, 'Invalid request cookies', '_ckv.error.issues', errorFormat)}`
     )
     lines.push(`${indent}  }`)
   }
@@ -859,7 +875,9 @@ function buildRouteHandler(
       lines.push(
         `${indent}  if (!_ct.toLowerCase().startsWith('application/x-www-form-urlencoded')) {`
       )
-      lines.push(`${indent}    return c.json({ error: 'Unsupported Media Type' }, 415)`)
+      lines.push(
+        `${indent}    ${honoErrorReturn(415, 'Unsupported Media Type', undefined, errorFormat)}`
+      )
       lines.push(`${indent}  }`)
       lines.push(`${indent}  const body: unknown = await c.req.parseBody()`)
     } else if (op.bodyInfo.contentType === 'multipart/form-data') {
@@ -878,13 +896,17 @@ function buildRouteHandler(
       // than the correct 400. JSON.parse('') always throws SyntaxError.
       lines.push(`${indent}  const _ct = c.req.header('content-type') ?? ''`)
       lines.push(`${indent}  if (!_ct.toLowerCase().startsWith('application/json')) {`)
-      lines.push(`${indent}    return c.json({ error: 'Unsupported Media Type' }, 415)`)
+      lines.push(
+        `${indent}    ${honoErrorReturn(415, 'Unsupported Media Type', undefined, errorFormat)}`
+      )
       lines.push(`${indent}  }`)
       lines.push(`${indent}  let body: ${typeDecl}`)
       lines.push(`${indent}  try {`)
       lines.push(`${indent}    body = JSON.parse(await c.req.text()) as ${typeDecl}`)
       lines.push(`${indent}  } catch {`)
-      lines.push(`${indent}    return c.json({ error: 'Invalid JSON body' }, 400)`)
+      lines.push(
+        `${indent}    ${honoErrorReturn(400, 'Invalid JSON body', undefined, errorFormat)}`
+      )
       lines.push(`${indent}  }`)
     }
 
@@ -903,7 +925,7 @@ function buildRouteHandler(
       lines.push(`${indent}  const parseResult = ${schemaName}.safeParse(body)`)
       lines.push(`${indent}  if (!parseResult.success) {`)
       lines.push(
-        `${indent}    return c.json({ error: 'Invalid request body', issues: parseResult.error.issues }, 422)`
+        `${indent}    ${honoErrorReturn(422, 'Invalid request body', 'parseResult.error.issues', errorFormat)}`
       )
       lines.push(`${indent}  }`)
       // Forward the validated/coerced data (parseResult.data), NOT the raw parsed body,
@@ -972,9 +994,7 @@ function buildRouteHandler(
   }
   lines.push(`${indent}  } catch (err) {`)
   lines.push(`${indent}    if (err instanceof HttpError) {`)
-  lines.push(
-    `${indent}      return new Response(JSON.stringify({ error: err.message }), { status: err.status, headers: { 'content-type': 'application/json' } })`
-  )
+  lines.push(`${indent}      ${honoHttpErrorReturn(errorFormat)}`)
   lines.push(`${indent}    }`)
   lines.push(`${indent}    throw err`)
   lines.push(`${indent}  }`)
@@ -990,7 +1010,8 @@ function buildExpressRouteHandler(
   op: RouteOperation,
   indent: string,
   schemaNames?: Set<string>,
-  contextType?: string
+  contextType?: string,
+  errorFormat?: ErrorFormat
 ): string {
   const lines: string[] = []
   lines.push(
@@ -1002,7 +1023,7 @@ function buildExpressRouteHandler(
     emitPathValidation(lines, op.pathParamValidations, indent, 'express')
     lines.push(`${indent}  if (!_pv.success) {`)
     lines.push(
-      `${indent}    return void res.status(422).json({ error: 'Invalid path parameters', issues: _pv.error.issues })`
+      `${indent}    ${expressErrorReturn(422, 'Invalid path parameters', '_pv.error.issues', errorFormat)}`
     )
     lines.push(`${indent}  }`)
   }
@@ -1045,7 +1066,7 @@ function buildExpressRouteHandler(
       emitQueryValidation(lines, op.queryParams, indent)
       lines.push(`${indent}  if (!_qv.success) {`)
       lines.push(
-        `${indent}    return void res.status(422).json({ error: 'Invalid query parameters', issues: _qv.error.issues })`
+        `${indent}    ${expressErrorReturn(422, 'Invalid query parameters', '_qv.error.issues', errorFormat)}`
       )
       lines.push(`${indent}  }`)
     }
@@ -1056,7 +1077,7 @@ function buildExpressRouteHandler(
     emitHeaderValidation(lines, op.headerParams, indent, 'express')
     lines.push(`${indent}  if (!_hv.success) {`)
     lines.push(
-      `${indent}    return void res.status(422).json({ error: 'Invalid request headers', issues: _hv.error.issues })`
+      `${indent}    ${expressErrorReturn(422, 'Invalid request headers', '_hv.error.issues', errorFormat)}`
     )
     lines.push(`${indent}  }`)
   }
@@ -1067,7 +1088,7 @@ function buildExpressRouteHandler(
     emitCookieValidation(lines, op.cookieParams, indent, 'express')
     lines.push(`${indent}  if (!_ckv.success) {`)
     lines.push(
-      `${indent}    return void res.status(422).json({ error: 'Invalid request cookies', issues: _ckv.error.issues })`
+      `${indent}    ${expressErrorReturn(422, 'Invalid request cookies', '_ckv.error.issues', errorFormat)}`
     )
     lines.push(`${indent}  }`)
   }
@@ -1097,7 +1118,7 @@ function buildExpressRouteHandler(
         lines.push(`${indent}  const parseResult = ${schemaName}.safeParse(req.body)`)
         lines.push(`${indent}  if (!parseResult.success) {`)
         lines.push(
-          `${indent}    return void res.status(422).json({ error: 'Invalid request body', issues: parseResult.error.issues })`
+          `${indent}    ${expressErrorReturn(422, 'Invalid request body', 'parseResult.error.issues', errorFormat)}`
         )
         lines.push(`${indent}  }`)
         // Cast parseResult.data to the declared model type so the service call receives
@@ -1179,7 +1200,7 @@ function buildExpressRouteHandler(
   }
   lines.push(`${indent}  } catch (err) {`)
   lines.push(`${indent}    if (err instanceof HttpError) {`)
-  lines.push(`${indent}      return void res.status(err.status).json({ error: err.message })`)
+  lines.push(`${indent}      ${expressHttpErrorReturn(errorFormat)}`)
   lines.push(`${indent}    }`)
   lines.push(`${indent}    throw err`)
   lines.push(`${indent}  }`)
@@ -1258,12 +1279,13 @@ export function generateExpressRouter(
   }
 
   if (needsQueryBoolHelper(operations)) lines.push(...TO_QUERY_BOOL_HELPER)
+  if (isProblemJson(options?.errorFormat)) lines.push(...expressProblemHelperLines())
   lines.push(`export function createRouter(service: ${serviceRef}): Router {`)
   lines.push('  const router = Router()')
   lines.push('')
 
   for (const op of operations) {
-    lines.push(buildExpressRouteHandler(op, '  ', options?.schemaNames, ctx))
+    lines.push(buildExpressRouteHandler(op, '  ', options?.schemaNames, ctx, options?.errorFormat))
     lines.push('')
   }
 
@@ -1313,12 +1335,13 @@ export function generateRouter(spec: OpenAPIV3_1.Document, options?: RouterOptio
   lines.push(`export { HttpError } from '${honoErrorsPath}'`)
   lines.push('')
   if (needsQueryBoolHelper(operations)) lines.push(...TO_QUERY_BOOL_HELPER)
+  if (isProblemJson(options?.errorFormat)) lines.push(...honoProblemHelperLines())
   lines.push(`export function createRouter(service: ${serviceRef}): Hono {`)
   lines.push('  const app = new Hono()')
   lines.push('')
 
   for (const op of operations) {
-    lines.push(buildRouteHandler(op, '  ', options?.schemaNames, ctx))
+    lines.push(buildRouteHandler(op, '  ', options?.schemaNames, ctx, options?.errorFormat))
     lines.push('')
   }
 

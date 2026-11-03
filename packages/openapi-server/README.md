@@ -299,6 +299,7 @@ serve({ fetch: app.fetch, port: 3001 })
 | `emit_response_validation` | No | `false` | Fastify only. Synthesize inline Zod response schemas for flat inline schemas. See below. |
 | `shared_output` | No | derived | Override directory for `_shared/errors.ts`. Default: derived from output paths (see below). |
 | `spec_prefix` | No | none | Namespace prefix for schema lookups when several specs share one `input_schema` file: looks up `${spec_prefix}${Type}Schema` instead of `${Type}Schema`. See [Sharing one schemas file across specs](#sharing-one-schemas-file-across-specs-spec_prefix). |
+| `error_format` | No | `"default"` | `"default"` or `"problem+json"`. With `"problem+json"`, router-produced errors use RFC 9457 / RFC 7807 `application/problem+json` bodies in all three frameworks. See [Problem details errors](#problem-details-errors-error_format). |
 
 Use `--config <path>` to point at a config file in a different location:
 
@@ -460,6 +461,53 @@ Each framework has a different error shape for built-in validation failures. Use
 | Zod validation failure | Fastify | 400 | `{ statusCode: 400, code: 'FST_ERR_VALIDATION', error: '...', message: '...' }` |
 | Unsupported Content-Type | Hono | 415 | `{ error: 'Unsupported Media Type' }` |
 | Unsupported Content-Type | Fastify | 415 | `{ statusCode: 415, code: 'FST_ERR_CTP_INVALID_MEDIA_TYPE', error: '...', message: '...' }` |
+
+### Problem details errors (`error_format`)
+
+Set `"error_format": "problem+json"` to replace the ad-hoc `{ error, issues }` bodies with [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) (the successor of RFC 7807) problem details. The default (`"default"`, or the field omitted) keeps the existing shapes byte-for-byte.
+
+```json
+{
+  "input_openapi": "./spec/api.json",
+  "output": "./generated",
+  "framework": "hono",
+  "input_schema": "./generated/schemas.ts",
+  "error_format": "problem+json"
+}
+```
+
+Every error the generated router produces is then sent with `Content-Type: application/problem+json`:
+
+```json
+{
+  "type": "about:blank",
+  "title": "Unprocessable Content",
+  "status": 422,
+  "detail": "Invalid request body",
+  "instance": "/pets",
+  "errors": [{ "code": "invalid_type", "path": ["name"], "message": "Invalid input: expected string, received undefined" }]
+}
+```
+
+| Member | Value |
+|---|---|
+| `type` | Always `"about:blank"` |
+| `title` | The HTTP reason phrase for `status` (e.g. `"Not Found"`) |
+| `status` | The HTTP status code |
+| `detail` | The router message (`"Invalid request body"`, `"Invalid query parameters"`, ...) or `HttpError.message` |
+| `instance` | The request path (Express: `req.baseUrl + req.path`, so it includes the mount prefix) |
+| `errors` | Extension member, present on validation failures: the Zod issues (Fastify: the type-provider validation entries) |
+
+What is covered per framework:
+
+| Error | Hono | Express | Fastify |
+|---|---|---|---|
+| Path / query / header / cookie / body validation | 422 | 422 | 400 (native validation; cookies 422) |
+| Invalid JSON body / unsupported media type | 400 / 415 | n/a (`express.json()` handles these) | other 4xx framework errors, e.g. 415 |
+| `HttpError` thrown by the service | its status | its status | its status |
+| Any other thrown error | re-thrown | re-thrown | re-thrown |
+
+On Fastify the mapping lives in the generated default `setErrorHandler`; a caller-supplied `errorHandler` in `CreateRouterOptions` still replaces it entirely. Errors raised by your own app-level handlers or middleware are not reshaped.
 
 ### How error propagation works
 

@@ -24,7 +24,7 @@ When `input_schema` is set in config:
 
 ## Config
 
-Default: `openapi-server.config.json` in CWD. Fields: `input_openapi`, `output`, `framework?` (`"hono"` | `"express"` | `"fastify"` | `"none"`, default: `"none"`), `input_schema?`, `shared_output?` (override for `_shared/errors.ts` location), `spec_prefix?` (namespace for schema lookups when several specs share one `input_schema`: `${spec_prefix}${Type}Schema` is imported aliased to the bare `${Type}Schema`, see `src/plugins/schema-prefix.ts`).
+Default: `openapi-server.config.json` in CWD. Fields: `input_openapi`, `output`, `framework?` (`"hono"` | `"express"` | `"fastify"` | `"none"`, default: `"none"`), `input_schema?`, `shared_output?` (override for `_shared/errors.ts` location), `spec_prefix?` (namespace for schema lookups when several specs share one `input_schema`: `${spec_prefix}${Type}Schema` is imported aliased to the bare `${Type}Schema`, see `src/plugins/schema-prefix.ts`), `error_format?` (`"default"` | `"problem+json"`; problem+json makes every router-produced error an RFC 9457 `application/problem+json` body, emitted via `src/plugins/problem-details.ts`; Fastify applies it in the generated default `setErrorHandler`).
 
 ## Fastify service interface shape
 
