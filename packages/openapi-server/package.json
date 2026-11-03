@@ -3,6 +3,9 @@
   "version": "2.2.1",
   "description": "Generate typed server-side service interfaces and framework routers from OpenAPI 3.1",
   "type": "module",
+  "engines": {
+    "node": ">=22.19.0"
+  },
   "bin": {
     "openapi-server": "./dist/cli.cjs"
   },

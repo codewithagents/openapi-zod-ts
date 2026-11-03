@@ -87,7 +87,7 @@ jobs:
       - run: pnpm test:coverage
 
       - name: Upload coverage to Codecov (api-errors)
-        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v5
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           use_oidc: true
           files: ./packages/api-errors/coverage/lcov.info
@@ -96,7 +96,7 @@ jobs:
           fail_ci_if_error: false
 
       - name: Upload coverage to Codecov (openapi-zod-ts)
-        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v5
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           use_oidc: true
           files: ./packages/openapi-zod-ts/coverage/lcov.info
@@ -105,7 +105,7 @@ jobs:
           fail_ci_if_error: false
 
       - name: Upload coverage to Codecov (openapi-react-query)
-        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v5
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           use_oidc: true
           files: ./packages/openapi-react-query/coverage/lcov.info
@@ -114,7 +114,7 @@ jobs:
           fail_ci_if_error: false
 
       - name: Upload coverage to Codecov (openapi-server)
-        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v5
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           use_oidc: true
           files: ./packages/openapi-server/coverage/lcov.info
@@ -123,7 +123,7 @@ jobs:
           fail_ci_if_error: false
 
       - name: Upload coverage to Codecov (openapi-msw)
-        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v5
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           use_oidc: true
           files: ./packages/openapi-msw/coverage/lcov.info

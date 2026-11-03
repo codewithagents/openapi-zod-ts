@@ -615,7 +615,7 @@ import { useListTasks } from '../api/hooks'
 import { configureClient } from '../api/client-config'
 
 const server = setupServer()
-beforeAll(() => server.listen({ onUnhandledFrame: 'error' })) // MSW 2: onUnhandledRequest
+beforeAll(() => server.listen({ onUnhandledFrame: 'error' })) // MSW 3; on MSW 2 use onUnhandledRequest
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
@@ -653,7 +653,7 @@ import { useCreateTask } from '../api/hooks'
 import { configureClient } from '../api/client-config'
 
 const server = setupServer()
-beforeAll(() => server.listen({ onUnhandledFrame: 'error' })) // MSW 2: onUnhandledRequest
+beforeAll(() => server.listen({ onUnhandledFrame: 'error' })) // MSW 3; on MSW 2 use onUnhandledRequest
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
