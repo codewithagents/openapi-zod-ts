@@ -141,7 +141,10 @@ export function createRouter(
             intParam: z.coerce.number().optional(),
             int32Param: z.coerce.number().optional(),
             numParam: z.coerce.number().optional(),
-            boolParam: z.boolean().optional(),
+            boolParam: z
+              .enum(['true', 'false'])
+              .transform((v) => v === 'true')
+              .optional(),
           }),
           response: { 200: MxAllPrimitivesContainerSchema },
         },

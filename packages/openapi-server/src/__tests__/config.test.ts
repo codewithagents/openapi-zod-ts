@@ -68,6 +68,41 @@ describe('loadConfig', () => {
     await expect(loadConfig(tmpDir)).rejects.toThrow('"input_schema" must be a non-empty string')
   })
 
+  it('loads spec_prefix when provided (#334)', async () => {
+    writeConfig({ input_openapi: 'openapi.json', output: 'out', spec_prefix: 'PublicApi' })
+    expect((await loadConfig(tmpDir)).spec_prefix).toBe('PublicApi')
+  })
+
+  it('spec_prefix is undefined when not provided', async () => {
+    writeConfig({ input_openapi: 'openapi.json', output: 'out' })
+    expect((await loadConfig(tmpDir)).spec_prefix).toBeUndefined()
+  })
+
+  it.each([
+    ['', '"spec_prefix" must be a non-empty string'],
+    [42, '"spec_prefix" must be a non-empty string'],
+    ['1Api', '"spec_prefix" must be a valid TypeScript identifier prefix'],
+    ['Public-Api', '"spec_prefix" must be a valid TypeScript identifier prefix'],
+  ])('throws on invalid spec_prefix %j', async (value, message) => {
+    writeConfig({ input_openapi: 'openapi.json', output: 'out', spec_prefix: value })
+    await expect(loadConfig(tmpDir)).rejects.toThrow(message)
+  })
+
+  it.each(['default', 'problem+json'])('loads error_format %s', async (value) => {
+    writeConfig({ input_openapi: 'openapi.json', output: 'out', error_format: value })
+    expect((await loadConfig(tmpDir)).error_format).toBe(value)
+  })
+
+  it('error_format is undefined when not provided', async () => {
+    writeConfig({ input_openapi: 'openapi.json', output: 'out' })
+    expect((await loadConfig(tmpDir)).error_format).toBeUndefined()
+  })
+
+  it.each(['problem', 'json', 42])('throws on invalid error_format %j', async (value) => {
+    writeConfig({ input_openapi: 'openapi.json', output: 'out', error_format: value })
+    await expect(loadConfig(tmpDir)).rejects.toThrow('"error_format" must be one of')
+  })
+
   it('loads a full config with framework: none', async () => {
     writeConfig({ input_openapi: 'openapi.json', output: 'src/server', framework: 'none' })
     const config = await loadConfig(tmpDir)

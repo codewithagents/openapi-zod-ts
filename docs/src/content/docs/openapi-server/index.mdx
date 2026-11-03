@@ -142,8 +142,10 @@ npx openapi-server --config ./config/openapi-server.config.json
 | `framework`                | `"hono" \| "express" \| "fastify" \| "none"` | No       | `"none"` | Router framework to generate. Use `"none"` to generate only `service.ts`                                                                                                                                                     |
 | `input_schema`             | `string`                                     | No       | n/a      | Path to user-owned Zod schema file. Enables server-side request validation (never overwritten)                                                                                                                               |
 | `context_type`             | `string`                                     | No       | n/a      | TypeScript type name threaded through every service method as a final `ctx` argument. On Fastify this becomes a required `createContext(req)` auth seam. See [request-scoped context](#request-scoped-context-context_type). |
-| `emit_response_validation` | `boolean`                                    | No       | `false`  | Fastify only. Synthesize inline Zod response schemas for flat inline response shapes. See [response validation](#response-validation-opt-in-emit_response_validation-fastify-only).                                          |
+| `emit_response_validation` | `boolean` | No | `false` | Validate JSON service results against the response schema before sending, in Hono, Express and Fastify; invalid results get a `500` and are never sent. See [response validation](#response-validation-opt-in-emit_response_validation). |
 | `shared_output`            | `string`                                     | No       | derived  | Override directory for the shared `_shared/errors.ts` file. Defaults to a location derived from the output paths.                                                                                                            |
+| `spec_prefix` | `string` | No | n/a | Namespace prefix for schema lookups when several specs share one `input_schema` file: `${spec_prefix}${Type}Schema` (e.g. `PublicApiGetUserSchema`) is imported under the bare `${Type}Schema` name. Unprefixed exports remain a fallback. `openapi-zod-ts` emits bare names only, so the shared prefixed file is user-maintained. |
+| `error_format` | `"default" \| "problem+json"` | No | `"default"` | `"problem+json"` makes router-produced errors (validation failures, 400/415, `HttpError` mapping, response-validation failures) RFC 9457 / RFC 7807 `application/problem+json` bodies `{ type, title, status, detail?, instance, errors? }` in Hono, Express and Fastify. |
 
 **Full config example:**
 
@@ -707,9 +709,9 @@ Fastify 5 natively parses only `application/json` and `text/plain`. For other co
 
 Pass `registerParsers: false` to register the multipart plugin yourself when you need custom options such as upload size limits.
 
-## Response validation opt-in (`emit_response_validation`, Fastify only)
+## Response validation opt-in (`emit_response_validation`)
 
-Set `emit_response_validation: true` to have the Fastify emitter synthesize inline Zod expressions for `schema.response` on routes that have no named schema from `input_schema`. The synthesizer is intentionally minimal: it handles flat objects with scalar properties, scalar top-level responses, and arrays of scalars, and falls back to `z.unknown()` for `$ref`, `allOf`, `oneOf`, `anyOf`, or nested objects. For complete, type-safe response validation, point `input_schema` at the `schemas.ts` from `openapi-zod-ts` instead.
+Set `emit_response_validation: true` to validate each JSON service result before it is sent. The schema is the named schema from `input_schema` for `$ref` / array-of-`$ref` responses, otherwise a schema synthesized from the inline response (flat objects with scalar properties, scalar top-level responses, arrays of scalars; `$ref`, `allOf`, `oneOf`, `anyOf` and nested objects fall back to `z.unknown()`). Hono and Express `safeParse` the result, send the parsed data (undeclared keys stripped) and answer `500` without the result on failure (a problem body with `error_format: "problem+json"`). Fastify attaches the same schemas to `schema.response`. For complete, type-safe response validation, point `input_schema` at the `schemas.ts` from `openapi-zod-ts`.
 
 ## What is out of scope
 
@@ -720,7 +722,7 @@ Coverage differs by framework. The Fastify router validates the most through `fa
 | Request body validation              | Native via `fastify-type-provider-zod`. Rejects with `400 FST_ERR_VALIDATION`.                                                         | `safeParse` when `input_schema` is set. Rejects with `422 { error, issues }`. |
 | Query and path validation            | Native, against the Zod schemas attached to each route.                                                                                | Not validated. Path params reach your service as raw strings.                 |
 | Request header and cookie validation | Headers validated natively; cookie params validated via a `_ckv` safeParse block (`422`). Requires `@fastify/cookie`.                  | Not extracted or validated.                                                   |
-| Response-body validation             | Available. Point `input_schema` at your `schemas.ts`, or set `emit_response_validation` for simple inline shapes.                      | Not generated. Validate in your service if needed.                            |
+| Response-body validation | Available. Point `input_schema` at your `schemas.ts`, or set `emit_response_validation` for simple inline shapes. | Opt-in via `emit_response_validation` (named schemas from `input_schema`, else synthesized inline schemas). Invalid results get a `500`. |
 | Security scheme enforcement          | Surfaced as metadata: `req.routeOptions.config.security` and a `@security` JSDoc tag. Enforce it in `createContext` or a `preHandler`. | Not generated. Add auth middleware manually (see above).                      |
 | `multipart/form-data` bodies         | Auto-registers `@fastify/multipart` with `attachFieldsToBody: true` so `req.body` is populated.                                        | Wire file upload routes manually.                                             |
 

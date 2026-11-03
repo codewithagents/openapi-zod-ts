@@ -6,6 +6,7 @@ import { loadConfigs, type ServerConfig } from './config.js'
 import { generateService, type ServiceOptions } from './plugins/service.js'
 import { generateFastifyTypes, generateFastifyTypedService } from './plugins/fastify-service.js'
 import { generateRouter, generateExpressRouter, generateFastifyRouter } from './plugins/router.js'
+import { resolvePrefixedSchemaNames } from './plugins/schema-prefix.js'
 import {
   emitSharedErrorsFile,
   deriveSharedDir,
@@ -22,9 +23,13 @@ async function formatTs(content: string, filePath: string): Promise<string> {
 interface BaseRouterOptions {
   schemaNames?: Set<string>
   schemaImportPath?: string
+  /** spec_prefix aliases: bare schema name -> actual exported name. */
+  schemaImportAliases?: Map<string, string>
   contextType?: string
   /** Relative path from the generated router.ts to the shared _shared/errors.js module. */
   errorsImportPath?: string
+  /** Forward the error_format config ('default' | 'problem+json'). */
+  errorFormat?: 'default' | 'problem+json'
 }
 
 /** Extended options for the Fastify zero-cast path. */
@@ -73,6 +78,7 @@ async function generateOne(
         contextType: config.context_type,
         emitResponseValidation: config.emit_response_validation === true,
         errorsImportPath,
+        errorFormat: config.error_format,
       })
     )
   }
@@ -120,6 +126,13 @@ async function generateSchemaEnhancedRouter(
 
   if (exportedSchemas.size === 0) return
 
+  // spec_prefix (#334): expose `${prefix}${Type}Schema` exports under their bare
+  // `${Type}Schema` lookup names; the emitters import them aliased back to the bare name.
+  const { schemaNames, importAliases } = resolvePrefixedSchemaNames(
+    exportedSchemas,
+    config.spec_prefix
+  )
+
   // Compute relative import path from outputDir to schemaPath
   const relPath = relative(outputDir, schemaPath).replace(/\\/g, '/')
   const schemaImportPath = relPath.startsWith('.') ? relPath : `./${relPath}`
@@ -128,22 +141,31 @@ async function generateSchemaEnhancedRouter(
   // Compute the relative path from this router's outputDir to the shared errors module.
   const errorsImportPath = sharedErrorsImportPath(outputDir, sharedDir)
 
+  // Router options shared by the Fastify zero-cast and the Hono/Express second pass.
+  const enhancedRouterOptions: FastifyRouterOptions = {
+    schemaNames,
+    schemaImportAliases: importAliases,
+    schemaImportPath: schemaImportPathJs,
+    contextType: config.context_type,
+    emitResponseValidation: config.emit_response_validation === true,
+    errorsImportPath,
+    errorFormat: config.error_format,
+  }
+
   // For Fastify: emit schema-types.ts (z.infer aliases) and re-emit service.ts using those
   // aliases. This enables the zero-cast router path where req.body and service params align.
   if (framework === 'fastify') {
-    const schemaTypesFile = generateFastifyTypes(exportedSchemas, schemaImportPathJs)
+    const schemaTypesFile = generateFastifyTypes(schemaNames, schemaImportPathJs, importAliases)
     const schemaTypesPath = join(outputDir, schemaTypesFile.filename)
     await writeFile(
       schemaTypesPath,
       await formatTs(schemaTypesFile.content, schemaTypesPath),
       'utf-8'
     )
-    console.log(
-      `${prefix}  ✓ schema-types.ts (z.infer aliases for ${exportedSchemas.size} schema(s))`
-    )
+    console.log(`${prefix}  ✓ schema-types.ts (z.infer aliases for ${schemaNames.size} schema(s))`)
 
     const fastifyServiceFile = generateFastifyTypedService(spec, {
-      schemaNames: exportedSchemas,
+      schemaNames,
       schemaImportPath: schemaImportPathJs,
       contextType: config.context_type,
     })
@@ -156,28 +178,19 @@ async function generateSchemaEnhancedRouter(
     console.log(`${prefix}  ✓ service.ts (Fastify-typed, imports from schema-types.js)`)
 
     const routerFile = buildRouterFile(spec, framework, {
-      schemaNames: exportedSchemas,
-      schemaImportPath: schemaImportPathJs,
+      ...enhancedRouterOptions,
       zeroCast: true,
-      contextType: config.context_type,
-      emitResponseValidation: config.emit_response_validation === true,
-      errorsImportPath,
     })
     const routerPath = join(outputDir, routerFile.filename)
     await writeFile(routerPath, await formatTs(routerFile.content, routerPath), 'utf-8')
-    console.log(`${prefix}  ✓ router.ts (Fastify zero-cast, ${exportedSchemas.size} schema(s))`)
+    console.log(`${prefix}  ✓ router.ts (Fastify zero-cast, ${schemaNames.size} schema(s))`)
     return
   }
 
-  const routerFile = buildRouterFile(spec, framework, {
-    schemaNames: exportedSchemas,
-    schemaImportPath: schemaImportPathJs,
-    contextType: config.context_type,
-    errorsImportPath,
-  })
+  const routerFile = buildRouterFile(spec, framework, enhancedRouterOptions)
   const routerPath = join(outputDir, routerFile.filename)
   await writeFile(routerPath, await formatTs(routerFile.content, routerPath), 'utf-8')
-  console.log(`${prefix}  ✓ router.ts (with Zod validation for ${exportedSchemas.size} schema(s))`)
+  console.log(`${prefix}  ✓ router.ts (with Zod validation for ${schemaNames.size} schema(s))`)
 }
 
 export async function generate(cwd: string, configPath?: string): Promise<void> {

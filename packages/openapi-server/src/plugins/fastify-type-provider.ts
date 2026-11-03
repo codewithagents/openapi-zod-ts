@@ -44,6 +44,14 @@ import {
   collectUsedSchemaNames,
   collectUsedResponseSchemaNames,
 } from './operation-ir.js'
+import { formatSchemaImportSpecifiers } from './schema-prefix.js'
+import {
+  type ErrorFormat,
+  isProblemJson,
+  fastifyErrorReturn,
+  fastifyProblemErrorHandlerLines,
+  fastifyProblemHelperLines,
+} from './problem-details.js'
 
 type OperationObject = OpenAPIV3_1.OperationObject
 type ReferenceObject = OpenAPIV3_1.ReferenceObject
@@ -78,6 +86,10 @@ interface RouteOperation {
 interface RouterOptions {
   schemaNames?: Set<string>
   schemaImportPath?: string
+  /** Bare schema name -> actual exported name, for spec_prefix (#334). See schema-prefix.ts. */
+  schemaImportAliases?: Map<string, string>
+  /** Error body format; 'problem+json' emits RFC 9457 / RFC 7807 bodies. See problem-details.ts. */
+  errorFormat?: ErrorFormat
   /**
    * When true, emit the zero-cast router: body is passed as req.body (no cast),
    * response is sent without a cast, and model imports are skipped. The router
@@ -361,7 +373,7 @@ function synthesizePropExpr(
  * CI runs fallow audit without coverage data.
  */
 // fallow-ignore-next-line complexity
-function synthesizeResponseSchemaExpr(
+export function synthesizeResponseSchemaExpr(
   schema: OpenAPIV3_1.SchemaObject | ReferenceObject | undefined
 ): string {
   if (schema === undefined || isRef(schema)) return 'z.unknown()'
@@ -402,6 +414,41 @@ function synthesizeResponseSchemaExpr(
   return synthesizePropExpr(s)
 }
 
+const SCALAR_QUERY_BOOL_EXPR = "z.enum(['true', 'false']).transform((v) => v === 'true')"
+
+/**
+ * Return the JSON schema of the operation's primary 2xx response: the first of 200, 201, then
+ * the other 2xx codes (204 excluded) that declares `application/json` content with a schema.
+ * $ref'd response objects are skipped. The returned schema may itself be a $ref.
+ *
+ * The priority-ordered 2xx scan mirrors fastify-service.ts getReturnInfo, which resolves type
+ * names rather than schemas; the two passes stay independent by design.
+ */
+export function findPrimaryJsonResponseSchema(
+  operation: OperationObject
+): OpenAPIV3_1.SchemaObject | ReferenceObject | undefined {
+  const responses = operation.responses as
+    Record<string, ResponseObject | ReferenceObject> | undefined
+  if (responses === undefined) return undefined
+  // fallow-ignore-next-line code-duplication
+  const priority = [
+    '200',
+    '201',
+    ...Object.keys(responses).filter(
+      (k) => /^2\d\d$/.test(k) && k !== '200' && k !== '201' && k !== '204'
+    ),
+  ]
+  for (const code of priority) {
+    const response = responses[code]
+    if (response === undefined || isRef(response)) continue
+    const content = (response as ResponseObject).content as
+      Record<string, { schema?: OpenAPIV3_1.SchemaObject | ReferenceObject }> | undefined
+    const schema = content?.['application/json']?.schema
+    if (schema !== undefined) return schema
+  }
+  return undefined
+}
+
 function queryParamItemExpr(itemsTsType: string | undefined): string {
   if (itemsTsType === 'number') return 'z.coerce.number()'
   if (itemsTsType === 'boolean') return 'z.boolean()'
@@ -422,7 +469,10 @@ function queryParamBaseExpr(param: QueryParam): string {
   // querystring schema matches the service T[] signature. Item coercion mirrors the scalar path.
   if (param.isArray === true) return `z.array(${queryParamItemExpr(param.itemsTsType)})`
   if (param.tsType === 'number') return `z.coerce.number()${numberConstraintSuffix(param)}`
-  if (param.tsType === 'boolean') return 'z.boolean()'
+  // Fastify's querystring parser never converts types, so a scalar boolean arrives as the
+  // string 'true'/'false'. Accept exactly those two and transform to a boolean; anything
+  // else is rejected with 400 by the validatorCompiler.
+  if (param.tsType === 'boolean') return SCALAR_QUERY_BOOL_EXPR
   return enumOrStringExpr(param)
 }
 
@@ -496,10 +546,13 @@ function buildParamsSchemaExpr(op: RouteOperation, spec: OpenAPIV3_1.Document): 
  * Returns undefined when no complex query params are present.
  */
 function buildPreValidationLines(queryParams: QueryParam[]): string[] | undefined {
-  const hasComplex = queryParams.some(
-    (q) => q.isDeepObject === true || q.delimiterStyle !== undefined
+  // A param whose URL key differs from its normalized identifier (e.g. `is-active` ->
+  // `isActive`) also needs the reshape: the querystring schema and the service type are keyed
+  // by the identifier, but Fastify parses req.query with the raw URL keys.
+  const needsReshape = queryParams.some(
+    (q) => q.isDeepObject === true || q.delimiterStyle !== undefined || q.name !== q.rawName
   )
-  if (!hasComplex) return undefined
+  if (!needsReshape) return undefined
 
   const lines: string[] = []
   lines.push(`      const _dq = req.query as unknown as Record<string, string | undefined>`)
@@ -565,7 +618,8 @@ function buildFastifyTypeProviderHandler(
   schemaNames?: Set<string>,
   contextType?: string,
   zeroCast?: boolean,
-  emitResponseValidation?: boolean
+  emitResponseValidation?: boolean,
+  errorFormat?: ErrorFormat
 ): string {
   const lines: string[] = []
   const inner = `${indent}  `
@@ -642,35 +696,10 @@ function buildFastifyTypeProviderHandler(
     op.responseStatus.isMultiStatus !== true &&
     !op.responseStatus.isVoid
   ) {
-    const responses = op.rawOperation.responses as
-      Record<string, ResponseObject | ReferenceObject> | undefined
-    if (responses !== undefined) {
-      // The priority-ordered 2xx response scan mirrors the one in fastify-service.ts
-      // getReturnInfo. Both emitters must independently walk the same responses object:
-      // fastify-service.ts resolves type names, this emitter synthesizes Zod expressions.
-      // They cannot share a helper without coupling two separate generation passes.
-      // fallow-ignore-next-line code-duplication
-      const priority = [
-        '200',
-        '201',
-        ...Object.keys(responses).filter(
-          (k) => /^2\d\d$/.test(k) && k !== '200' && k !== '201' && k !== '204'
-        ),
-      ]
-      for (const code of priority) {
-        const response = responses[code]
-        if (response === undefined || isRef(response)) continue
-        const content = (response as ResponseObject).content as
-          Record<string, { schema?: OpenAPIV3_1.SchemaObject | ReferenceObject }> | undefined
-        if (content === undefined) continue
-        const jsonContent = content['application/json']
-        if (jsonContent?.schema === undefined) continue
-        // Only synthesize for inline schemas: $ref responses are handled via named schema lookup.
-        if (!isRef(jsonContent.schema)) {
-          responseSchemaExpr = synthesizeResponseSchemaExpr(jsonContent.schema)
-        }
-        break
-      }
+    // Only synthesize for inline schemas: $ref responses are handled via named schema lookup.
+    const primary = findPrimaryJsonResponseSchema(op.rawOperation)
+    if (primary !== undefined && !isRef(primary)) {
+      responseSchemaExpr = synthesizeResponseSchemaExpr(primary)
     }
   }
 
@@ -730,7 +759,7 @@ function buildFastifyTypeProviderHandler(
     lines.push(`${inner}})`)
     lines.push(`${inner}if (!_ckv.success) {`)
     lines.push(
-      `${inner}  return reply.status(422).send({ error: 'Invalid request cookies', issues: _ckv.error.issues })`
+      `${inner}  ${fastifyErrorReturn(422, 'Invalid request cookies', '_ckv.error.issues', errorFormat)}`
     )
     lines.push(`${inner}}`)
   }
@@ -1009,8 +1038,8 @@ export function generateFastifyRouter(
   // z is always imported for schema.params/querystring/headers/response and cookie _ckv blocks.
   lines.push(`import { z } from 'zod'`)
   if (allUsedSchemaNames.size > 0 && options?.schemaImportPath !== undefined) {
-    const sortedUsedSchemas = Array.from(allUsedSchemaNames).sort()
-    lines.push(`import { ${sortedUsedSchemas.join(', ')} } from '${options.schemaImportPath}'`)
+    const specifiers = formatSchemaImportSpecifiers(allUsedSchemaNames, options.schemaImportAliases)
+    lines.push(`import { ${specifiers} } from '${options.schemaImportPath}'`)
   }
   lines.push('')
   // Augment FastifyContextConfig so that config: { operationId, security } on each route is type-safe.
@@ -1025,6 +1054,8 @@ export function generateFastifyRouter(
   lines.push(`import { HttpError } from '${errorsImportPath}'`)
   lines.push(`export { HttpError } from '${errorsImportPath}'`)
   lines.push('')
+  const problemJson = isProblemJson(options?.errorFormat)
+  if (problemJson) lines.push(...fastifyProblemHelperLines())
   // Emit the CreateRouterOptions escape hatch so callers can override compilers/errorHandler
   // and control parser registration without having to re-implement the whole plugin.
   // When context_type is set, the interface is generic and adds the required createContext field.
@@ -1128,31 +1159,40 @@ export function generateFastifyRouter(
   lines.push('    if (options?.errorHandler !== undefined) {')
   lines.push('      app.setErrorHandler(options.errorHandler)')
   lines.push('    } else {')
-  // Emit a small status-code-to-code lookup for the error envelope. This mirrors the
-  // FST_ERR_VALIDATION shape (statusCode, code, error, message) so HttpError responses
-  // are structurally consistent with Fastify's built-in validation errors.
-  lines.push('      const _HTTP_CODES: Record<number, string> = {')
-  lines.push("        400: 'BAD_REQUEST',")
-  lines.push("        401: 'UNAUTHORIZED',")
-  lines.push("        403: 'FORBIDDEN',")
-  lines.push("        404: 'NOT_FOUND',")
-  lines.push("        409: 'CONFLICT',")
-  lines.push("        410: 'GONE',")
-  lines.push("        422: 'UNPROCESSABLE_ENTITY',")
-  lines.push("        429: 'TOO_MANY_REQUESTS',")
-  lines.push("        500: 'INTERNAL_ERROR',")
-  lines.push('      }')
-  lines.push('      app.setErrorHandler((err, _req, reply) => {')
-  lines.push('        if (err instanceof HttpError) {')
-  lines.push("          const _errCode = _HTTP_CODES[err.status] ?? 'APP_ERROR'")
-  lines.push('          const _errReply = reply.status(err.status)')
-  lines.push(
-    '          return _errReply.send({ statusCode: err.status, code: _errCode, error: err.message, message: err.message })'
-  )
-  lines.push('        }')
-  lines.push('        throw err')
-  lines.push('      })')
-  lines.push('    }')
+  if (problemJson) {
+    // error_format: 'problem+json': one handler maps HttpError, validation, serialization and
+    // other 4xx framework errors to application/problem+json; anything else is re-thrown.
+    lines.push('      app.setErrorHandler((err, req, reply) => {')
+    lines.push(...fastifyProblemErrorHandlerLines('        '))
+    lines.push('      })')
+    lines.push('    }')
+  } else {
+    // Emit a small status-code-to-code lookup for the error envelope. This mirrors the
+    // FST_ERR_VALIDATION shape (statusCode, code, error, message) so HttpError responses
+    // are structurally consistent with Fastify's built-in validation errors.
+    lines.push('      const _HTTP_CODES: Record<number, string> = {')
+    lines.push("        400: 'BAD_REQUEST',")
+    lines.push("        401: 'UNAUTHORIZED',")
+    lines.push("        403: 'FORBIDDEN',")
+    lines.push("        404: 'NOT_FOUND',")
+    lines.push("        409: 'CONFLICT',")
+    lines.push("        410: 'GONE',")
+    lines.push("        422: 'UNPROCESSABLE_ENTITY',")
+    lines.push("        429: 'TOO_MANY_REQUESTS',")
+    lines.push("        500: 'INTERNAL_ERROR',")
+    lines.push('      }')
+    lines.push('      app.setErrorHandler((err, _req, reply) => {')
+    lines.push('        if (err instanceof HttpError) {')
+    lines.push("          const _errCode = _HTTP_CODES[err.status] ?? 'APP_ERROR'")
+    lines.push('          const _errReply = reply.status(err.status)')
+    lines.push(
+      '          return _errReply.send({ statusCode: err.status, code: _errCode, error: err.message, message: err.message })'
+    )
+    lines.push('        }')
+    lines.push('        throw err')
+    lines.push('      })')
+    lines.push('    }')
+  }
 
   // Global lifecycle hooks: registered after setErrorHandler, before body parsers.
   // _asHookArray normalizes single-handler and array forms into a plain array.
@@ -1218,7 +1258,8 @@ export function generateFastifyRouter(
         options?.schemaNames,
         ctx,
         zeroCast,
-        options?.emitResponseValidation
+        options?.emitResponseValidation,
+        options?.errorFormat
       )
     )
   }

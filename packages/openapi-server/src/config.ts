@@ -27,9 +27,15 @@ export interface ServerConfig {
    */
   context_type?: string
   /**
-   * Fastify only. When true, the generated router emits inline Zod response schema
-   * expressions in schema.response for operations with flat inline response schemas.
-   * Operations with $ref, allOf, oneOf, anyOf, or nested schemas fall back to z.unknown().
+   * When true, the generated router validates JSON service results against the response
+   * schema before sending: the named schema from input_schema for $ref / array-of-$ref
+   * responses, otherwise a Zod expression synthesized from a flat inline response schema
+   * ($ref, allOf, oneOf, anyOf, or nested schemas fall back to z.unknown(), i.e. unchecked).
+   *
+   * - Hono / Express: safeParse the result; send the parsed data, or respond 500 without the
+   *   result on failure (a problem+json body when error_format is 'problem+json').
+   * - Fastify: named schemas are always attached to schema.response; this flag additionally
+   *   attaches the synthesized inline schemas.
    *
    * Default: false. For best coverage, wire input_schema with your Zod schema file and let
    * the generator use the exact schemas you own.
@@ -46,6 +52,27 @@ export interface ServerConfig {
    * to consolidate the shared runtime at a specific location.
    */
   shared_output?: string
+  /**
+   * Namespace prefix for schema lookups in `input_schema`, for sharing ONE schemas file
+   * across several specs (#334). When set, the router looks up `${spec_prefix}${Type}Schema`
+   * (e.g. `PublicApiGetUserSchema`) instead of the bare `${Type}Schema`, and imports it
+   * under the bare name. Unprefixed exports remain available as a fallback for schemas that
+   * are genuinely shared between specs. Must be a valid identifier prefix (e.g. "PublicApi").
+   * Has no effect without `input_schema`. Default: unset (bare names).
+   */
+  spec_prefix?: string
+  /**
+   * Shape of the error responses the generated router produces (Zod validation failures,
+   * invalid JSON / unsupported media type, HttpError mapping, response-validation failures).
+   *
+   * - 'default' (or unset): the existing `{ error, issues? }` bodies (Fastify: its native
+   *   validation envelope and `{ statusCode, code, error, message }` for HttpError).
+   * - 'problem+json': RFC 9457 / RFC 7807 `application/problem+json` bodies
+   *   `{ type, title, status, detail?, instance, errors? }`, with Zod issues under the
+   *   `errors` extension member. On Fastify this is applied by the generated default
+   *   setErrorHandler (a caller-supplied `errorHandler` still takes precedence).
+   */
+  error_format?: 'default' | 'problem+json'
 }
 
 /** Validate that an optional config field is a non-empty string when present. */
@@ -53,6 +80,26 @@ function assertOptionalString(raw: Record<string, unknown>, key: string, label: 
   if (raw[key] !== undefined && (typeof raw[key] !== 'string' || !raw[key])) {
     throw new Error(`"${key}" must be a non-empty string ${label}`)
   }
+}
+
+/** spec_prefix: optional non-empty string that is a valid identifier prefix. */
+function assertSpecPrefix(raw: Record<string, unknown>): void {
+  assertOptionalString(raw, 'spec_prefix', 'identifier prefix (e.g. "PublicApi")')
+  const value = raw['spec_prefix']
+  if (value !== undefined && !/^[A-Za-z_$][\w$]*$/.test(value as string)) {
+    throw new Error(
+      '"spec_prefix" must be a valid TypeScript identifier prefix (letters, digits, _ or $; not starting with a digit)'
+    )
+  }
+}
+
+/** error_format: optional 'default' | 'problem+json'. */
+function parseErrorFormat(raw: Record<string, unknown>): ServerConfig['error_format'] {
+  const value = raw['error_format']
+  if (value !== undefined && value !== 'default' && value !== 'problem+json') {
+    throw new Error('"error_format" must be one of: "default" or "problem+json"')
+  }
+  return value
 }
 
 function parseServerConfig(
@@ -72,6 +119,8 @@ function parseServerConfig(
   assertOptionalString(raw, 'input_schema', 'path to your Zod schema file')
   assertOptionalString(raw, 'context_type', 'TypeScript type name')
   assertOptionalString(raw, 'shared_output', 'path to the shared output directory')
+  assertSpecPrefix(raw)
+  const errorFormat = parseErrorFormat(raw)
   if (
     raw['emit_response_validation'] !== undefined &&
     typeof raw['emit_response_validation'] !== 'boolean'
@@ -85,6 +134,8 @@ function parseServerConfig(
     context_type: raw['context_type'] as string | undefined,
     emit_response_validation: raw['emit_response_validation'] as boolean | undefined,
     shared_output: raw['shared_output'] as string | undefined,
+    spec_prefix: raw['spec_prefix'] as string | undefined,
+    error_format: errorFormat,
   }
 }
 
