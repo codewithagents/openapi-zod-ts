@@ -20,6 +20,11 @@ export interface MswConfig {
   max_array_items?: number
   /** Maximum schema recursion depth before emitting null (default: 30) */
   depth_cap?: number
+  /**
+   * Origin (optionally with a base path) prefixed to every handler path, e.g.
+   * "https://api.test". When omitted, handlers match any origin via MSW's "*" wildcard.
+   */
+  base_url?: string
 }
 
 function expectIntegerAtLeast(raw: Record<string, unknown>, key: string, min: number): void {
@@ -33,10 +38,19 @@ function expectIntegerAtLeast(raw: Record<string, unknown>, key: string, min: nu
   }
 }
 
+function expectNonEmptyString(raw: Record<string, unknown>, key: string): void {
+  const val = raw[key]
+  if (val === undefined) return
+  if (typeof val !== 'string' || val.trim() === '') {
+    throw new Error(`"${key}" must be a non-empty string`)
+  }
+}
+
 function validateMswFields(raw: Record<string, unknown>): void {
   expectIntegerAtLeast(raw, 'seed', 0)
   expectIntegerAtLeast(raw, 'max_array_items', 1)
   expectIntegerAtLeast(raw, 'depth_cap', 1)
+  expectNonEmptyString(raw, 'base_url')
 }
 
 function parseMswConfig(
@@ -49,6 +63,7 @@ function parseMswConfig(
     seed: raw['seed'] as number | undefined,
     max_array_items: raw['max_array_items'] as number | undefined,
     depth_cap: raw['depth_cap'] as number | undefined,
+    base_url: raw['base_url'] as string | undefined,
   }
 }
 

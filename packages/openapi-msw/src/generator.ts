@@ -23,6 +23,7 @@ async function generateOne(cwd: string, config: MswConfig, label?: string): Prom
     seed: config.seed ?? 42,
     maxArrayItems: config.max_array_items ?? 3,
     depthCap: config.depth_cap ?? 30,
+    baseUrl: config.base_url,
   })
 
   await mkdir(outputDir, { recursive: true })

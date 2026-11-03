@@ -5,7 +5,7 @@ import { faker } from '@faker-js/faker'
 faker.seed(42)
 
 export const handlers = [
-  http.get('/api/v1/tasks', () =>
+  http.get('*/api/v1/tasks', () =>
     HttpResponse.json({
       items: Array.from({ length: 3 }, () => ({
         id: faker.string.uuid(),
@@ -21,7 +21,7 @@ export const handlers = [
       pageSize: faker.number.int({ min: 1, max: 1000 }),
     })
   ),
-  http.post('/api/v1/tasks', () =>
+  http.post('*/api/v1/tasks', () =>
     HttpResponse.json(
       {
         id: faker.string.uuid(),
@@ -35,7 +35,7 @@ export const handlers = [
       { status: 201 }
     )
   ),
-  http.post('/api/v1/tasks/upload', () =>
+  http.post('*/api/v1/tasks/upload', () =>
     HttpResponse.json({
       id: faker.string.uuid(),
       title: faker.lorem.word(),
@@ -46,7 +46,7 @@ export const handlers = [
       createdAt: faker.date.recent().toISOString(),
     })
   ),
-  http.get('/api/v1/tasks/:id', () =>
+  http.get('*/api/v1/tasks/:id', () =>
     HttpResponse.json({
       id: faker.string.uuid(),
       title: faker.lorem.word(),
@@ -57,7 +57,7 @@ export const handlers = [
       createdAt: faker.date.recent().toISOString(),
     })
   ),
-  http.patch('/api/v1/tasks/:id', () =>
+  http.patch('*/api/v1/tasks/:id', () =>
     HttpResponse.json({
       id: faker.string.uuid(),
       title: faker.lorem.word(),
@@ -68,5 +68,5 @@ export const handlers = [
       createdAt: faker.date.recent().toISOString(),
     })
   ),
-  http.delete('/api/v1/tasks/:id', () => HttpResponse.json(null, { status: 204 })),
+  http.delete('*/api/v1/tasks/:id', () => HttpResponse.json(null, { status: 204 })),
 ]

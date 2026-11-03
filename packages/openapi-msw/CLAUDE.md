@@ -22,6 +22,7 @@ Default: `openapi-msw.config.json` in CWD. Point elsewhere with `--config <path>
 | `seed` | number | `42` | Passed to `faker.seed()`; integer >= 0 |
 | `max_array_items` | number | `3` | Array length in generated mocks; integer >= 1 |
 | `depth_cap` | number | `30` | Schema recursion depth before emitting `null`; integer >= 1 |
+| `base_url` | string | `*` wildcard | Origin (+ optional base path) prefixed to every handler path; non-empty string |
 
 Multi-spec generation via a top-level `projects` array (inherited from openapi-zod-ts config-core). Mixing `projects` with top-level `input_openapi`/`output` throws.
 
@@ -40,6 +41,8 @@ The generated `handlers.ts` imports `http`/`HttpResponse` from `msw` and `faker`
 **Seeded faker**: `faker.seed(42)` (default, configurable) ensures generated output is stable across runs. The seed is emitted at the top of the generated file, not in the generator itself.
 
 **MSW v2 path syntax**: OpenAPI `{id}` path params are converted to MSW `:id` colon-style params.
+
+**Origin-anchored handler URLs**: never emit a bare relative path. MSW resolves relative matchers against `location.href`, so in Node (`setupServer`) `'/api/v1/tasks'` never matches `fetch('http://localhost/api/v1/tasks')`. Default is `'*/api/v1/tasks'` (any origin); `base_url` replaces `*`. `handlers-runtime.test.ts` proves this with a real `setupServer` + `onUnhandledFrame: 'error'`.
 
 **depth_cap**: Schema recursion is terminated at depth 30 (default, configurable) with `null /* depth cap reached */` to avoid infinite loops on circular or deeply nested allOf/anyOf/oneOf schemas. The depth counter increments at each $ref hop and each allOf/anyOf/oneOf resolution step.
 

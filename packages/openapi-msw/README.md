@@ -12,6 +12,7 @@
 - **One handler per operation**: every `get`, `post`, `put`, `patch`, and `delete` operation becomes an `http.<method>(path, resolver)` entry in an exported `handlers` array.
 - **Seeded, deterministic mocks**: `faker.seed(<seed>)` (default `42`) is written into the generated file, so every run with the same spec and seed produces identical mock values. Change the seed, re-generate, get a new but still stable dataset.
 - **MSW v2 path syntax**: OpenAPI `{id}` path params are rewritten to MSW colon style `:id`. Every param in a path is converted (`/orgs/{orgId}/repos/{repoId}` becomes `/orgs/:orgId/repos/:repoId`).
+- **Works in the browser and in Node**: handler paths are anchored to an origin (the `*` wildcard by default, or your `base_url`), so they match the absolute URLs Node's `fetch` sends under `setupServer` as well as browser requests under `setupWorker`.
 - **Schema-aware bodies**: each handler returns a Faker-generated body shaped from the operation's 2xx JSON response schema, honouring string formats, enums, arrays, and nested objects.
 - **Prettier-clean output**: the generated `handlers.ts` passes `prettier --check` out of the box.
 - **OpenAPI 3.x**: 3.1.x is the primary target; 3.0.x is supported in practice (8 of the 13 showcase specs are 3.0.x and all compile under `tsc --strict`).
@@ -101,7 +102,7 @@ import { faker } from '@faker-js/faker'
 faker.seed(42)
 
 export const handlers = [
-  http.get('/api/v1/tasks', () =>
+  http.get('*/api/v1/tasks', () =>
     HttpResponse.json({
       items: Array.from({ length: 3 }, () => ({
         id: faker.string.uuid(),
@@ -114,7 +115,7 @@ export const handlers = [
       total: faker.number.int({ min: 1, max: 1000 }),
     })
   ),
-  http.delete('/api/v1/tasks/:id', () => HttpResponse.json(null, { status: 204 })),
+  http.delete('*/api/v1/tasks/:id', () => HttpResponse.json(null, { status: 204 })),
 ]
 ```
 
@@ -133,8 +134,9 @@ A committed, drift-checked sample lives at [`packages/integration/generated/hand
 | `seed` | No | `42` | Passed to `faker.seed()` in the generated file. Must be an integer `>= 0` |
 | `max_array_items` | No | `3` | Length of arrays in generated mocks. Must be an integer `>= 1` |
 | `depth_cap` | No | `30` | Schema recursion depth before bailing out to `null`. Must be an integer `>= 1` |
+| `base_url` | No | `*` wildcard origin | Origin (optionally with a base path) prefixed to every handler path, e.g. `"https://api.test"` gives `https://api.test/api/v1/tasks`. Trailing slashes are dropped. Must be a non-empty string |
 
-The three optional keys are validated only when present.
+The optional keys are validated only when present.
 
 **Multi-spec generation.** Replace the top-level fields with a `projects` array to generate one `handlers.ts` per spec. Mixing a `projects` array with top-level `input_openapi` / `output` throws.
 
@@ -174,6 +176,7 @@ The resolver body for each handler is built from the operation's selected 2xx JS
 ## Non-obvious behavior
 
 - **The seed lives in the output, not the runtime.** `faker.seed(<seed>)` is the first executable line of the generated file. To change mock values, re-generate with a different `seed`. Two runs of the same spec and seed produce byte-identical handlers.
+- **Handler URLs are origin-anchored.** A bare relative matcher such as `'/api/v1/tasks'` is resolved by MSW against `location.href`, so in Node (`setupServer` from `msw/node`) it never matches an absolute request like `fetch('http://localhost/api/v1/tasks')`. Generated handlers therefore always carry an origin: `'*/api/v1/tasks'` by default (MSW's wildcard: any origin, browser and Node alike), or `'<base_url>/api/v1/tasks'` when `base_url` is set. Set `base_url` when you want handlers to match only one origin, or when your server URL carries a base path the spec's `paths` do not include (for example `"https://api.test/v2"`). Output generated before this change used bare relative paths; re-generate to pick up the fix.
 - **2xx selection order.** The generator prefers a `200` response, then `201`, then the first 2xx code that declares an `application/json` body. A `200` emits `HttpResponse.json(body)` with no status argument; any other 2xx (for example `201`) emits `HttpResponse.json(body, { status: N })`.
 - **No JSON body.** If the chosen 2xx response has no `application/json` schema, the handler emits `HttpResponse.json(null, { status: N })` (status from the first 2xx code, defaulting to `204`). If that response instead declares a non-JSON content type (`text/plain`, `text/csv`, `application/octet-stream`, image, and so on) the handler emits `new HttpResponse(null, { status: N })` rather than falsely claiming `application/json`. Only `application/json` content is mocked with a faker body.
 - **`allOf` is merged; `anyOf` / `oneOf` is not unioned.** Properties of all `allOf` members are merged into one object and their `required` arrays concatenated. For `anyOf` / `oneOf` the generator picks the first concrete (non-`$ref`) member, or resolves the first member if all are refs.
@@ -196,6 +199,7 @@ const { filename, content } = generateHandlers(spec, {
   seed: 42,
   maxArrayItems: 3,
   depthCap: 30,
+  baseUrl: 'https://api.test', // optional; omit for the '*' wildcard origin
 })
 // filename === 'handlers.ts'
 ```

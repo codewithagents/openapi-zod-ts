@@ -14,6 +14,13 @@ export interface HandlerGenOptions {
    * allOf/anyOf/oneOf resolution steps. Default: 30.
    */
   depthCap: number
+  /**
+   * Origin (optionally with a base path) prefixed to every handler path, e.g.
+   * `https://api.test` -> `https://api.test/api/v1/tasks`. When omitted, handlers are
+   * prefixed with MSW's `*` wildcard origin, which matches any origin in both the browser
+   * (`setupWorker`) and Node (`setupServer`).
+   */
+  baseUrl?: string
 }
 
 export interface GeneratedFile {
@@ -38,6 +45,24 @@ function refName(ref: string): string {
 /** Convert OpenAPI {param} path params to MSW :param colon style */
 function toMswPath(openApiPath: string): string {
   return openApiPath.replace(/\{([^}]+)\}/g, ':$1')
+}
+
+/**
+ * Build the full MSW request matcher for an OpenAPI path. A relative path such as
+ * `/api/v1/tasks` only matches same-origin requests in the browser and never matches the
+ * absolute URLs Node's fetch requires, so the path is always anchored to an origin: the
+ * configured base URL, or the `*` wildcard origin when none is set.
+ */
+function toMswUrl(openApiPath: string, baseUrl: string | undefined): string {
+  let origin = baseUrl ?? '*'
+  while (origin.endsWith('/')) origin = origin.slice(0, -1)
+  const path = toMswPath(openApiPath)
+  return `${origin}${path.startsWith('/') ? '' : '/'}${path}`
+}
+
+/** Single-quoted TS string literal (escapes backslashes and single quotes). */
+function quote(value: string): string {
+  return `'${value.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`
 }
 
 // ── Schema resolution ──────────────────────────────────────────────────────────
@@ -313,16 +338,16 @@ function buildHandlerLine(
   schemas: Record<string, SchemaOrRef>,
   opts: HandlerGenOptions
 ): string {
-  const mswPath = toMswPath(path)
+  const mswPath = quote(toMswUrl(path, opts.baseUrl))
   const responseBody = find2xxResponse(responses)
 
   if (responseBody === null) {
     const status = noBodyStatus(responses)
     // Use new HttpResponse() for non-JSON content types to avoid claiming application/json
     if (is2xxNonJsonBody(responses)) {
-      return `http.${method}('${mswPath}', () => new HttpResponse(null, { status: ${status} }))`
+      return `http.${method}(${mswPath}, () => new HttpResponse(null, { status: ${status} }))`
     }
-    return `http.${method}('${mswPath}', () => HttpResponse.json(null, { status: ${status} }))`
+    return `http.${method}(${mswPath}, () => HttpResponse.json(null, { status: ${status} }))`
   }
 
   const bodyExpr = schemaToFaker(
@@ -335,9 +360,9 @@ function buildHandlerLine(
   )
   const needsStatus = responseBody.statusCode !== 200
   if (needsStatus) {
-    return `http.${method}('${mswPath}', () => HttpResponse.json(${bodyExpr}, { status: ${responseBody.statusCode} }))`
+    return `http.${method}(${mswPath}, () => HttpResponse.json(${bodyExpr}, { status: ${responseBody.statusCode} }))`
   }
-  return `http.${method}('${mswPath}', () => HttpResponse.json(${bodyExpr}))`
+  return `http.${method}(${mswPath}, () => HttpResponse.json(${bodyExpr}))`
 }
 
 /** Collect handler lines for all operations in a single path item. */

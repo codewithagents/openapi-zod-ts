@@ -5,7 +5,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],
-      exclude: ['src/**/*.test.ts', 'src/cli.ts', 'src/generator.ts'],
+      exclude: ['src/**/*.test.ts', 'src/__tests__/**', 'src/cli.ts', 'src/generator.ts'],
       // Seeded below current (82.98/75/96.96/87.97) with generous margin (smaller,
       // more volatile suite). Ratchet up over time.
       thresholds: {

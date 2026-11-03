@@ -36,6 +36,7 @@ describe('loadConfig: valid config', () => {
     expect(config.seed).toBeUndefined()
     expect(config.max_array_items).toBeUndefined()
     expect(config.depth_cap).toBeUndefined()
+    expect(config.base_url).toBeUndefined()
   })
 
   it('loads optional fields when provided', async () => {
@@ -45,8 +46,10 @@ describe('loadConfig: valid config', () => {
       seed: 0,
       max_array_items: 5,
       depth_cap: 10,
+      base_url: 'https://api.test',
     })
     const config = await loadConfig(cwd, configPath)
+    expect(config.base_url).toBe('https://api.test')
     expect(config.seed).toBe(0)
     expect(config.max_array_items).toBe(5)
     expect(config.depth_cap).toBe(10)
@@ -108,6 +111,30 @@ describe('loadConfig: invalid field values', () => {
       depth_cap: 3.7,
     })
     await expect(loadConfig(cwd, configPath)).rejects.toThrow('"depth_cap" must be an integer')
+  })
+})
+
+describe('loadConfig: base_url', () => {
+  it('rejects a non-string base_url', async () => {
+    const { cwd, configPath } = await writeConfig({
+      input_openapi: 'spec.json',
+      output: 'generated',
+      base_url: 42,
+    })
+    await expect(loadConfig(cwd, configPath)).rejects.toThrow(
+      '"base_url" must be a non-empty string'
+    )
+  })
+
+  it('rejects an empty base_url', async () => {
+    const { cwd, configPath } = await writeConfig({
+      input_openapi: 'spec.json',
+      output: 'generated',
+      base_url: '  ',
+    })
+    await expect(loadConfig(cwd, configPath)).rejects.toThrow(
+      '"base_url" must be a non-empty string'
+    )
   })
 })
 
