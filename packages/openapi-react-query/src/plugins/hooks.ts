@@ -1167,6 +1167,47 @@ function collectOperations(
   return operations
 }
 
+/** Which @tanstack/react-query exports the generated file uses. */
+interface ReactQueryImportNeeds {
+  queries: boolean
+  useQueries: boolean
+  suspense: boolean
+  infinite: boolean
+  mutations: boolean
+  queryClient: boolean
+  optimistic: boolean
+}
+
+function buildReactQueryImports(needs: ReactQueryImportNeeds): string[] {
+  const groups: Array<[boolean, string[]]> = [
+    [needs.queries, ['queryOptions', 'useQuery', 'type UseQueryOptions']],
+    [needs.useQueries, ['useQueries', 'type UseQueryResult']],
+    [needs.suspense, ['useSuspenseQuery', 'type UseSuspenseQueryOptions']],
+    [
+      needs.infinite,
+      ['useInfiniteQuery', 'type UseInfiniteQueryOptions', 'type InfiniteData', 'type QueryKey'],
+    ],
+    [needs.mutations, ['useMutation', 'type UseMutationOptions']],
+    [needs.queryClient, ['useQueryClient']],
+    // The optimistic helpers need QueryKey too; infinite hooks may already import it.
+    [
+      needs.optimistic,
+      needs.infinite ? ['type QueryClient'] : ['type QueryClient', 'type QueryKey'],
+    ],
+  ]
+  return groups.flatMap(([needed, names]) => (needed ? names : []))
+}
+
+/** Client imports: every operation function, ApiError, and per-operation error aliases in use. */
+function buildClientImports(operations: OperationMeta[]): string[] {
+  const funcNames = operations.map((op) => op.funcName).sort()
+  const errorAliases = [...new Set(operations.map((op) => op.errorType))]
+    .filter((t) => t !== 'ApiError')
+    .sort()
+    .map((t) => `type ${t}`)
+  return [...funcNames, 'type ApiError', ...errorAliases]
+}
+
 export function generateHooks(
   spec: OpenAPIV3_1.Document,
   options: HookGenOptions
@@ -1344,33 +1385,18 @@ export function generateHooks(
   }
 
   // Determine which react-query exports to import
-  const needsQueryOptions = getOps.length > 0
-  const needsUseQuery = getOps.length > 0
-  const needsUseMutation = mutationOps.length > 0
-  const needsUseSuspenseQuery = suspense && getOps.length > 0
-  const needsOptimistic = optimisticUpdates && needsUseMutation
-  const needsUseQueryClient = (autoInvalidate || optimisticUpdates) && needsUseMutation
-  const rqImports: string[] = []
-  if (needsQueryOptions) rqImports.push('queryOptions')
-  if (needsUseQuery) rqImports.push('useQuery', 'type UseQueryOptions')
-  if (needsUseQueries) rqImports.push('useQueries', 'type UseQueryResult')
-  if (needsUseSuspenseQuery) rqImports.push('useSuspenseQuery', 'type UseSuspenseQueryOptions')
-  if (needsUseInfiniteQuery)
-    rqImports.push(
-      'useInfiniteQuery',
-      'type UseInfiniteQueryOptions',
-      'type InfiniteData',
-      'type QueryKey'
-    )
-  if (needsUseMutation) rqImports.push('useMutation', 'type UseMutationOptions')
-  if (needsUseQueryClient) rqImports.push('useQueryClient')
-  if (needsOptimistic) {
-    rqImports.push('type QueryClient')
-    if (!needsUseInfiniteQuery) rqImports.push('type QueryKey')
-  }
-
-  // Collect all function names for client import
-  const allFuncNames = operations.map((op) => op.funcName).sort()
+  const hasQueries = getOps.length > 0
+  const hasMutations = mutationOps.length > 0
+  const needsOptimistic = optimisticUpdates && hasMutations
+  const rqImports = buildReactQueryImports({
+    queries: hasQueries,
+    useQueries: needsUseQueries,
+    suspense: suspense && hasQueries,
+    infinite: needsUseInfiniteQuery,
+    mutations: hasMutations,
+    queryClient: (autoInvalidate || optimisticUpdates) && hasMutations,
+    optimistic: needsOptimistic,
+  })
 
   // Build file content
   const lines: string[] = []
@@ -1379,13 +1405,7 @@ export function generateHooks(
   if (rqImports.length > 0) {
     lines.push(`import { ${rqImports.join(', ')} } from '@tanstack/react-query'`)
   }
-  // Error types: bare ApiError (default) plus any per-operation aliases in use.
-  const errorTypeImports = [...new Set(operations.map((op) => op.errorType))]
-    .filter((t) => t !== 'ApiError')
-    .sort()
-    .map((t) => `type ${t}`)
-  const clientImports = [...allFuncNames, 'type ApiError', ...errorTypeImports]
-  lines.push(`import { ${clientImports.join(', ')} } from './client.js'`)
+  lines.push(`import { ${buildClientImports(operations).join(', ')} } from './client.js'`)
   lines.push('')
 
   if (keyFactoryBlocks.length > 0) {
