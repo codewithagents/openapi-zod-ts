@@ -3,5 +3,6 @@
   "output": "generated",
   "seed": 42,
   "max_array_items": 3,
-  "depth_cap": 30
+  "depth_cap": 30,
+  "fixtures": true
 }

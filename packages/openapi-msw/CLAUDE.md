@@ -11,6 +11,8 @@ A single `handlers.ts` file containing:
 - One `http.<method>(path, resolver)` handler per operation
 - `export const handlers = [...]`
 
+Opt-in (`fixtures: true`): `fixtures.ts` next to it, one `a<Name>(overrides?: Partial<Name>, variant = 0): Name` builder (plus `a<Name>.full()`) per component schema, typed via `import type` from `models_import` (default `./models.js`).
+
 ## Config
 
 Default: `openapi-msw.config.json` in CWD. Point elsewhere with `--config <path>` (relative paths in the config resolve from the config file's directory).
@@ -23,6 +25,8 @@ Default: `openapi-msw.config.json` in CWD. Point elsewhere with `--config <path>
 | `max_array_items` | number | `3` | Array length in generated mocks; integer >= 1 |
 | `depth_cap` | number | `30` | Schema recursion depth before emitting `null`; integer >= 1 |
 | `base_url` | string | `*` wildcard | Origin (+ optional base path) prefixed to every handler path; non-empty string |
+| `fixtures` | boolean | `false` | Also write `fixtures.ts` (per-schema fixture builders) |
+| `models_import` | string | `./models.js` | Module specifier fixtures.ts imports model types from |
 
 Multi-spec generation via a top-level `projects` array (inherited from openapi-zod-ts config-core). Mixing `projects` with top-level `input_openapi`/`output` throws.
 
@@ -43,6 +47,10 @@ The generated `handlers.ts` imports `http`/`HttpResponse` from `msw` and `faker`
 **MSW v2 path syntax**: OpenAPI `{id}` path params are converted to MSW `:id` colon-style params.
 
 **Origin-anchored handler URLs**: never emit a bare relative path. MSW resolves relative matchers against `location.href`, so in Node (`setupServer`) `'/api/v1/tasks'` never matches `fetch('http://localhost/api/v1/tasks')`. Default is `'*/api/v1/tasks'` (any origin); `base_url` replaces `*`. `handlers-runtime.test.ts` proves this with a real `setupServer` + `onUnhandledFrame: 'error'`.
+
+**Shared faker machinery**: `src/plugins/faker-expr.ts` (`schemaToFaker` + context) is used by both `handlers.ts` and `fixtures.ts`; do not fork it. Context flags `requiredOnly` / `omitWriteOnly` are fixtures-only; handlers emit every property.
+
+**Fixture determinism**: each builder call reseeds a private `new Faker(...)` (aliased import `_Faker`, so a schema named `Faker` cannot clash) with `[seed, fnv1a(schemaName), variant]`, and `faker.setDefaultRefDate` pins relative dates (otherwise `faker.date.recent()` differs per call). Same call = same value, independent of call order and of the handlers' global faker. Builder type names mirror openapi-zod-ts `models.ts` naming (`toTypeName` + `uniquifyName` in schema order). Base values are cast to the model type; only `overrides` are type-checked. Every component `$ref` is emitted as a call to the referenced builder via the `refExpr` hook (pure inlining blew docusign up to a 248 MB file). Refs back into the builder's own reference cycle (SCC, `schema-graph.ts`, same last-segment ref rule as `resolveRef`) are wrapped in the generated `cyclic(...)` guard (one nested level, then `null`) so runtime calls cannot recurse forever. `.full()` runs inside `deeper()`; nested builder calls pick `.full` only while `fullDepth < FULL_DEPTH` (2), else the required-only builder: without this, `.full()` on docusign's wide DAG never finished. Nested calls get `variant = faker.number.int(0xffffffff)` from the caller's seeded faker so array siblings differ. `fixtures.test.ts` compiles generated fixtures against `generateTypes` output.
 
 **depth_cap**: Schema recursion is terminated at depth 30 (default, configurable) with `null /* depth cap reached */` to avoid infinite loops on circular or deeply nested allOf/anyOf/oneOf schemas. The depth counter increments at each $ref hop and each allOf/anyOf/oneOf resolution step.
 

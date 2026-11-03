@@ -118,6 +118,8 @@ npx openapi-msw --config ./config/openapi-msw.config.json
 | `max_array_items` | `number` | No       | `3`     | Number of items generated for array schemas. Integer `>= 1`            |
 | `depth_cap`       | `number` | No       | `30`    | Maximum schema-resolution depth before emitting `null`. Integer `>= 1` |
 | `base_url`        | `string` | No       | `*`     | Origin (and optional base path) prefixed to every handler path         |
+| `fixtures`        | `boolean` | No      | `false` | Also write `fixtures.ts`: one typed fixture builder per component schema |
+| `models_import`   | `string` | No       | `./models.js` | Module specifier `fixtures.ts` imports the model types from      |
 
 Only `input_openapi` and `output` are required. The optional keys are validated only when present, and their defaults are applied at generation time if omitted.
 
@@ -199,6 +201,21 @@ export const handlers = [
 ```
 
 The `{id}` path parameter is rewritten to MSW's `:id`, and each field maps to a Faker call chosen from its schema type and format.
+
+## Fixture builders
+
+`handlers.ts` is the **mock layer**: a full handler set with one seeded dataset, for a dev worker or the baseline `setupServer(...handlers)`. With `"fixtures": true` the generator also writes `fixtures.ts`, **per-test data** for inline handlers: one builder per component schema that returns a complete, valid value.
+
+```typescript
+import { aTask } from './mocks/fixtures.js'
+
+const TASK = aTask({ title: 'Write docs', status: 'done' })
+server.use(http.get('*/api/v1/tasks/:id', () => HttpResponse.json(TASK)))
+```
+
+- `a<Name>(overrides?: Partial<Name>, variant = 0): Name` (`an<Name>` before a vowel). Types are imported from `models_import` (default `./models.js`, the `openapi-zod-ts` output), so overrides are type-checked. Overrides are shallow-merged.
+- `a<Name>()` fills required properties only; `a<Name>.full()` fills optional ones too, for the object itself and one nested builder level (deeper nesting is required-only). Nested `$ref`s call the referenced builder; references back into a cycle stop after one nested level with `null`. `writeOnly` properties are omitted.
+- Every call reseeds a private Faker instance from `(seed, builder, variant)`, so the same call always returns the same value regardless of call order. Pass a different `variant` for a different deterministic value.
 
 ### Faker mapping
 

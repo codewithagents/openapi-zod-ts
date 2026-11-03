@@ -37,6 +37,8 @@ describe('loadConfig: valid config', () => {
     expect(config.max_array_items).toBeUndefined()
     expect(config.depth_cap).toBeUndefined()
     expect(config.base_url).toBeUndefined()
+    expect(config.fixtures).toBeUndefined()
+    expect(config.models_import).toBeUndefined()
   })
 
   it('loads optional fields when provided', async () => {
@@ -135,6 +137,52 @@ describe('loadConfig: base_url', () => {
     await expect(loadConfig(cwd, configPath)).rejects.toThrow(
       '"base_url" must be a non-empty string'
     )
+  })
+})
+
+describe('loadConfig: fixtures / models_import', () => {
+  it('loads fixtures and models_import', async () => {
+    const { cwd, configPath } = await writeConfig({
+      input_openapi: 'spec.json',
+      output: 'generated',
+      fixtures: true,
+      models_import: '../api/models.js',
+    })
+    const config = await loadConfig(cwd, configPath)
+    expect(config.fixtures).toBe(true)
+    expect(config.models_import).toBe('../api/models.js')
+  })
+
+  it('rejects a non-boolean fixtures', async () => {
+    const { cwd, configPath } = await writeConfig({
+      input_openapi: 'spec.json',
+      output: 'generated',
+      fixtures: 'yes',
+    })
+    await expect(loadConfig(cwd, configPath)).rejects.toThrow('"fixtures" must be a boolean')
+  })
+
+  it('rejects an empty models_import', async () => {
+    const { cwd, configPath } = await writeConfig({
+      input_openapi: 'spec.json',
+      output: 'generated',
+      models_import: '',
+    })
+    await expect(loadConfig(cwd, configPath)).rejects.toThrow(
+      '"models_import" must be a non-empty string'
+    )
+  })
+
+  it('accepts fixtures per project in the projects form', async () => {
+    const { cwd, configPath } = await writeConfig({
+      projects: [
+        { input_openapi: 'a.json', output: 'mocks/a', fixtures: true },
+        { input_openapi: 'b.json', output: 'mocks/b' },
+      ],
+    })
+    const configs = await loadConfigs(cwd, configPath)
+    expect(configs[0]!.fixtures).toBe(true)
+    expect(configs[1]!.fixtures).toBeUndefined()
   })
 })
 

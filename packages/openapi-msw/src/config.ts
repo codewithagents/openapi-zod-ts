@@ -25,6 +25,10 @@ export interface MswConfig {
    * "https://api.test". When omitted, handlers match any origin via MSW's "*" wildcard.
    */
   base_url?: string
+  /** When true, also write fixtures.ts with one builder per component schema (default: false) */
+  fixtures?: boolean
+  /** Module specifier fixtures.ts imports the model types from (default: "./models.js") */
+  models_import?: string
 }
 
 function expectIntegerAtLeast(raw: Record<string, unknown>, key: string, min: number): void {
@@ -51,6 +55,10 @@ function validateMswFields(raw: Record<string, unknown>): void {
   expectIntegerAtLeast(raw, 'max_array_items', 1)
   expectIntegerAtLeast(raw, 'depth_cap', 1)
   expectNonEmptyString(raw, 'base_url')
+  expectNonEmptyString(raw, 'models_import')
+  if (raw['fixtures'] !== undefined && typeof raw['fixtures'] !== 'boolean') {
+    throw new Error('"fixtures" must be a boolean')
+  }
 }
 
 function parseMswConfig(
@@ -64,6 +72,8 @@ function parseMswConfig(
     max_array_items: raw['max_array_items'] as number | undefined,
     depth_cap: raw['depth_cap'] as number | undefined,
     base_url: raw['base_url'] as string | undefined,
+    fixtures: raw['fixtures'] as boolean | undefined,
+    models_import: raw['models_import'] as string | undefined,
   }
 }
 
