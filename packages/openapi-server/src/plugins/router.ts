@@ -26,8 +26,23 @@ import {
   collectSortedBodyTypes,
   collectUsedResponseSchemaNames,
 } from './operation-ir.js'
+import { formatSchemaImportSpecifiers } from './schema-prefix.js'
+import {
+  type ErrorFormat,
+  isProblemJson,
+  honoErrorReturn,
+  honoHttpErrorReturn,
+  honoProblemHelperLines,
+  expressErrorReturn,
+  expressHttpErrorReturn,
+  expressProblemHelperLines,
+} from './problem-details.js'
 // Fastify emitter: delegates to the dedicated type-provider module.
 export { generateFastifyRouter } from './fastify-type-provider.js'
+import {
+  findPrimaryJsonResponseSchema,
+  synthesizeResponseSchemaExpr,
+} from './fastify-type-provider.js'
 
 type OperationObject = OpenAPIV3_1.OperationObject
 type ReferenceObject = OpenAPIV3_1.ReferenceObject
@@ -327,6 +342,33 @@ function honoArrayQueryExpr(q: QueryParam): string {
  * (emitted once per file, see generateExpressRouter) normalizes all three cases to
  * string[] | undefined before item coercion, mirroring queryParamArrayZodBase's item expression.
  */
+/**
+ * Source of the `_toQueryBool` helper emitted once per Hono/Express router file when any
+ * operation declares a scalar boolean query param. Query values are strings on the wire:
+ * 'true'/'false' are coerced to booleans, every other value (including undefined) is
+ * returned unchanged so the z.boolean() validation rejects garbage with a 422 and an absent
+ * optional param stays undefined.
+ */
+const TO_QUERY_BOOL_HELPER = [
+  'function _toQueryBool(v: unknown): unknown {',
+  "  return v === 'true' ? true : v === 'false' ? false : v",
+  '}',
+  '',
+]
+
+/** True when any operation declares a scalar (non-array) boolean query param. */
+function needsQueryBoolHelper(operations: RouteOperation[]): boolean {
+  return operations.some((op) =>
+    op.queryParams.some(
+      (q) =>
+        q.tsType === 'boolean' &&
+        q.isArray !== true &&
+        q.delimiterStyle === undefined &&
+        q.isDeepObject !== true
+    )
+  )
+}
+
 function expressArrayQueryExpr(q: QueryParam): string {
   const base = `_toQueryArray(req.query['${q.rawName}'] as string | string[] | undefined)`
   if (q.itemsTsType === 'number') return `${base}?.map(Number)`
@@ -572,6 +614,8 @@ interface RouteOperation {
    * In this case responseTypeName holds the items type name, not the array wrapper.
    */
   responseIsArray?: boolean
+  /** Primary 2xx application/json response schema (may be a $ref); used by emit_response_validation. */
+  primaryResponseSchema?: OpenAPIV3_1.SchemaObject | ReferenceObject
 }
 
 function collectOperations(spec: OpenAPIV3_1.Document): RouteOperation[] {
@@ -608,6 +652,7 @@ function collectOperations(spec: OpenAPIV3_1.Document): RouteOperation[] {
         responseStatus,
         responseTypeName: responseTypeInfo?.typeName,
         responseIsArray: responseTypeInfo?.isArray,
+        primaryResponseSchema: findPrimaryJsonResponseSchema(operation),
       })
     }
   }
@@ -615,11 +660,99 @@ function collectOperations(spec: OpenAPIV3_1.Document): RouteOperation[] {
   return operations
 }
 
+// ── Response validation (emit_response_validation) ───────────────────────────
+
+/**
+ * Zod expression the Hono/Express router validates a JSON service result against when
+ * emit_response_validation is on, mirroring the Fastify schema.response semantics:
+ *
+ * 1. A named schema from input_schema for a $ref / array-of-$ref response (`PetSchema`,
+ *    `z.array(PetSchema)`).
+ * 2. Otherwise an inline response schema synthesized by the shared synthesizer.
+ * 3. Otherwise (a $ref with no named schema, or a shape the synthesizer cannot express)
+ *    undefined: Fastify would attach z.unknown(), which accepts anything, so no check is
+ *    emitted at all.
+ *
+ * Only plain JSON responses are validated: void, multi-status envelopes, text/plain and
+ * application/octet-stream responses are skipped (as on Fastify).
+ */
+function responseValidationExpr(
+  op: RouteOperation,
+  schemaNames: Set<string> | undefined,
+  emitResponseValidation: boolean | undefined
+): string | undefined {
+  if (emitResponseValidation !== true || !isPlainJsonResponse(op.responseStatus)) return undefined
+  if (op.responseTypeName !== undefined && schemaNames?.has(`${op.responseTypeName}Schema`)) {
+    const name = `${op.responseTypeName}Schema`
+    return op.responseIsArray === true ? `z.array(${name})` : name
+  }
+  if (op.primaryResponseSchema === undefined || isRef(op.primaryResponseSchema)) return undefined
+  const expr = synthesizeResponseSchemaExpr(op.primaryResponseSchema)
+  return expr === 'z.unknown()' ? undefined : expr
+}
+
+/** True for a single-status JSON response body (not void, multi-status, text or binary). */
+function isPlainJsonResponse(rs: ResponseStatus): boolean {
+  if (rs.isVoid || rs.isMultiStatus === true) return false
+  return (
+    rs.responseContentType !== 'text/plain' && rs.responseContentType !== 'application/octet-stream'
+  )
+}
+
+/** Push the `z` import and the input_schema import (aliased for spec_prefix) when needed. */
+function pushZodAndSchemaImports(
+  lines: string[],
+  needsZod: boolean,
+  importSchemaNames: Set<string>,
+  options: RouterOptions | undefined
+): void {
+  if (needsZod) {
+    lines.push(`import { z } from 'zod'`)
+  }
+  if (importSchemaNames.size > 0 && options?.schemaImportPath !== undefined) {
+    const specifiers = formatSchemaImportSpecifiers(importSchemaNames, options.schemaImportAliases)
+    lines.push(`import { ${specifiers} } from '${options.schemaImportPath}'`)
+  }
+}
+
+/** Response schema names actually referenced by the response-validation blocks. */
+function collectResponseValidationSchemaNames(
+  operations: RouteOperation[],
+  options: RouterOptions | undefined
+): Set<string> {
+  const used = new Set<string>()
+  if (options?.emitResponseValidation !== true || options.schemaNames === undefined) return used
+  for (const op of operations) {
+    const expr = responseValidationExpr(op, options.schemaNames, true)
+    if (expr !== undefined && op.responseTypeName !== undefined) {
+      const name = `${op.responseTypeName}Schema`
+      if (options.schemaNames.has(name)) used.add(name)
+    }
+  }
+  return used
+}
+
 // ── Shared options interface ──────────────────────────────────────────────────
 
 interface RouterOptions {
   schemaNames?: Set<string>
   schemaImportPath?: string
+  /**
+   * Bare schema name -> actual exported name, for spec_prefix (#334). Prefixed exports are
+   * imported under their bare name (`PublicApiGetUserSchema as GetUserSchema`).
+   */
+  schemaImportAliases?: Map<string, string>
+  /**
+   * Shape of router-produced error responses. 'problem+json' emits RFC 9457 / RFC 7807
+   * `application/problem+json` bodies; 'default' (or unset) keeps `{ error, issues? }`.
+   */
+  errorFormat?: ErrorFormat
+  /**
+   * When true, safeParse each JSON service result against its response schema before sending
+   * (a named schema from input_schema, else a synthesized inline schema). On failure the
+   * router responds 500 without the result. Same fallback semantics as the Fastify emitter.
+   */
+  emitResponseValidation?: boolean
   /**
    * When set, matches the `contextType` from ServiceOptions. The generated router
    * handlers extract a context value from the framework's native channel and pass
@@ -645,6 +778,8 @@ interface GeneratorSetup {
   sortedBodyTypes: string[]
   usedSchemaNames: Set<string>
   usedResponseSchemaNames: Set<string>
+  /** Schema names to import from input_schema: body schemas + response-validation schemas. */
+  importSchemaNames: Set<string>
   needsZod: boolean
 }
 
@@ -698,13 +833,25 @@ function collectGeneratorSetup(
         op.responseTypeName !== undefined &&
         usedResponseSchemaNames.has(`${op.responseTypeName}Schema`)
     )
+  // emit_response_validation: z.array(...) wrappers and synthesized inline schemas need z;
+  // a bare named schema (PetSchema.safeParse) does not.
+  const responseValidationNeedsZod = operations.some((op) =>
+    responseValidationExpr(op, options?.schemaNames, options?.emitResponseValidation)?.startsWith(
+      'z.'
+    )
+  )
   const needsZod =
     (usedSchemaNames.size > 0 && options?.schemaImportPath !== undefined) ||
     operationsNeedZodForParams(operations) ||
     (usedResponseSchemaNames.size > 0 &&
       options?.schemaImportPath !== undefined &&
-      hasArrayResponseSchema)
-  return { sortedBodyTypes, usedSchemaNames, usedResponseSchemaNames, needsZod }
+      hasArrayResponseSchema) ||
+    responseValidationNeedsZod
+  const importSchemaNames = new Set([
+    ...usedSchemaNames,
+    ...collectResponseValidationSchemaNames(operations, options),
+  ])
+  return { sortedBodyTypes, usedSchemaNames, usedResponseSchemaNames, importSchemaNames, needsZod }
 }
 
 // ── Hono route handler ────────────────────────────────────────────────────────
@@ -714,7 +861,9 @@ function buildRouteHandler(
   op: RouteOperation,
   indent: string,
   schemaNames?: Set<string>,
-  contextType?: string
+  contextType?: string,
+  errorFormat?: ErrorFormat,
+  emitResponseValidation?: boolean
 ): string {
   const lines: string[] = []
   lines.push(`${indent}app.${op.httpMethod}(${JSON.stringify(op.honoPath)}, async (c) => {`)
@@ -724,7 +873,7 @@ function buildRouteHandler(
     emitPathValidation(lines, op.pathParamValidations, indent, 'hono')
     lines.push(`${indent}  if (!_pv.success) {`)
     lines.push(
-      `${indent}    return c.json({ error: 'Invalid path parameters', issues: _pv.error.issues }, 422)`
+      `${indent}    ${honoErrorReturn(422, 'Invalid path parameters', '_pv.error.issues', errorFormat)}`
     )
     lines.push(`${indent}  }`)
   }
@@ -762,9 +911,14 @@ function buildRouteHandler(
           return `    ${q.name}: ${honoArrayQueryExpr(q)}`
         }
         if (q.tsType === 'number') {
-          return `    ${q.name}: c.req.query('${q.name}') !== undefined ? Number(c.req.query('${q.name}')) : undefined`
+          return `    ${q.name}: c.req.query('${q.rawName}') !== undefined ? Number(c.req.query('${q.rawName}')) : undefined`
         }
-        return `    ${q.name}: c.req.query('${q.name}') ?? undefined`
+        if (q.tsType === 'boolean') {
+          // 'true'/'false' become booleans; anything else is passed through unchanged so the
+          // z.boolean() validation below still rejects it with 422 (absent stays undefined).
+          return `    ${q.name}: _toQueryBool(c.req.query('${q.rawName}'))`
+        }
+        return `    ${q.name}: c.req.query('${q.rawName}') ?? undefined`
       })
       .join(',\n')
     lines.push(`${indent}  const params = {`)
@@ -776,7 +930,7 @@ function buildRouteHandler(
       emitQueryValidation(lines, op.queryParams, indent)
       lines.push(`${indent}  if (!_qv.success) {`)
       lines.push(
-        `${indent}    return c.json({ error: 'Invalid query parameters', issues: _qv.error.issues }, 422)`
+        `${indent}    ${honoErrorReturn(422, 'Invalid query parameters', '_qv.error.issues', errorFormat)}`
       )
       lines.push(`${indent}  }`)
     }
@@ -787,7 +941,7 @@ function buildRouteHandler(
     emitHeaderValidation(lines, op.headerParams, indent, 'hono')
     lines.push(`${indent}  if (!_hv.success) {`)
     lines.push(
-      `${indent}    return c.json({ error: 'Invalid request headers', issues: _hv.error.issues }, 422)`
+      `${indent}    ${honoErrorReturn(422, 'Invalid request headers', '_hv.error.issues', errorFormat)}`
     )
     lines.push(`${indent}  }`)
   }
@@ -798,7 +952,7 @@ function buildRouteHandler(
     emitCookieValidation(lines, op.cookieParams, indent, 'hono')
     lines.push(`${indent}  if (!_ckv.success) {`)
     lines.push(
-      `${indent}    return c.json({ error: 'Invalid request cookies', issues: _ckv.error.issues }, 422)`
+      `${indent}    ${honoErrorReturn(422, 'Invalid request cookies', '_ckv.error.issues', errorFormat)}`
     )
     lines.push(`${indent}  }`)
   }
@@ -821,7 +975,9 @@ function buildRouteHandler(
       lines.push(
         `${indent}  if (!_ct.toLowerCase().startsWith('application/x-www-form-urlencoded')) {`
       )
-      lines.push(`${indent}    return c.json({ error: 'Unsupported Media Type' }, 415)`)
+      lines.push(
+        `${indent}    ${honoErrorReturn(415, 'Unsupported Media Type', undefined, errorFormat)}`
+      )
       lines.push(`${indent}  }`)
       lines.push(`${indent}  const body: unknown = await c.req.parseBody()`)
     } else if (op.bodyInfo.contentType === 'multipart/form-data') {
@@ -840,13 +996,17 @@ function buildRouteHandler(
       // than the correct 400. JSON.parse('') always throws SyntaxError.
       lines.push(`${indent}  const _ct = c.req.header('content-type') ?? ''`)
       lines.push(`${indent}  if (!_ct.toLowerCase().startsWith('application/json')) {`)
-      lines.push(`${indent}    return c.json({ error: 'Unsupported Media Type' }, 415)`)
+      lines.push(
+        `${indent}    ${honoErrorReturn(415, 'Unsupported Media Type', undefined, errorFormat)}`
+      )
       lines.push(`${indent}  }`)
       lines.push(`${indent}  let body: ${typeDecl}`)
       lines.push(`${indent}  try {`)
       lines.push(`${indent}    body = JSON.parse(await c.req.text()) as ${typeDecl}`)
       lines.push(`${indent}  } catch {`)
-      lines.push(`${indent}    return c.json({ error: 'Invalid JSON body' }, 400)`)
+      lines.push(
+        `${indent}    ${honoErrorReturn(400, 'Invalid JSON body', undefined, errorFormat)}`
+      )
       lines.push(`${indent}  }`)
     }
 
@@ -865,7 +1025,7 @@ function buildRouteHandler(
       lines.push(`${indent}  const parseResult = ${schemaName}.safeParse(body)`)
       lines.push(`${indent}  if (!parseResult.success) {`)
       lines.push(
-        `${indent}    return c.json({ error: 'Invalid request body', issues: parseResult.error.issues }, 422)`
+        `${indent}    ${honoErrorReturn(422, 'Invalid request body', 'parseResult.error.issues', errorFormat)}`
       )
       lines.push(`${indent}  }`)
       // Forward the validated/coerced data (parseResult.data), NOT the raw parsed body,
@@ -927,6 +1087,18 @@ function buildRouteHandler(
         `${indent}    return new Response(_result as BodyInit, { status: ${op.responseStatus.status}, headers: { 'content-type': 'application/octet-stream' } })`
       )
     }
+  } else if (responseValidationExpr(op, schemaNames, emitResponseValidation) !== undefined) {
+    // emit_response_validation: send only a result that matches the response schema
+    // (parsed data, so undeclared keys are stripped); otherwise 500 without the result.
+    const rvExpr = responseValidationExpr(op, schemaNames, emitResponseValidation)!
+    const statusArg = op.responseStatus.status === 200 ? '' : `, ${op.responseStatus.status}`
+    lines.push(`${indent}    const _rv = ${rvExpr}.safeParse(await ${serviceCall})`)
+    lines.push(`${indent}    if (!_rv.success) {`)
+    lines.push(
+      `${indent}      ${honoErrorReturn(500, 'Response validation failed', undefined, errorFormat)}`
+    )
+    lines.push(`${indent}    }`)
+    lines.push(`${indent}    return c.json(_rv.data${statusArg})`)
   } else if (op.responseStatus.status === 200) {
     lines.push(`${indent}    return c.json(await ${serviceCall})`)
   } else {
@@ -934,9 +1106,7 @@ function buildRouteHandler(
   }
   lines.push(`${indent}  } catch (err) {`)
   lines.push(`${indent}    if (err instanceof HttpError) {`)
-  lines.push(
-    `${indent}      return new Response(JSON.stringify({ error: err.message }), { status: err.status, headers: { 'content-type': 'application/json' } })`
-  )
+  lines.push(`${indent}      ${honoHttpErrorReturn(errorFormat)}`)
   lines.push(`${indent}    }`)
   lines.push(`${indent}    throw err`)
   lines.push(`${indent}  }`)
@@ -952,7 +1122,9 @@ function buildExpressRouteHandler(
   op: RouteOperation,
   indent: string,
   schemaNames?: Set<string>,
-  contextType?: string
+  contextType?: string,
+  errorFormat?: ErrorFormat,
+  emitResponseValidation?: boolean
 ): string {
   const lines: string[] = []
   lines.push(
@@ -964,7 +1136,7 @@ function buildExpressRouteHandler(
     emitPathValidation(lines, op.pathParamValidations, indent, 'express')
     lines.push(`${indent}  if (!_pv.success) {`)
     lines.push(
-      `${indent}    return void res.status(422).json({ error: 'Invalid path parameters', issues: _pv.error.issues })`
+      `${indent}    ${expressErrorReturn(422, 'Invalid path parameters', '_pv.error.issues', errorFormat)}`
     )
     lines.push(`${indent}  }`)
   }
@@ -988,12 +1160,14 @@ function buildExpressRouteHandler(
           return `    ${q.name}: ${expressArrayQueryExpr(q)}`
         }
         if (q.tsType === 'number') {
-          return `    ${q.name}: Number(req.query['${q.name}'] as string)`
+          // Guard undefined so an absent optional param stays undefined instead of NaN (→ 422).
+          return `    ${q.name}: req.query['${q.rawName}'] !== undefined ? Number(req.query['${q.rawName}'] as string) : undefined`
         }
         if (q.tsType === 'boolean') {
-          return `    ${q.name}: req.query['${q.name}'] === 'true'`
+          // Absent stays undefined; values other than 'true'/'false' still fail z.boolean().
+          return `    ${q.name}: _toQueryBool(req.query['${q.rawName}'])`
         }
-        return `    ${q.name}: req.query['${q.name}'] as string | undefined`
+        return `    ${q.name}: req.query['${q.rawName}'] as string | undefined`
       })
       .join(',\n')
     lines.push(`${indent}  const params = {`)
@@ -1005,7 +1179,7 @@ function buildExpressRouteHandler(
       emitQueryValidation(lines, op.queryParams, indent)
       lines.push(`${indent}  if (!_qv.success) {`)
       lines.push(
-        `${indent}    return void res.status(422).json({ error: 'Invalid query parameters', issues: _qv.error.issues })`
+        `${indent}    ${expressErrorReturn(422, 'Invalid query parameters', '_qv.error.issues', errorFormat)}`
       )
       lines.push(`${indent}  }`)
     }
@@ -1016,7 +1190,7 @@ function buildExpressRouteHandler(
     emitHeaderValidation(lines, op.headerParams, indent, 'express')
     lines.push(`${indent}  if (!_hv.success) {`)
     lines.push(
-      `${indent}    return void res.status(422).json({ error: 'Invalid request headers', issues: _hv.error.issues })`
+      `${indent}    ${expressErrorReturn(422, 'Invalid request headers', '_hv.error.issues', errorFormat)}`
     )
     lines.push(`${indent}  }`)
   }
@@ -1027,7 +1201,7 @@ function buildExpressRouteHandler(
     emitCookieValidation(lines, op.cookieParams, indent, 'express')
     lines.push(`${indent}  if (!_ckv.success) {`)
     lines.push(
-      `${indent}    return void res.status(422).json({ error: 'Invalid request cookies', issues: _ckv.error.issues })`
+      `${indent}    ${expressErrorReturn(422, 'Invalid request cookies', '_ckv.error.issues', errorFormat)}`
     )
     lines.push(`${indent}  }`)
   }
@@ -1057,7 +1231,7 @@ function buildExpressRouteHandler(
         lines.push(`${indent}  const parseResult = ${schemaName}.safeParse(req.body)`)
         lines.push(`${indent}  if (!parseResult.success) {`)
         lines.push(
-          `${indent}    return void res.status(422).json({ error: 'Invalid request body', issues: parseResult.error.issues })`
+          `${indent}    ${expressErrorReturn(422, 'Invalid request body', 'parseResult.error.issues', errorFormat)}`
         )
         lines.push(`${indent}  }`)
         // Cast parseResult.data to the declared model type so the service call receives
@@ -1132,6 +1306,19 @@ function buildExpressRouteHandler(
         `${indent}    res.status(${op.responseStatus.status}).setHeader('Content-Type', 'application/octet-stream').send(Buffer.from(await ${serviceCall}))`
       )
     }
+  } else if (responseValidationExpr(op, schemaNames, emitResponseValidation) !== undefined) {
+    // emit_response_validation: send only a result that matches the response schema
+    // (parsed data, so undeclared keys are stripped); otherwise 500 without the result.
+    const rvExpr = responseValidationExpr(op, schemaNames, emitResponseValidation)!
+    const statusPrefix =
+      op.responseStatus.status === 200 ? 'res' : `res.status(${op.responseStatus.status})`
+    lines.push(`${indent}    const _rv = ${rvExpr}.safeParse(await ${serviceCall})`)
+    lines.push(`${indent}    if (!_rv.success) {`)
+    lines.push(
+      `${indent}      ${expressErrorReturn(500, 'Response validation failed', undefined, errorFormat)}`
+    )
+    lines.push(`${indent}    }`)
+    lines.push(`${indent}    ${statusPrefix}.json(_rv.data)`)
   } else if (op.responseStatus.status === 200) {
     lines.push(`${indent}    res.json(await ${serviceCall})`)
   } else {
@@ -1139,7 +1326,7 @@ function buildExpressRouteHandler(
   }
   lines.push(`${indent}  } catch (err) {`)
   lines.push(`${indent}    if (err instanceof HttpError) {`)
-  lines.push(`${indent}      return void res.status(err.status).json({ error: err.message })`)
+  lines.push(`${indent}      ${expressHttpErrorReturn(errorFormat)}`)
   lines.push(`${indent}    }`)
   lines.push(`${indent}    throw err`)
   lines.push(`${indent}  }`)
@@ -1174,8 +1361,12 @@ export function generateExpressRouter(
 ): GeneratedFile {
   const serviceName = deriveServiceName(spec)
   const operations = collectOperations(spec)
-  const { sortedBodyTypes, usedSchemaNames, needsZod } = collectGeneratorSetup(operations, options)
-  // usedResponseSchemaNames is Fastify-only; not used in Express generator.
+  const { sortedBodyTypes, importSchemaNames, needsZod } = collectGeneratorSetup(
+    operations,
+    options
+  )
+  // usedResponseSchemaNames is Fastify-only; Express imports response schemas only for the
+  // emit_response_validation blocks (see collectResponseValidationSchemaNames).
 
   const lines: string[] = []
   lines.push('// This file is auto-generated. Do not edit manually.')
@@ -1191,13 +1382,7 @@ export function generateExpressRouter(
   const ctx = options?.contextType
   const serviceRef = ctx !== undefined ? `${serviceName}<${ctx}>` : serviceName
   lines.push(`import type { ${serviceName} } from './service.js'`)
-  if (needsZod) {
-    lines.push(`import { z } from 'zod'`)
-  }
-  if (usedSchemaNames.size > 0 && options?.schemaImportPath !== undefined) {
-    const sortedUsedSchemas = Array.from(usedSchemaNames).sort()
-    lines.push(`import { ${sortedUsedSchemas.join(', ')} } from '${options.schemaImportPath}'`)
-  }
+  pushZodAndSchemaImports(lines, needsZod, importSchemaNames, options)
   const expressErrorsPath = options?.errorsImportPath ?? './_shared/errors.js'
   lines.push('')
   lines.push(`import { HttpError } from '${expressErrorsPath}'`)
@@ -1217,12 +1402,23 @@ export function generateExpressRouter(
     lines.push('')
   }
 
+  if (needsQueryBoolHelper(operations)) lines.push(...TO_QUERY_BOOL_HELPER)
+  if (isProblemJson(options?.errorFormat)) lines.push(...expressProblemHelperLines())
   lines.push(`export function createRouter(service: ${serviceRef}): Router {`)
   lines.push('  const router = Router()')
   lines.push('')
 
   for (const op of operations) {
-    lines.push(buildExpressRouteHandler(op, '  ', options?.schemaNames, ctx))
+    lines.push(
+      buildExpressRouteHandler(
+        op,
+        '  ',
+        options?.schemaNames,
+        ctx,
+        options?.errorFormat,
+        options?.emitResponseValidation
+      )
+    )
     lines.push('')
   }
 
@@ -1242,7 +1438,10 @@ export function generateExpressRouter(
 export function generateRouter(spec: OpenAPIV3_1.Document, options?: RouterOptions): GeneratedFile {
   const serviceName = deriveServiceName(spec)
   const operations = collectOperations(spec)
-  const { sortedBodyTypes, usedSchemaNames, needsZod } = collectGeneratorSetup(operations, options)
+  const { sortedBodyTypes, importSchemaNames, needsZod } = collectGeneratorSetup(
+    operations,
+    options
+  )
 
   const lines: string[] = []
   lines.push('// This file is auto-generated. Do not edit manually.')
@@ -1259,24 +1458,29 @@ export function generateRouter(spec: OpenAPIV3_1.Document, options?: RouterOptio
     lines.push(`import type { ${sortedBodyTypes.join(', ')} } from './models.js'`)
   }
   lines.push(`import type { ${serviceName} } from './service.js'`)
-  if (needsZod) {
-    lines.push(`import { z } from 'zod'`)
-  }
-  if (usedSchemaNames.size > 0 && options?.schemaImportPath !== undefined) {
-    const sortedUsedSchemas = Array.from(usedSchemaNames).sort()
-    lines.push(`import { ${sortedUsedSchemas.join(', ')} } from '${options.schemaImportPath}'`)
-  }
+  pushZodAndSchemaImports(lines, needsZod, importSchemaNames, options)
   const honoErrorsPath = options?.errorsImportPath ?? './_shared/errors.js'
   lines.push('')
   lines.push(`import { HttpError } from '${honoErrorsPath}'`)
   lines.push(`export { HttpError } from '${honoErrorsPath}'`)
   lines.push('')
+  if (needsQueryBoolHelper(operations)) lines.push(...TO_QUERY_BOOL_HELPER)
+  if (isProblemJson(options?.errorFormat)) lines.push(...honoProblemHelperLines())
   lines.push(`export function createRouter(service: ${serviceRef}): Hono {`)
   lines.push('  const app = new Hono()')
   lines.push('')
 
   for (const op of operations) {
-    lines.push(buildRouteHandler(op, '  ', options?.schemaNames, ctx))
+    lines.push(
+      buildRouteHandler(
+        op,
+        '  ',
+        options?.schemaNames,
+        ctx,
+        options?.errorFormat,
+        options?.emitResponseValidation
+      )
+    )
     lines.push('')
   }
 

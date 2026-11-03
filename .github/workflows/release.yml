@@ -66,6 +66,7 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
+          check-latest: true
           cache: pnpm
           registry-url: https://registry.npmjs.org
       # Node 22 ships with npm 10.x which does not implement OIDC Trusted Publishing auth.
@@ -99,6 +100,7 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
+          check-latest: true
           cache: pnpm
           registry-url: https://registry.npmjs.org
       # Node 22 ships with npm 10.x which does not implement OIDC Trusted Publishing auth.
@@ -136,6 +138,7 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
+          check-latest: true
           cache: pnpm
           registry-url: https://registry.npmjs.org
       # Node 22 ships with npm 10.x which does not implement OIDC Trusted Publishing auth.
@@ -174,6 +177,7 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
+          check-latest: true
           cache: pnpm
           registry-url: https://registry.npmjs.org
       - name: Upgrade npm to latest (OIDC Trusted Publishing requires ≥11.5.1)
@@ -203,6 +207,7 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
+          check-latest: true
           cache: pnpm
           registry-url: https://registry.npmjs.org
       - name: Upgrade npm to latest (OIDC Trusted Publishing requires ≥11.5.1)

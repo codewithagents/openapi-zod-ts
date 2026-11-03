@@ -296,8 +296,10 @@ serve({ fetch: app.fetch, port: 3001 })
 | `framework` | No | `"none"` | Router framework to generate: `"hono"`, `"express"`, `"fastify"`, or `"none"`. Use `"none"` to generate only `service.ts` |
 | `input_schema` | No | none | Path to user-owned Zod schema file. Enables server-side request validation (see below) |
 | `context_type` | No | none | TypeScript type name to thread through service methods as a final `ctx` argument. See below. |
-| `emit_response_validation` | No | `false` | Fastify only. Synthesize inline Zod response schemas for flat inline schemas. See below. |
+| `emit_response_validation` | No | `false` | Validate JSON service results against the response schema before sending (Hono, Express, Fastify). Invalid results get a `500`. See below. |
 | `shared_output` | No | derived | Override directory for `_shared/errors.ts`. Default: derived from output paths (see below). |
+| `spec_prefix` | No | none | Namespace prefix for schema lookups when several specs share one `input_schema` file: looks up `${spec_prefix}${Type}Schema` instead of `${Type}Schema`. See [Sharing one schemas file across specs](#sharing-one-schemas-file-across-specs-spec_prefix). |
+| `error_format` | No | `"default"` | `"default"` or `"problem+json"`. With `"problem+json"`, router-produced errors use RFC 9457 / RFC 7807 `application/problem+json` bodies in all three frameworks. See [Problem details errors](#problem-details-errors-error_format). |
 
 Use `--config <path>` to point at a config file in a different location:
 
@@ -460,6 +462,54 @@ Each framework has a different error shape for built-in validation failures. Use
 | Unsupported Content-Type | Hono | 415 | `{ error: 'Unsupported Media Type' }` |
 | Unsupported Content-Type | Fastify | 415 | `{ statusCode: 415, code: 'FST_ERR_CTP_INVALID_MEDIA_TYPE', error: '...', message: '...' }` |
 
+### Problem details errors (`error_format`)
+
+Set `"error_format": "problem+json"` to replace the ad-hoc `{ error, issues }` bodies with [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) (the successor of RFC 7807) problem details. The default (`"default"`, or the field omitted) keeps the existing shapes byte-for-byte.
+
+```json
+{
+  "input_openapi": "./spec/api.json",
+  "output": "./generated",
+  "framework": "hono",
+  "input_schema": "./generated/schemas.ts",
+  "error_format": "problem+json"
+}
+```
+
+Every error the generated router produces is then sent with `Content-Type: application/problem+json`:
+
+```json
+{
+  "type": "about:blank",
+  "title": "Unprocessable Content",
+  "status": 422,
+  "detail": "Invalid request body",
+  "instance": "/pets",
+  "errors": [{ "code": "invalid_type", "path": ["name"], "message": "Invalid input: expected string, received undefined" }]
+}
+```
+
+| Member | Value |
+|---|---|
+| `type` | Always `"about:blank"` |
+| `title` | The HTTP reason phrase for `status` (e.g. `"Not Found"`) |
+| `status` | The HTTP status code |
+| `detail` | The router message (`"Invalid request body"`, `"Invalid query parameters"`, ...) or `HttpError.message` |
+| `instance` | The request path (Express: `req.baseUrl + req.path`, so it includes the mount prefix) |
+| `errors` | Extension member, present on validation failures: the Zod issues (Fastify: the type-provider validation entries) |
+
+What is covered per framework:
+
+| Error | Hono | Express | Fastify |
+|---|---|---|---|
+| Path / query / header / cookie / body validation | 422 | 422 | 400 (native validation; cookies 422) |
+| Invalid JSON body / unsupported media type | 400 / 415 | n/a (`express.json()` handles these) | other 4xx framework errors, e.g. 415 |
+| `HttpError` thrown by the service | its status | its status | its status |
+| Response validation failure (`emit_response_validation`) | 500 | 500 | 500 |
+| Any other thrown error | re-thrown | re-thrown | re-thrown |
+
+On Fastify the mapping lives in the generated default `setErrorHandler`; a caller-supplied `errorHandler` in `CreateRouterOptions` still replaces it entirely. Errors raised by your own app-level handlers or middleware are not reshaped.
+
 ### How error propagation works
 
 The generated router maps service-call errors in two cases. Hono and Express use a per-route `try/catch`; Fastify registers a single `setErrorHandler` once (no per-route `try/catch`). Both handle the same two cases:
@@ -581,6 +631,65 @@ fastify.listen({ port: 3000 })
 ```
 
 Because `HttpError` is a single class imported from one shared file, the `instanceof` check on line `if (err instanceof HttpError)` works for errors thrown in either router. Without the shared module, each router's locally-defined class would be a distinct identity and the check would silently fail for errors from the other router.
+
+### Sharing one schemas file across specs (`spec_prefix`)
+
+By default every router looks up its Zod schemas by the bare convention name `${Type}Schema`. When two specs both declare a `GetUser` type and point `input_schema` at the **same** file, both would resolve to one `GetUserSchema`. Set `spec_prefix` per project to namespace the lookup:
+
+```json
+{
+  "projects": [
+    {
+      "input_openapi": "./specs/public.json",
+      "output": "./gen/public",
+      "framework": "fastify",
+      "input_schema": "./shared/schemas.ts",
+      "spec_prefix": "PublicApi"
+    },
+    {
+      "input_openapi": "./specs/admin.json",
+      "output": "./gen/admin",
+      "framework": "fastify",
+      "input_schema": "./shared/schemas.ts",
+      "spec_prefix": "AdminApi"
+    }
+  ]
+}
+```
+
+```ts
+// shared/schemas.ts: user-owned, names chosen by you
+export const PublicApiGetUserSchema = z.object({ id: z.string(), name: z.string() })
+export const AdminApiGetUserSchema = z.object({ id: z.string(), role: z.string() })
+export const ErrorSchema = z.object({ message: z.string() }) // unprefixed: shared by both
+```
+
+Each generated file imports the prefixed export under its bare name, so the rest of the output is identical to the unprefixed case:
+
+```ts
+// gen/public/router.ts
+import { PublicApiGetUserSchema as GetUserSchema } from '../../shared/schemas.js'
+```
+
+Rules:
+
+- Applies to every framework that looks schemas up by name: the Hono/Express `safeParse` blocks and the Fastify `schema.body` / `schema.response` slots plus `schema-types.ts`.
+- `${spec_prefix}${Type}Schema` wins. An **unprefixed** `${Type}Schema` export is still used as a fallback, so schemas genuinely shared by all specs can stay unprefixed.
+- Schemas must be declared as `export const NameSchema = ...` (the generator scans for that form; `export { A as B }` re-export lists are not detected).
+- `spec_prefix` must be a valid identifier prefix (letters, digits, `_`, `$`; not starting with a digit) and has no effect without `input_schema`.
+
+**Where the prefixed names come from.** `openapi-zod-ts` has no prefix option: its bootstrapped `input_schema` always uses bare `${Type}Schema` names, and its own `models.ts` / `client.ts` import those bare names. So the shared, prefixed file is one **you** maintain for the server side. A practical pattern is to keep each spec's bootstrapped `schemas.ts` for its client and build the shared server file from them:
+
+```ts
+// shared/schemas.ts
+import * as publicApi from '../gen/public-client/schemas.js'
+import * as adminApi from '../gen/admin-client/schemas.js'
+
+export const PublicApiGetUserSchema = publicApi.GetUserSchema
+export const AdminApiGetUserSchema = adminApi.GetUserSchema
+```
+
+If each spec has its own `schemas.ts` (the common setup), you do not need `spec_prefix` at all.
 
 ---
 
@@ -909,29 +1018,53 @@ Hono uses the shared `{ error }` envelope from the generated router. Fastify use
 
 ---
 
-## Response validation opt-in (`emit_response_validation`, Fastify only)
+## Response validation opt-in (`emit_response_validation`)
 
-Set `emit_response_validation: true` in your config to instruct the Fastify emitter to synthesize inline Zod expressions for `schema.response` on routes that have no named schema from `input_schema`.
+Set `emit_response_validation: true` to validate what your service returns before it goes on the wire. It works for all three router frameworks:
 
 ```json
 {
   "input_openapi": "./spec/api.json",
   "output": "./generated",
-  "framework": "fastify",
+  "framework": "hono",
+  "input_schema": "./generated/schemas.ts",
   "emit_response_validation": true
 }
 ```
 
-**What the synthesizer does:**
+**Which schema is used** (the same rules for every framework):
 
-- Flat `object` schema with scalar properties: emits `z.object({ field: z.string(), count: z.number() })`
-- Scalar top-level responses: emits `z.string()`, `z.number()`, `z.boolean()`
-- Array of scalars: emits `z.array(z.string())` (or the appropriate item type)
-- `$ref`, `allOf`, `oneOf`, `anyOf`, or nested object properties: emits `z.unknown()` for that field or the whole response
+1. A `$ref` (or array-of-`$ref`) JSON response with a matching named schema in `input_schema`: that schema (`PetSchema`, `z.array(PetSchema)`).
+2. Otherwise an inline response schema is synthesized:
+   - Flat `object` schema with scalar properties: `z.object({ field: z.string(), count: z.number() })`
+   - Scalar top-level responses: `z.string()`, `z.number()`, `z.boolean()`
+   - Array of scalars: `z.array(z.string())` (or the appropriate item type)
+   - `$ref`, `allOf`, `oneOf`, `anyOf`, or nested object properties: `z.unknown()` for that field or the whole response
+3. A `$ref` with no named schema, or a whole response that synthesizes to `z.unknown()`, is effectively not checked.
+
+Only JSON responses are validated: void (`204`), multi-status envelopes, `text/plain` and `application/octet-stream` responses are passed through.
+
+**Hono and Express.** The router `safeParse`s the service result and sends the **parsed** data, so keys the schema does not declare are stripped. On failure it responds `500 { error: 'Response validation failed' }` (a `500` problem body with `error_format: "problem+json"`) and never sends the invalid result:
+
+```ts
+app.get('/pets/:id', async (c) => {
+  try {
+    const _rv = PetSchema.safeParse(await service.getPet(c.req.param('id')))
+    if (!_rv.success) {
+      return c.json({ error: 'Response validation failed' }, 500)
+    }
+    return c.json(_rv.data)
+  } catch (err) {
+    // HttpError mapping ...
+  }
+})
+```
+
+**Fastify.** Named response schemas from `input_schema` are always attached to `schema.response` (validated by the `fastify-type-provider-zod` serializer, which fails with a `500`). `emit_response_validation` additionally attaches the synthesized inline schemas.
 
 **Limitations.** The synthesizer is intentionally minimal and honest. It does not chase `$ref` pointers or handle composition keywords. Complex schemas fall back to `z.unknown()`, which passes through any value. If your spec uses `$ref` or composition heavily, wire `input_schema` instead for full coverage.
 
-**Recommendation.** Use `input_schema` (point it at the `schemas.ts` from `openapi-zod-ts`) for complete, type-safe response validation. `emit_response_validation` is a lightweight alternative for specs with simple flat inline response schemas where adding a full Zod schema file is not yet practical.
+**Recommendation.** Use `input_schema` (point it at the `schemas.ts` from `openapi-zod-ts`) for complete, type-safe response validation. Without `input_schema`, `emit_response_validation` still covers specs with simple flat inline response schemas.
 
 ---
 

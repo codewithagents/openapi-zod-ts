@@ -5,6 +5,7 @@
  * Import with the .js extension as required by NodeNext module resolution:
  *   import { compileFiles, compileSingleFile, makeSpec } from './helpers.js'
  */
+import { posix } from 'node:path'
 import ts from 'typescript'
 import type { OpenAPIV3_1 } from 'openapi-types'
 
@@ -94,9 +95,11 @@ export function compileFiles(files: Record<string, string>): readonly ts.Diagnos
         // Strip leading ./ and any .js extension so both './models' and
         // './models.js' resolve to the virtual 'models.ts' file.
         if (specifier.startsWith('./') || specifier.startsWith('../')) {
+          // posix.join normalizes '../' so nested files (e.g. client/pets.ts importing
+          // '../models.js' for a split_by_tag client) resolve too.
           const dir = containingFile.replace(/\/[^/]*$/, '')
-          const baseName = specifier.replace(/^\.\//, '').replace(/\.js$/, '')
-          const candidates = [`${dir}/${baseName}.ts`, `${dir}/${baseName}/index.ts`]
+          const base = posix.join(dir, specifier.replace(/\.js$/, ''))
+          const candidates = [`${base}.ts`, `${base}/index.ts`]
           for (const cand of candidates) {
             if (cand in virtualFiles) {
               return {

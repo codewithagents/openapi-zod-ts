@@ -63,9 +63,49 @@ async function classifyFiles(
 }
 
 /**
+ * List the files inside every subdirectory the generator writes into (e.g. client/ for a
+ * split_by_tag client), as '/'-separated paths relative to outputDir. Only directories
+ * that hold at least one expected file are scanned, so unrelated subdirectories in the
+ * output dir (e.g. another generator's) are never reported as extra.
+ */
+async function listExpectedSubdirFiles(
+  expected: Map<string, string>,
+  outputDir: string
+): Promise<string[]> {
+  const files: string[] = []
+  for (const subdir of expectedSubdirs(expected)) {
+    files.push(...(await listSubdirFiles(outputDir, subdir)))
+  }
+  return files
+}
+
+/** The distinct parent directories of nested expected filenames (e.g. 'client'). */
+function expectedSubdirs(expected: Map<string, string>): Set<string> {
+  const subdirs = new Set<string>()
+  for (const filename of expected.keys()) {
+    const slash = filename.lastIndexOf('/')
+    if (slash > 0) subdirs.add(filename.slice(0, slash))
+  }
+  return subdirs
+}
+
+/** Files directly inside outputDir/subdir as 'subdir/name'; [] when it does not exist. */
+async function listSubdirFiles(outputDir: string, subdir: string): Promise<string[]> {
+  try {
+    const entries = await readdir(join(outputDir, subdir), { withFileTypes: true })
+    return entries.filter((e) => e.isFile()).map((e) => `${subdir}/${e.name}`)
+  } catch (err) {
+    // A missing subdirectory just means its expected files are all missing.
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') return []
+    throw err
+  }
+}
+
+/**
  * Compare in-memory generator output against files on disk.
  *
- * @param expected  Map of filename (basename only, e.g. "models.ts") to formatted file content.
+ * @param expected  Map of filename (relative to outputDir, '/'-separated, e.g. "models.ts" or
+ *                  "client/pets.ts") to formatted file content.
  *                  This must be the already-formatted output (prettier applied) to match the write path.
  * @param outputDir Absolute path to the directory that holds the committed generated files.
  * @returns A DriftReport describing any stale, missing, or extra files.
@@ -79,6 +119,7 @@ export async function compareOutput(
   try {
     const entries = await readdir(outputDir, { withFileTypes: true })
     diskFiles = entries.filter((e) => e.isFile()).map((e) => e.name)
+    diskFiles.push(...(await listExpectedSubdirFiles(expected, outputDir)))
   } catch (err) {
     const nodeErr = err as NodeJS.ErrnoException
     if (nodeErr.code === 'ENOENT') {
