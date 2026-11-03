@@ -99,6 +99,7 @@ export default defineConfig({
 | `input_schema`  | `string`  | No       | none    | Path to a user-owned Zod schema file. Bootstrapped on first run if the file does not exist; never overwritten after that |
 | `baseUrl`       | `string`  | No       | `""`    | Default base URL embedded in the generated `client-config.ts`                                                            |
 | `server_client` | `boolean` | No       | `false` | When `true`, also generates `server.ts` with a `createServerClient()` factory                                            |
+| `split_by_tag`  | `boolean` | No       | `false` | When `true`, splits the client into one `client/<tag>.ts` module per OpenAPI tag; `client.ts` becomes a re-export barrel |
 
 **Full config example:**
 
@@ -233,6 +234,19 @@ export async function createTask(
   config?: Partial<ClientConfig>,
 ): Promise<Task> { ... }
 ```
+
+#### Splitting the client by tag (`split_by_tag: true`)
+
+Large specs produce one very large `client.ts`. Set `split_by_tag: true` to emit one module per OpenAPI tag instead:
+
+| File                 | Contents                                                                |
+| -------------------- | ----------------------------------------------------------------------- |
+| `client/<tag>.ts`    | The operations whose **first** tag is `<tag>` (kebab-case file name)    |
+| `client/default.ts`  | Operations without a tag                                                |
+| `client/_runtime.ts` | Shared runtime: `ApiError` and the request helpers (emitted once)       |
+| `client.ts`          | Barrel that re-exports `ApiError` and every tag module                  |
+
+Every existing import of `./client.js` (your code, `index.ts`, `server.ts`, react-query hooks) keeps working unchanged. For smaller bundles, import from the tag module directly (`import { listPets } from './api/client/pets.js'`): that module pulls in only its own operations plus the shared runtime. Tag names are sanitized to kebab-case (`Store Orders` and `storeOrders` both become `store-orders.ts`, and tags that collide this way share one module). Stale generated tag modules are removed on regeneration, and `--check-drift` checks the `client/` directory too.
 
 ## Error handling
 
