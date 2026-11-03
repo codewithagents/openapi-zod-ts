@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.2](https://github.com/codewithagents/openapi-zod-ts/compare/openapi-server-v2.2.1...openapi-server-v2.2.2) (2026-11-03)
+
+
+### Bug Fixes
+
+* **deps:** update all dependencies to latest ([#444](https://github.com/codewithagents/openapi-zod-ts/issues/444)) ([38de74e](https://github.com/codewithagents/openapi-zod-ts/commit/38de74ebf2836542b2fbe04f0d99f7b236d8fdf7))
+
 ## [2.2.1](https://github.com/codewithagents/openapi-zod-ts/compare/openapi-server-v2.2.0...openapi-server-v2.2.1) (2026-07-04)
 
 

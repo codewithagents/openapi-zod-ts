@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.12.3](https://github.com/codewithagents/openapi-zod-ts/compare/openapi-react-query-v3.12.2...openapi-react-query-v3.12.3) (2026-11-03)
+
+
+### Bug Fixes
+
+* **deps:** update all dependencies to latest ([#444](https://github.com/codewithagents/openapi-zod-ts/issues/444)) ([38de74e](https://github.com/codewithagents/openapi-zod-ts/commit/38de74ebf2836542b2fbe04f0d99f7b236d8fdf7))
+
 ## [3.12.2](https://github.com/codewithagents/openapi-zod-ts/compare/openapi-react-query-v3.12.1...openapi-react-query-v3.12.2) (2026-06-21)
 
 

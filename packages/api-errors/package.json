@@ -1,6 +1,6 @@
 {
   "name": "@codewithagents/api-errors",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Map backend API errors to form field errors. Framework-agnostic core with React Hook Form adapter.",
   "type": "module",
   "main": "./dist/index.js",

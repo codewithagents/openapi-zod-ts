@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/codewithagents/openapi-zod-ts/compare/api-errors-v1.2.0...api-errors-v1.2.1) (2026-11-03)
+
+
+### Bug Fixes
+
+* **deps:** update all dependencies to latest ([#444](https://github.com/codewithagents/openapi-zod-ts/issues/444)) ([38de74e](https://github.com/codewithagents/openapi-zod-ts/commit/38de74ebf2836542b2fbe04f0d99f7b236d8fdf7))
+
 ## [1.2.0](https://github.com/codewithagents/openapi-zod-ts/compare/api-errors-v1.1.0...api-errors-v1.2.0) (2026-06-15)
 
 
