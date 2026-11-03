@@ -30,6 +30,21 @@ export interface ReactQueryConfig {
    * - false: never emit useXxxInfinite hooks.
    */
   infinite_query?: boolean | 'auto'
+  /**
+   * When true, hooks type their error as the client's per-operation error alias
+   * (e.g. `GetPetError`) so `error.status` narrows `error.body` (default: false).
+   */
+  typed_errors?: boolean
+  /**
+   * When true, emits a `useXxxQueries(paramsList, options?, combine?)` useQueries
+   * wrapper per parameterized GET operation (default: false).
+   */
+  queries?: boolean
+  /**
+   * When true, mutation hooks accept an `optimistic: { queryKey, updater }` option
+   * for optimistic cache updates with rollback on error (default: false).
+   */
+  optimistic_updates?: boolean
 }
 
 function validateTiming(resource: string, timing: unknown): void {
@@ -73,6 +88,9 @@ function validateReactQueryFields(raw: Record<string, unknown>): void {
   expectNumber(raw, 'gc_time', '"gc_time" must be a number (milliseconds)')
   expectBoolean(raw, 'suspense', '"suspense" must be a boolean')
   expectBoolean(raw, 'auto_invalidate', '"auto_invalidate" must be a boolean')
+  expectBoolean(raw, 'typed_errors', '"typed_errors" must be a boolean')
+  expectBoolean(raw, 'queries', '"queries" must be a boolean')
+  expectBoolean(raw, 'optimistic_updates', '"optimistic_updates" must be a boolean')
   validateInfiniteQuery(raw['infinite_query'])
   if (raw['overrides'] !== undefined) validateOverrides(raw['overrides'])
 }
@@ -91,6 +109,9 @@ function parseReactQueryConfig(
       Record<string, { stale_time?: number; gc_time?: number }> | undefined,
     auto_invalidate: raw['auto_invalidate'] as boolean | undefined,
     infinite_query: raw['infinite_query'] as boolean | 'auto' | undefined,
+    typed_errors: raw['typed_errors'] as boolean | undefined,
+    queries: raw['queries'] as boolean | undefined,
+    optimistic_updates: raw['optimistic_updates'] as boolean | undefined,
   }
 }
 

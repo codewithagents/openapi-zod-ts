@@ -8,5 +8,11 @@
     "skipLibCheck": true,
     "outDir": "dist"
   },
-  "include": ["src", "generated", "generated-matrix", "generated-matrix-legit"]
+  "include": [
+    "src",
+    "generated",
+    "generated-hooks-extended",
+    "generated-matrix",
+    "generated-matrix-legit"
+  ]
 }

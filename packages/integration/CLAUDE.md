@@ -13,7 +13,9 @@ Build packages first, then run every generate script so all committed files stay
 pnpm run generate        # runs openapi-zod-ts, emits client.ts, models.ts, server.ts (server_client: true)
 pnpm run generate:hooks  # runs openapi-react-query, emits hooks.ts
 pnpm run generate:mocks  # runs openapi-msw, emits handlers.ts + fixtures.ts
+pnpm run generate:hooks:extended  # opt-in hooks (typed_errors, queries, optimistic_updates) into generated-hooks-extended/
 ```
+`generated-hooks-extended/` holds hooks generated with the opt-in options from `openapi-react-query.extended.config.json`; its `client.ts` is a hand-written shim re-exporting `../generated/client.js`. `src/consumer-simulation-extended.ts` type-checks it.
 `server.ts` is produced by the `generate` script via the `server_client: true` flag in `openapi-zod-ts.config.json`, not by a separate openapi-server step.
 
 ## Test

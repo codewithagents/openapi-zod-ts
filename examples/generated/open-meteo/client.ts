@@ -131,3 +131,6 @@ export async function getV1Forecast(
   const res = await _request('GET', '/v1/forecast', { searchParams }, config)
   return res.json()
 }
+
+/** Documented error responses of `getV1Forecast`, for narrowing on `error.status`. */
+export type GetV1ForecastError = ApiError<400, { error?: boolean; reason?: string }>

@@ -55,6 +55,9 @@ Create `openapi-react-query.config.json` in your project root:
 | `suspense` | No | `false` | When `true`, generates a `useSuspense*` variant alongside every query hook |
 | `auto_invalidate` | No | `false` | When `true`, mutation hooks auto-invalidate related queries on success |
 | `infinite_query` | No | `'auto'` | `boolean \| 'auto'`. Generates a `useXxxInfinite` hook for paginated list operations. `'auto'` detects paginated GETs; `true` forces generation, `false` disables it |
+| `typed_errors` | No | `false` | When `true`, hooks type their error as the client's per-operation error alias (e.g. `GetTaskError`), so `error.status` narrows `error.body` (see [Typed per-status errors](#typed-per-status-errors)) |
+| `queries` | No | `false` | When `true`, generates a `useXxxQueries(paramsList, options?, combine?)` hook per GET operation with parameters, for a dynamic number of parallel queries (see [Dynamic parallel queries](#dynamic-parallel-queries)) |
+| `optimistic_updates` | No | `false` | When `true`, mutation hooks accept an `optimistic: { queryKey, updater }` option that updates the cache before the request and rolls back on error (see [Optimistic updates](#optimistic-updates)) |
 | `overrides` | No | none | Per-resource cache timing (see [Per-resource cache timing](#per-resource-cache-timing)) |
 
 ## Generate
@@ -163,6 +166,64 @@ All types are derived from the generated client, no duplication:
 - Data type: `Awaited<ReturnType<typeof listTasks>>`
 - Variables type: `Parameters<typeof createTask>[0]`
 
+## Typed `select` transforms
+
+Every query hook, `queryOptions` factory, `useSuspense*` hook and `useXxxInfinite` hook takes a `TData` generic that defaults to the response type. A `select` transform therefore changes the type of `data`:
+
+```ts
+const { data } = useGetTask(id, { select: (task) => task.title })
+//      ^? string | undefined
+
+const { data: count } = useListTasks({}, { select: (page) => page.items.length })
+//      ^? number | undefined
+
+// The queryOptions factory carries the select type into useQuery / useQueries
+useQuery(getTaskQueryOptions(id, { select: (task) => task.id }))
+```
+
+Without `select`, `data` is still the raw response type, so existing call sites (including explicit `UseQueryResult<Task, ApiError>` annotations) keep compiling.
+
+## Typed per-status errors
+
+`openapi-zod-ts` exports a per-operation error alias from `client.ts` for every operation that documents explicit `4xx` / `5xx` responses, e.g. `export type GetTaskError = ApiError<404, NotFound> | ApiError<422, ValidationProblem>`. With `typed_errors: true` the hooks use it as their error type:
+
+```ts
+const { error } = useGetTask(id)
+if (error?.status === 422) {
+  error.body.errors // ValidationProblem
+}
+
+useCreateTask({
+  onError: (error) => {
+    if (error.status === 409) toast(error.body.message)
+  },
+})
+```
+
+Operations without documented error statuses keep `ApiError`. This is opt-in because the alias only lists *documented* statuses: an existing comparison against an undocumented status (`error.status === 500`) stops compiling once the type is narrowed, and an undocumented status at runtime is still thrown as a plain `ApiError`.
+
+## Dynamic parallel queries
+
+When `queries: true` in config, every GET operation that takes parameters also gets a `useXxxQueries` hook: a `useQueries` wrapper that builds each query with the operation's `xxxQueryOptions` factory, so cache keys, timing and `queryFn` match the single-query hook exactly.
+
+```ts
+// One argument (a path param or the params object): pass the values directly
+const results = useGetTaskQueries(taskIds) // UseQueryResult<Task, ApiError>[]
+
+// Several arguments: pass one tuple per query, in client-function order
+const repos = useGetRepoQueries([
+  ['acme', 'web', { ref: 'main' }],
+  ['acme', 'api', { ref: 'main' }],
+])
+
+// Shared options apply to every query; `combine` reduces the results
+const titles = useGetTaskQueries(taskIds, { staleTime: 60_000 }, (results) =>
+  results.flatMap((r) => (r.data ? [r.data.title] : []))
+)
+```
+
+Operations without parameters get no `useXxxQueries` hook (there is nothing to vary). With `typed_errors: true` the results use the per-operation error alias.
+
 ## Next.js App Router SSR prefetch
 
 The generated `queryOptions` factories work in React Server Components (RSC) without any client-boundary workarounds. Prefetch on the server, then pass the dehydrated cache to the client:
@@ -260,6 +321,29 @@ Invalidation scope:
 - `DELETE` → invalidates `resourceKeys.all()`
 
 Your `onSuccess` callback (if provided in `options`) is called after invalidation.
+
+## Optimistic updates
+
+When `optimistic_updates: true` in config, every mutation hook accepts an `optimistic` option implementing the TanStack Query v5 optimistic-update recipe:
+
+```ts
+const update = useUpdateTask({
+  optimistic: {
+    // static key, or derived from the mutation variables
+    queryKey: (vars) => taskKeys.detail(vars.id),
+    // annotate `old` to type the cache entry
+    updater: (old: Task | undefined, vars) => old && { ...old, ...vars.body },
+  },
+})
+update.mutate({ id: '123', body: { title: 'Renamed' } }) // the UI updates immediately
+```
+
+What the generated hook does:
+- **onMutate**: `cancelQueries` for the key (so an in-flight fetch cannot overwrite the optimistic value), snapshots `getQueryData`, then `setQueryData` with your `updater`.
+- **onError**: restores the snapshot (or resets the entry if it was not cached before).
+- **onSettled**: invalidates the key so the server state wins.
+
+Your own `onMutate` / `onError` / `onSuccess` / `onSettled` still run. `onMutate` runs after the optimistic write, and whatever it returns is passed to your other callbacks as their context, exactly as without the option. With `auto_invalidate: true` the resource invalidation runs on success as well. Without an `optimistic` option the hooks behave exactly like plain mutations. The hooks export `OptimisticUpdate<TVariables, TQueryData>` and `OptimisticContext<TContext>` types.
 
 ## Per-resource cache timing
 

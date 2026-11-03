@@ -13,6 +13,7 @@ export {
   detectAuthSchemes,
   CLIENT_INTERNAL_NAMES,
   getParamPresence,
+  buildOperationErrorTypeNames,
 } from './plugins/client.js'
 export type { AuthSchemes } from './plugins/client.js'
 export { generateZodSchemas } from './plugins/zod.js'

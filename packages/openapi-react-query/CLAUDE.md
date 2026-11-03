@@ -26,10 +26,15 @@ Default: `openapi-react-query.config.json` in CWD. Fields:
 - `suspense?`: when true, generates `useSuspense*` variants alongside each `useQuery` hook (default: false)
 - `overrides?`: per-resource cache timing overrides; key is resource name, value is `{ stale_time?, gc_time? }`
 - `auto_invalidate?`: when true, mutation hooks auto-invalidate related resource queries on success (default: false)
+- `infinite_query?`: `boolean | 'auto'`, controls `useXxxInfinite` generation (default: `'auto'`)
+- `typed_errors?`: when true, hooks type TError as the client's per-operation alias (`GetPetError`, from `buildOperationErrorTypeNames`) instead of bare `ApiError` (default: false; opt-in because narrowing to documented statuses breaks `error.status === <undocumented>` comparisons)
+- `queries?`: when true, emits `useXxxQueries(paramsList, options?, combine?)` (a `useQueries` wrapper over the queryOptions factory) per GET op with parameters (default: false)
+- `optimistic_updates?`: when true, mutation hooks take `<TContext, TQueryData>` generics and an `optimistic?: { queryKey, updater }` option, routed through a once-emitted `_withOptimisticUpdate` helper (default: false)
 
 `--config <path>` resolves relative paths from config file's directory (same pattern as openapi-zod-ts).
 
 ## Key non-obvious decisions
+- **Every query hook / factory has a `TData` generic** defaulting to `Awaited<ReturnType<typeof fn>>` (`InfiniteData<...>` for infinite hooks), so `select` changes the `data` type. Mutations have none.
 - **Multiple detail ops produce an operation-name key segment**: when a resource has >1 GET with path params (e.g. `/items/{id}` and `/items/{id}/usage`), each key includes the operation name to prevent cache collisions: `['items', 'getItemById', id]` vs `['items', 'getItemUsage', id]`. Single detail ops keep the canonical `['resource', id]` shape.
 - **`...options` spread before `onSuccess` in auto-invalidate hooks**, so the generated `onSuccess` (which calls `queryClient.invalidateQueries`) always wins; the caller's `onSuccess` is composed inside via `options?.onSuccess?.(...args)`.
 

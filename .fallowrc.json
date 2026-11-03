@@ -5,6 +5,7 @@
     "examples/generated-rq/**",
     "packages/*/dist/**",
     "packages/*/generated/**",
+    "packages/*/generated-hooks-extended/**",
     "packages/*/generated-matrix/**",
     "packages/*/generated-matrix-legit/**",
     "packages/openapi-zod-ts/src/__fixtures__/**",
@@ -12,6 +13,7 @@
   ],
   "ignoreUnresolvedImports": [
     "**/generated/**",
+    "**/generated-hooks-extended/**",
     "**/generated-matrix/**",
     "**/generated-matrix-legit/**"
   ],

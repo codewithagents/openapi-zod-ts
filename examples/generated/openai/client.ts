@@ -74,6 +74,8 @@ import type {
   DeletedThreadResource,
   DeletedVideoResource,
   EditImageBodyJsonParam,
+  Error,
+  ErrorResponse,
   Eval,
   EvalList,
   EvalRun,
@@ -853,6 +855,9 @@ export async function deleteEval(
   return res.json()
 }
 
+/** Documented error responses of `deleteEval`, for narrowing on `error.status`. */
+export type DeleteEvalError = ApiError<404, Error>
+
 export async function getEvalRuns(
   evalId: string,
   params?: {
@@ -888,6 +893,9 @@ export async function createEvalRun(
   const res = await _request('POST', `/evals/${encodeURIComponent(evalId)}/runs`, { body }, config)
   return res.json()
 }
+
+/** Documented error responses of `createEvalRun`, for narrowing on `error.status`. */
+export type CreateEvalRunError = ApiError<400, Error>
 
 export async function getEvalRun(
   evalId: string,
@@ -933,6 +941,9 @@ export async function deleteEvalRun(
   )
   return res.json()
 }
+
+/** Documented error responses of `deleteEvalRun`, for narrowing on `error.status`. */
+export type DeleteEvalRunError = ApiError<404, Error>
 
 export async function getEvalRunOutputItems(
   evalId: string,
@@ -1715,6 +1726,9 @@ export async function modifyProject(
   return res.json()
 }
 
+/** Documented error responses of `modifyProject`, for narrowing on `error.status`. */
+export type ModifyProjectError = ApiError<400, ErrorResponse>
+
 export async function listProjectApiKeys(
   projectId: string,
   params?: {
@@ -1765,6 +1779,9 @@ export async function deleteProjectApiKey(
   )
   return res.json()
 }
+
+/** Documented error responses of `deleteProjectApiKey`, for narrowing on `error.status`. */
+export type DeleteProjectApiKeyError = ApiError<400, ErrorResponse>
 
 export async function archiveProject(
   projectId: string,
@@ -1919,6 +1936,9 @@ export async function updateProjectRateLimits(
   return res.json()
 }
 
+/** Documented error responses of `updateProjectRateLimits`, for narrowing on `error.status`. */
+export type UpdateProjectRateLimitsError = ApiError<400, ErrorResponse>
+
 /**
  * @throws {ApiError<400, ErrorResponse>}
  */
@@ -1942,6 +1962,9 @@ export async function listProjectServiceAccounts(
   return res.json()
 }
 
+/** Documented error responses of `listProjectServiceAccounts`, for narrowing on `error.status`. */
+export type ListProjectServiceAccountsError = ApiError<400, ErrorResponse>
+
 /**
  * @throws {ApiError<400, ErrorResponse>}
  */
@@ -1958,6 +1981,9 @@ export async function createProjectServiceAccount(
   )
   return res.json()
 }
+
+/** Documented error responses of `createProjectServiceAccount`, for narrowing on `error.status`. */
+export type CreateProjectServiceAccountError = ApiError<400, ErrorResponse>
 
 export async function retrieveProjectServiceAccount(
   projectId: string,
@@ -2010,6 +2036,9 @@ export async function listProjectUsers(
   return res.json()
 }
 
+/** Documented error responses of `listProjectUsers`, for narrowing on `error.status`. */
+export type ListProjectUsersError = ApiError<400, ErrorResponse>
+
 /**
  * @throws {ApiError<400, ErrorResponse>}
  */
@@ -2026,6 +2055,9 @@ export async function createProjectUser(
   )
   return res.json()
 }
+
+/** Documented error responses of `createProjectUser`, for narrowing on `error.status`. */
+export type CreateProjectUserError = ApiError<400, ErrorResponse>
 
 export async function retrieveProjectUser(
   projectId: string,
@@ -2059,6 +2091,9 @@ export async function modifyProjectUser(
   return res.json()
 }
 
+/** Documented error responses of `modifyProjectUser`, for narrowing on `error.status`. */
+export type ModifyProjectUserError = ApiError<400, ErrorResponse>
+
 /**
  * @throws {ApiError<400, ErrorResponse>}
  */
@@ -2075,6 +2110,9 @@ export async function deleteProjectUser(
   )
   return res.json()
 }
+
+/** Documented error responses of `deleteProjectUser`, for narrowing on `error.status`. */
+export type DeleteProjectUserError = ApiError<400, ErrorResponse>
 
 export async function listRoles(
   params?: {
@@ -2828,6 +2866,9 @@ export async function deleteResponse(
   await _request('DELETE', `/responses/${encodeURIComponent(responseId)}`, {}, config)
 }
 
+/** Documented error responses of `deleteResponse`, for narrowing on `error.status`. */
+export type DeleteResponseError = ApiError<404, Error>
+
 /**
  * @throws {ApiError<404, Error>}
  */
@@ -2843,6 +2884,9 @@ export async function cancelResponse(
   )
   return res.json()
 }
+
+/** Documented error responses of `cancelResponse`, for narrowing on `error.status`. */
+export type CancelResponseError = ApiError<404, Error>
 
 export async function listInputItems(
   responseId: string,

@@ -119,6 +119,26 @@ describe('loadConfig', () => {
     await expect(loadConfig(tmpDir)).rejects.toThrow('"auto_invalidate" must be a boolean')
   })
 
+  it('throws when typed_errors is not a boolean', async () => {
+    writeConfig({ input_openapi: 'openapi.json', output: 'src/hooks', typed_errors: 'yes' })
+    await expect(loadConfig(tmpDir)).rejects.toThrow('"typed_errors" must be a boolean')
+  })
+
+  it('throws when queries is not a boolean', async () => {
+    writeConfig({ input_openapi: 'openapi.json', output: 'src/hooks', queries: 1 })
+    await expect(loadConfig(tmpDir)).rejects.toThrow('"queries" must be a boolean')
+  })
+
+  it('throws when optimistic_updates is not a boolean', async () => {
+    writeConfig({ input_openapi: 'openapi.json', output: 'src/hooks', optimistic_updates: 'on' })
+    await expect(loadConfig(tmpDir)).rejects.toThrow('"optimistic_updates" must be a boolean')
+  })
+
+  it('parses typed_errors: true', async () => {
+    writeConfig({ input_openapi: 'openapi.json', output: 'src/hooks', typed_errors: true })
+    expect((await loadConfig(tmpDir)).typed_errors).toBe(true)
+  })
+
   it('throws when overrides is not an object', async () => {
     writeConfig({ input_openapi: 'openapi.json', output: 'src/hooks', overrides: 'flat' })
     await expect(loadConfig(tmpDir)).rejects.toThrow('"overrides" must be an object')

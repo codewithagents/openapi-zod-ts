@@ -15,6 +15,7 @@ import type {
   CreateCheckoutSessionResponse,
   CreateOrderRequest,
   CreateOrderResponse,
+  DefaultErrorResponseEntity,
   DonationCampaignsRequest,
   DonationCampaignsResponse,
   DonationPaymentRequest,
@@ -40,6 +41,7 @@ import type {
   PaymentReversalResponse,
   PaypalUpdateOrderRequest,
   PaypalUpdateOrderResponse,
+  ServiceError,
   SessionResultResponse,
   StandalonePaymentCancelRequest,
   StandalonePaymentCancelResponse,
@@ -179,6 +181,14 @@ export async function postCancels(
   return res.json()
 }
 
+/** Documented error responses of `postCancels`, for narrowing on `error.status`. */
+export type PostCancelsError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 export async function postCardDetails(
   body: CardDetailsRequest,
   params?: {
@@ -214,6 +224,14 @@ export async function postDonationCampaigns(
   return res.json()
 }
 
+/** Documented error responses of `postDonationCampaigns`, for narrowing on `error.status`. */
+export type PostDonationCampaignsError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -234,6 +252,14 @@ export async function postDonations(
   const res = await _request('POST', '/donations', { body, extraHeaders }, config)
   return res.json()
 }
+
+/** Documented error responses of `postDonations`, for narrowing on `error.status`. */
+export type PostDonationsError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 export async function postForward(
   body: CheckoutForwardRequest,
@@ -270,6 +296,14 @@ export async function postOrders(
   return res.json()
 }
 
+/** Documented error responses of `postOrders`, for narrowing on `error.status`. */
+export type PostOrdersError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -290,6 +324,14 @@ export async function postOrdersCancel(
   const res = await _request('POST', '/orders/cancel', { body, extraHeaders }, config)
   return res.json()
 }
+
+/** Documented error responses of `postOrdersCancel`, for narrowing on `error.status`. */
+export type PostOrdersCancelError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @deprecated
@@ -313,6 +355,14 @@ export async function postOriginKeys(
   return res.json()
 }
 
+/** Documented error responses of `postOriginKeys`, for narrowing on `error.status`. */
+export type PostOriginKeysError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -334,6 +384,14 @@ export async function postPaymentLinks(
   return res.json()
 }
 
+/** Documented error responses of `postPaymentLinks`, for narrowing on `error.status`. */
+export type PostPaymentLinksError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -348,6 +406,14 @@ export async function getPaymentLinksLinkId(
   const res = await _request('GET', `/paymentLinks/${encodeURIComponent(linkId)}`, {}, config)
   return res.json()
 }
+
+/** Documented error responses of `getPaymentLinksLinkId`, for narrowing on `error.status`. */
+export type GetPaymentLinksLinkIdError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -370,6 +436,14 @@ export async function patchPaymentLinksLinkId(
   return res.json()
 }
 
+/** Documented error responses of `patchPaymentLinksLinkId`, for narrowing on `error.status`. */
+export type PatchPaymentLinksLinkIdError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -390,6 +464,14 @@ export async function postPaymentMethods(
   const res = await _request('POST', '/paymentMethods', { body, extraHeaders }, config)
   return res.json()
 }
+
+/** Documented error responses of `postPaymentMethods`, for narrowing on `error.status`. */
+export type PostPaymentMethodsError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -412,6 +494,14 @@ export async function postPaymentMethodsBalance(
   return res.json()
 }
 
+/** Documented error responses of `postPaymentMethodsBalance`, for narrowing on `error.status`. */
+export type PostPaymentMethodsBalanceError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -433,6 +523,14 @@ export async function postPayments(
   return res.json()
 }
 
+/** Documented error responses of `postPayments`, for narrowing on `error.status`. */
+export type PostPaymentsError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -453,6 +551,14 @@ export async function postPaymentsDetails(
   const res = await _request('POST', '/payments/details', { body, extraHeaders }, config)
   return res.json()
 }
+
+/** Documented error responses of `postPaymentsDetails`, for narrowing on `error.status`. */
+export type PostPaymentsDetailsError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -481,6 +587,14 @@ export async function postPaymentsPaymentPspReferenceAmountUpdates(
   return res.json()
 }
 
+/** Documented error responses of `postPaymentsPaymentPspReferenceAmountUpdates`, for narrowing on `error.status`. */
+export type PostPaymentsPaymentPspReferenceAmountUpdatesError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -507,6 +621,14 @@ export async function postPaymentsPaymentPspReferenceCancels(
   )
   return res.json()
 }
+
+/** Documented error responses of `postPaymentsPaymentPspReferenceCancels`, for narrowing on `error.status`. */
+export type PostPaymentsPaymentPspReferenceCancelsError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -535,6 +657,14 @@ export async function postPaymentsPaymentPspReferenceCaptures(
   return res.json()
 }
 
+/** Documented error responses of `postPaymentsPaymentPspReferenceCaptures`, for narrowing on `error.status`. */
+export type PostPaymentsPaymentPspReferenceCapturesError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -561,6 +691,14 @@ export async function postPaymentsPaymentPspReferenceRefunds(
   )
   return res.json()
 }
+
+/** Documented error responses of `postPaymentsPaymentPspReferenceRefunds`, for narrowing on `error.status`. */
+export type PostPaymentsPaymentPspReferenceRefundsError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -589,6 +727,14 @@ export async function postPaymentsPaymentPspReferenceReversals(
   return res.json()
 }
 
+/** Documented error responses of `postPaymentsPaymentPspReferenceReversals`, for narrowing on `error.status`. */
+export type PostPaymentsPaymentPspReferenceReversalsError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -609,6 +755,14 @@ export async function postPaypalUpdateOrder(
   const res = await _request('POST', '/paypal/updateOrder', { body, extraHeaders }, config)
   return res.json()
 }
+
+/** Documented error responses of `postPaypalUpdateOrder`, for narrowing on `error.status`. */
+export type PostPaypalUpdateOrderError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 export async function postSessions(
   body: CreateCheckoutSessionRequest,
@@ -707,3 +861,11 @@ export async function postValidateShopperId(
   const res = await _request('POST', '/validateShopperId', { body }, config)
   return res.json()
 }
+
+/** Documented error responses of `postValidateShopperId`, for narrowing on `error.status`. */
+export type PostValidateShopperIdError =
+  | ApiError<400, DefaultErrorResponseEntity>
+  | ApiError<401, DefaultErrorResponseEntity>
+  | ApiError<403, DefaultErrorResponseEntity>
+  | ApiError<422, DefaultErrorResponseEntity>
+  | ApiError<500, DefaultErrorResponseEntity>

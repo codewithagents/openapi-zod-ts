@@ -2,6 +2,7 @@
 
 import type {
   APIRequest,
+  ErrorResponse,
   File,
   FullItem,
   FullItemWritable,
@@ -113,6 +114,9 @@ export async function getApiActivity(
   return res.json()
 }
 
+/** Documented error responses of `getApiActivity`, for narrowing on `error.status`. */
+export type GetApiActivityError = ApiError<401, ErrorResponse>
+
 /**
  * @throws {ApiError<401, ErrorResponse>}
  */
@@ -128,6 +132,9 @@ export async function getVaults(
   return res.json()
 }
 
+/** Documented error responses of `getVaults`, for narrowing on `error.status`. */
+export type GetVaultsError = ApiError<401, ErrorResponse>
+
 /**
  * @throws {ApiError<401, ErrorResponse>}
  * @throws {ApiError<403, ErrorResponse>}
@@ -140,6 +147,10 @@ export async function getVaultById(
   const res = await _request('GET', `/vaults/${encodeURIComponent(vaultUuid)}`, {}, config)
   return res.json()
 }
+
+/** Documented error responses of `getVaultById`, for narrowing on `error.status`. */
+export type GetVaultByIdError =
+  ApiError<401, ErrorResponse> | ApiError<403, ErrorResponse> | ApiError<404, ErrorResponse>
 
 /**
  * @throws {ApiError<401, ErrorResponse>}
@@ -163,6 +174,9 @@ export async function getVaultItems(
   return res.json()
 }
 
+/** Documented error responses of `getVaultItems`, for narrowing on `error.status`. */
+export type GetVaultItemsError = ApiError<401, ErrorResponse> | ApiError<404, ErrorResponse>
+
 /**
  * @throws {ApiError<400, ErrorResponse>}
  * @throws {ApiError<401, ErrorResponse>}
@@ -183,6 +197,13 @@ export async function createVaultItem(
   return res.json()
 }
 
+/** Documented error responses of `createVaultItem`, for narrowing on `error.status`. */
+export type CreateVaultItemError =
+  | ApiError<400, ErrorResponse>
+  | ApiError<401, ErrorResponse>
+  | ApiError<403, ErrorResponse>
+  | ApiError<404, ErrorResponse>
+
 /**
  * @throws {ApiError<401, ErrorResponse>}
  * @throws {ApiError<403, ErrorResponse>}
@@ -201,6 +222,10 @@ export async function getVaultItemById(
   )
   return res.json()
 }
+
+/** Documented error responses of `getVaultItemById`, for narrowing on `error.status`. */
+export type GetVaultItemByIdError =
+  ApiError<401, ErrorResponse> | ApiError<403, ErrorResponse> | ApiError<404, ErrorResponse>
 
 /**
  * @throws {ApiError<400, ErrorResponse>}
@@ -223,6 +248,13 @@ export async function updateVaultItem(
   return res.json()
 }
 
+/** Documented error responses of `updateVaultItem`, for narrowing on `error.status`. */
+export type UpdateVaultItemError =
+  | ApiError<400, ErrorResponse>
+  | ApiError<401, ErrorResponse>
+  | ApiError<403, ErrorResponse>
+  | ApiError<404, ErrorResponse>
+
 /**
  * @throws {ApiError<401, ErrorResponse>}
  * @throws {ApiError<403, ErrorResponse>}
@@ -243,6 +275,10 @@ export async function patchVaultItem(
   return res.json()
 }
 
+/** Documented error responses of `patchVaultItem`, for narrowing on `error.status`. */
+export type PatchVaultItemError =
+  ApiError<401, ErrorResponse> | ApiError<403, ErrorResponse> | ApiError<404, ErrorResponse>
+
 /**
  * @throws {ApiError<401, ErrorResponse>}
  * @throws {ApiError<403, ErrorResponse>}
@@ -260,6 +296,10 @@ export async function deleteVaultItem(
     config
   )
 }
+
+/** Documented error responses of `deleteVaultItem`, for narrowing on `error.status`. */
+export type DeleteVaultItemError =
+  ApiError<401, ErrorResponse> | ApiError<403, ErrorResponse> | ApiError<404, ErrorResponse>
 
 /**
  * @throws {ApiError<401, ErrorResponse>}
@@ -283,6 +323,10 @@ export async function getItemFiles(
   )
   return res.json()
 }
+
+/** Documented error responses of `getItemFiles`, for narrowing on `error.status`. */
+export type GetItemFilesError =
+  ApiError<401, ErrorResponse> | ApiError<404, ErrorResponse> | ApiError<413, ErrorResponse>
 
 /**
  * @throws {ApiError<401, ErrorResponse>}
@@ -309,6 +353,13 @@ export async function getDetailsOfFileById(
   return res.json()
 }
 
+/** Documented error responses of `getDetailsOfFileById`, for narrowing on `error.status`. */
+export type GetDetailsOfFileByIdError =
+  | ApiError<401, ErrorResponse>
+  | ApiError<403, ErrorResponse>
+  | ApiError<404, ErrorResponse>
+  | ApiError<413, ErrorResponse>
+
 /**
  * @throws {ApiError<401, ErrorResponse>}
  * @throws {ApiError<404, ErrorResponse>}
@@ -327,6 +378,9 @@ export async function downloadFileByID(
   )
   return res.blob()
 }
+
+/** Documented error responses of `downloadFileByID`, for narrowing on `error.status`. */
+export type DownloadFileByIDError = ApiError<401, ErrorResponse> | ApiError<404, ErrorResponse>
 
 export async function getHeartbeat(config?: Partial<ClientConfig>): Promise<string> {
   const res = await _request('GET', '/heartbeat', {}, config)

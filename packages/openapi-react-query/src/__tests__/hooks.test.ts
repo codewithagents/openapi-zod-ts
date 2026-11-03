@@ -1989,11 +1989,11 @@ describe('Feature #188: queryOptions factories', () => {
   })
 
   it('generates listTasksQueryOptions for the list GET operation', () => {
-    expect(qoContent).toContain('export function listTasksQueryOptions(')
+    expect(qoContent).toContain('export function listTasksQueryOptions<TData = ')
   })
 
   it('generates getTaskQueryOptions for the detail GET operation', () => {
-    expect(qoContent).toContain('export function getTaskQueryOptions(')
+    expect(qoContent).toContain('export function getTaskQueryOptions<TData = ')
   })
 
   it('listTasksQueryOptions uses queryOptions() call (not useQuery)', () => {
@@ -2498,13 +2498,13 @@ describe('generateHooks — #189: infinite query generation', () => {
 
   it('both useListItems (regular) and useListItemsInfinite hooks are generated', () => {
     const { content } = generateHooks(makeListSpec(['page']), { staleTime: 0, gcTime: 0 })
-    expect(content).toContain('export function useListItems(')
-    expect(content).toContain('export function useListItemsInfinite(')
+    expect(content).toContain('export function useListItems<TData = ')
+    expect(content).toContain('export function useListItemsInfinite<TData = InfiniteData<')
   })
 
   it('regular useListItems hook is not affected when infinite is generated alongside', () => {
     const { content } = generateHooks(makeListSpec(['page']), { staleTime: 0, gcTime: 0 })
-    const regularHookStart = content.indexOf('export function useListItems(')
+    const regularHookStart = content.indexOf('export function useListItems<')
     const regularHookEnd = content.indexOf('\n}', regularHookStart) + 2
     const regularHookBody = content.slice(regularHookStart, regularHookEnd)
     // Regular hook must still use useQuery, not useInfiniteQuery

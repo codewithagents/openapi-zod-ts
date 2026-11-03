@@ -13,6 +13,7 @@ import {
   resolveBodyRefToWritableName,
 } from '../utils/writable-variants.js'
 import type { GeneratedFile } from './types.js'
+import { generateTypes } from './types.js'
 import { EVENT_STREAM_HELPER_NAMES, EVENT_STREAM_HELPER_SOURCE } from './event-stream.js'
 
 type OperationObject = OpenAPIV3_1.OperationObject
@@ -889,6 +890,163 @@ function getThrowsTags(operation: OperationObject): string[] {
   }
 
   return tags
+}
+
+/**
+ * Model imports needed by the per-operation error aliases. A model whose name
+ * collides with a declaration local to client.ts (the ApiError class, the
+ * ClientConfig import, ...) cannot be imported under its own name, so it is
+ * imported as `Name as NameModel` and referenced by that alias in the union.
+ */
+interface ErrorBodyImports {
+  /** Model names imported as-is (shared with the client's other model imports). */
+  plain: Set<string>
+  /** Colliding model name -> local alias. */
+  aliased: Map<string, string>
+  /** Names declared or imported locally in client.ts. */
+  localNames: ReadonlySet<string>
+  /** Every name models.ts exports (aliases must avoid them too). */
+  modelNames: ReadonlySet<string>
+}
+
+/**
+ * Rename type identifiers in a rendered TS type string, skipping quoted
+ * property keys and identifier property keys (`Name:` / `Name?:`).
+ */
+function renameTypeIdentifiers(typeStr: string, renames: ReadonlyMap<string, string>): string {
+  if (renames.size === 0) return typeStr
+  return typeStr.replace(
+    /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|[A-Za-z_$][\w$]*(?!\??:)(?![\w$])/g,
+    (token) => renames.get(token) ?? token
+  )
+}
+
+/** Record the models an error body references, aliasing the ones that collide. */
+function trackErrorBodyImports(names: Set<string>, imports: ErrorBodyImports): Map<string, string> {
+  const renames = new Map<string, string>()
+  for (const name of names) {
+    if (!imports.localNames.has(name)) {
+      imports.plain.add(name)
+      continue
+    }
+    let alias = imports.aliased.get(name)
+    if (alias === undefined) {
+      alias = uniquifyName(`${name}Model`, new Set([...imports.localNames, ...imports.modelNames]))
+      imports.aliased.set(name, alias)
+    }
+    renames.set(name, alias)
+  }
+  return renames
+}
+
+/**
+ * Render the body type of one documented error response. Responses without a
+ * JSON schema use `fallback` (the configured error_body_type, else `unknown`).
+ */
+function errorResponseBodyType(
+  response: ResponseObject | ReferenceObject,
+  spec: OpenAPIV3_1.Document,
+  imports: ErrorBodyImports | undefined,
+  fallback: string
+): string {
+  const resolved = isRef(response)
+    ? (resolveJsonPointer(spec, (response as ReferenceObject).$ref) as ResponseObject | undefined)
+    : (response as ResponseObject)
+  const content = resolved?.content as
+    Record<string, { schema?: SchemaObject | ReferenceObject }> | undefined
+  if (content === undefined) return fallback
+  const picked = pickResponseContent(content)
+  if (picked === null || picked.kind !== 'json' || picked.entry.schema === undefined) {
+    return fallback
+  }
+  const rendered = inlineSchemaToTs(picked.entry.schema, spec)
+  if (imports === undefined) return rendered
+  const referenced = new Set<string>()
+  collectComponentRefNames(picked.entry.schema, spec, referenced)
+  return renameTypeIdentifiers(rendered, trackErrorBodyImports(referenced, imports))
+}
+
+/**
+ * Build the union of `ApiError<Status, Body>` members for every explicit 4xx/5xx
+ * response an operation documents (ranges like `4XX` and `default` are skipped:
+ * they have no literal status). Returns undefined when nothing is documented.
+ */
+function operationErrorUnion(
+  operation: OperationObject,
+  spec: OpenAPIV3_1.Document,
+  imports?: ErrorBodyImports,
+  fallbackBodyType = 'unknown'
+): string | undefined {
+  const responses = operation.responses as
+    Record<string, ResponseObject | ReferenceObject> | undefined
+  if (responses === undefined) return undefined
+  const codes = Object.keys(responses)
+    .filter((code) => /^[45]\d\d$/.test(code))
+    .sort()
+  if (codes.length === 0) return undefined
+  return codes
+    .map((code) => {
+      const body = errorResponseBodyType(responses[code]!, spec, imports, fallbackBodyType)
+      return `ApiError<${code}, ${body}>`
+    })
+    .join(' | ')
+}
+
+/** Names exported from client-config.ts / client.ts that an error alias must not shadow. */
+const ERROR_ALIAS_RESERVED_NAMES = [
+  'ApiError',
+  'ClientConfig',
+  'configureClient',
+  'getConfig',
+  'LaravelValidationError',
+  '_FetchResponse',
+]
+
+/**
+ * Per-operation error type aliases (#195), keyed by client function name.
+ *
+ * For every operation that documents at least one explicit 4xx/5xx response,
+ * client.ts exports `export type <Op>Error = ApiError<404, NotFound> | ...` so
+ * callers (and the React Query hooks) can narrow on `error.status`. Alias names
+ * are `PascalCase(funcName) + 'Error'`, deduplicated against every type the
+ * barrel re-exports (models.ts, client-config.ts) so `export *` stays unambiguous.
+ *
+ * Exported so `@codewithagents/openapi-react-query` resolves the same names.
+ */
+export function buildOperationErrorTypeNames(
+  spec: OpenAPIV3_1.Document,
+  modelNames: ReadonlySet<string> = modelExportNames(spec)
+): Map<string, string> {
+  const names = new Map<string, string>()
+  const paths = spec.paths as Record<string, Record<string, OperationObject>> | undefined
+  if (paths === undefined) return names
+  const usedAliasNames = new Set<string>([...ERROR_ALIAS_RESERVED_NAMES, ...modelNames])
+  const usedFuncNames = new Set<string>(CLIENT_INTERNAL_NAMES)
+  for (const [path, pathItem] of Object.entries(paths)) {
+    for (const method of SUPPORTED_METHODS) {
+      const operation = pathItem[method] as OperationObject | undefined
+      if (operation === undefined) continue
+      const funcName = uniquifyName(operationFuncName(operation, method, path), usedFuncNames)
+      if (operationErrorUnion(operation, spec) === undefined) continue
+      const base = `${funcName.charAt(0).toUpperCase()}${funcName.slice(1)}Error`
+      names.set(funcName, uniquifyName(base, usedAliasNames))
+    }
+  }
+  return names
+}
+
+/** Every name models.ts exports for this spec. */
+function modelExportNames(spec: OpenAPIV3_1.Document): Set<string> {
+  const matches = generateTypes(spec).content.matchAll(
+    /^export (?:type|interface|const|enum) ([A-Za-z_$][\w$]*)/gm
+  )
+  return new Set(Array.from(matches, (m) => m[1]!))
+}
+
+function operationFuncName(operation: OperationObject, method: string, path: string): string {
+  return operation.operationId !== undefined
+    ? sanitizeOperationId(operation.operationId)
+    : deriveOperationName(method, path)
 }
 
 /** Get the $ref schema name from an operation's JSON request body, if any. */
@@ -1797,6 +1955,54 @@ interface ClientOperation {
   eventStream?: { sigParts: string[]; forwardedArgs: string[]; deprecated: boolean }
   /** The <op>Events wrapper, assigned after every operation name is final. */
   eventsCode?: string
+  /** Colliding error-body models imported under an alias: model name -> local alias. */
+  aliasedTypeNames: Map<string, string>
+  /** The `export type <Op>Error = ...` alias (#195), when errors are documented. */
+  errorTypeCode?: string
+}
+
+/** Spec-wide inputs for the per-operation error aliases. */
+interface ErrorAliasContext {
+  names: Map<string, string>
+  localNames: ReadonlySet<string>
+  modelNames: ReadonlySet<string>
+  fallbackBodyType: string
+}
+
+function errorAliasContext(
+  spec: OpenAPIV3_1.Document,
+  options: ClientOptions | undefined
+): ErrorAliasContext {
+  const modelNames = modelExportNames(spec)
+  const names = buildOperationErrorTypeNames(spec, modelNames)
+  const custom = options?.errorBodyType
+  const localNames = new Set([
+    ...CLIENT_INTERNAL_NAMES,
+    'LaravelValidationError',
+    ...names.values(),
+  ])
+  if (custom !== undefined && custom !== 'laravel') localNames.add(custom)
+  const fallbackBodyType = custom === 'laravel' ? 'LaravelValidationError' : (custom ?? 'unknown')
+  return { names, localNames, modelNames, fallbackBodyType }
+}
+
+/** Per-operation error alias (#195): additive, only for documented 4xx/5xx. */
+function attachErrorAlias(
+  op: ClientOperation,
+  operation: OperationObject,
+  spec: OpenAPIV3_1.Document,
+  ctx: ErrorAliasContext
+): void {
+  const aliasName = ctx.names.get(op.funcName)
+  if (aliasName === undefined) return
+  const imports: ErrorBodyImports = {
+    plain: op.typeNames,
+    aliased: op.aliasedTypeNames,
+    localNames: ctx.localNames,
+    modelNames: ctx.modelNames,
+  }
+  const union = operationErrorUnion(operation, spec, imports, ctx.fallbackBodyType)!
+  op.errorTypeCode = `/** Documented error responses of \`${op.funcName}\`, for narrowing on \`error.status\`. */\nexport type ${aliasName} = ${union}`
 }
 
 /** Everything generateClient/generateClientFiles need, collected in one pass over the spec. */
@@ -1934,6 +2140,7 @@ function buildOperation(
       needsZ,
       isMultipart: bodyInfo !== undefined && bodyInfo.kind === 'multipart',
       eventStream,
+      aliasedTypeNames: new Map(),
     },
     bodyInfo,
     headerCount: headerParams.length,
@@ -1959,6 +2166,7 @@ function collectClient(
   // The CLIENT_INTERNAL_NAMES set is defined at module level and exported so that
   // the hooks generator can reuse the same set (single source of truth).
   const usedFuncNames = new Set<string>(CLIENT_INTERNAL_NAMES)
+  const errorAliases = errorAliasContext(spec, options)
 
   for (const [path, pathItem] of Object.entries(paths ?? {})) {
     for (const method of SUPPORTED_METHODS) {
@@ -1979,6 +2187,7 @@ function collectClient(
         writableVariantMap
       )
       operations.push(built.op)
+      attachErrorAlias(built.op, operation, spec, errorAliases)
 
       // Track which features are used across the spec (drives conditional helper code-gen)
       if (built.op.isMultipart) hasMultipart = true
@@ -2029,6 +2238,7 @@ function mergeOperationImports(ops: ClientOperation[]): {
   let needsZ = false
   for (const op of ops) {
     for (const t of op.typeNames) typeNames.add(t)
+    for (const [name, alias] of op.aliasedTypeNames) typeNames.add(`${name} as ${alias}`)
     for (const s of op.schemaNames) schemaNames.add(s)
     if (op.needsZ) needsZ = true
   }
@@ -2136,6 +2346,10 @@ function emitOperations(lines: string[], ops: ClientOperation[]): void {
       lines.push('')
       lines.push(op.eventsCode)
     }
+    if (op.errorTypeCode !== undefined) {
+      lines.push('')
+      lines.push(op.errorTypeCode)
+    }
   }
 }
 
@@ -2231,6 +2445,8 @@ function assembleSplitModule(
   const runtimeImports = new Set<string>()
   for (const op of ops) runtimeImports.add(op.isMultipart ? '_requestForm' : '_request')
   const hasEvents = ops.some((op) => op.eventsCode !== undefined)
+  // Error aliases reference the ApiError class from the shared runtime module.
+  if (ops.some((op) => op.errorTypeCode !== undefined)) runtimeImports.add('type ApiError')
   if (hasEvents) {
     runtimeImports.add('parseEventStream')
     runtimeImports.add('type EventStreamMessage')

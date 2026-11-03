@@ -13,14 +13,16 @@ export const latestKeys = {
 
 // ── Query options factories ──────────────────────────────────
 
-export function getLatestByBaseCurrencyQueryOptions(
+export function getLatestByBaseCurrencyQueryOptions<
+  TData = Awaited<ReturnType<typeof getLatestByBaseCurrency>>,
+>(
   baseCurrency: Parameters<typeof getLatestByBaseCurrency>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getLatestByBaseCurrency>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getLatestByBaseCurrency>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return queryOptions<Awaited<ReturnType<typeof getLatestByBaseCurrency>>, ApiError>({
+  return queryOptions<Awaited<ReturnType<typeof getLatestByBaseCurrency>>, ApiError, TData>({
     queryKey: latestKeys.detail(baseCurrency),
     queryFn: () => getLatestByBaseCurrency(baseCurrency),
     staleTime: 0,
@@ -31,14 +33,16 @@ export function getLatestByBaseCurrencyQueryOptions(
 
 // ── Queries ──────────────────────────────────────────────────
 
-export function useGetLatestByBaseCurrency(
+export function useGetLatestByBaseCurrency<
+  TData = Awaited<ReturnType<typeof getLatestByBaseCurrency>>,
+>(
   baseCurrency: Parameters<typeof getLatestByBaseCurrency>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getLatestByBaseCurrency>>, ApiError>,
+    UseQueryOptions<Awaited<ReturnType<typeof getLatestByBaseCurrency>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getLatestByBaseCurrency>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getLatestByBaseCurrency>>, ApiError, TData>({
     queryKey: latestKeys.detail(baseCurrency!),
     queryFn: () => getLatestByBaseCurrency(baseCurrency!),
     staleTime: 0,

@@ -2,6 +2,7 @@
 
 import type {
   BuyMuseumTickets,
+  Error,
   MuseumHours,
   MuseumTicketsConfirmation,
   SpecialEvent,
@@ -120,6 +121,9 @@ export async function getMuseumHours(
   return MuseumHoursSchema.parse(await res.json())
 }
 
+/** Documented error responses of `getMuseumHours`, for narrowing on `error.status`. */
+export type GetMuseumHoursError = ApiError<400, Error> | ApiError<404, Error>
+
 export async function listSpecialEvents(
   params?: {
     startDate?: string
@@ -138,6 +142,9 @@ export async function listSpecialEvents(
   return SpecialEventCollectionSchema.parse(await res.json())
 }
 
+/** Documented error responses of `listSpecialEvents`, for narrowing on `error.status`. */
+export type ListSpecialEventsError = ApiError<400, Error> | ApiError<404, Error>
+
 export async function createSpecialEvent(
   body: SpecialEvent,
   config?: Partial<ClientConfig>
@@ -147,6 +154,9 @@ export async function createSpecialEvent(
   return SpecialEventSchema.parse(await res.json())
 }
 
+/** Documented error responses of `createSpecialEvent`, for narrowing on `error.status`. */
+export type CreateSpecialEventError = ApiError<400, Error> | ApiError<404, Error>
+
 export async function getSpecialEvent(
   eventId: string,
   config?: Partial<ClientConfig>
@@ -154,6 +164,9 @@ export async function getSpecialEvent(
   const res = await _request('GET', `/special-events/${encodeURIComponent(eventId)}`, {}, config)
   return SpecialEventSchema.parse(await res.json())
 }
+
+/** Documented error responses of `getSpecialEvent`, for narrowing on `error.status`. */
+export type GetSpecialEventError = ApiError<400, Error> | ApiError<404, Error>
 
 export async function updateSpecialEvent(
   eventId: string,
@@ -170,12 +183,19 @@ export async function updateSpecialEvent(
   return SpecialEventSchema.parse(await res.json())
 }
 
+/** Documented error responses of `updateSpecialEvent`, for narrowing on `error.status`. */
+export type UpdateSpecialEventError = ApiError<400, Error> | ApiError<404, Error>
+
 export async function deleteSpecialEvent(
   eventId: string,
   config?: Partial<ClientConfig>
 ): Promise<void> {
   await _request('DELETE', `/special-events/${encodeURIComponent(eventId)}`, {}, config)
 }
+
+/** Documented error responses of `deleteSpecialEvent`, for narrowing on `error.status`. */
+export type DeleteSpecialEventError =
+  ApiError<400, Error> | ApiError<401, Error> | ApiError<404, Error>
 
 export async function buyMuseumTickets(
   body: BuyMuseumTickets,
@@ -186,6 +206,9 @@ export async function buyMuseumTickets(
   return MuseumTicketsConfirmationSchema.parse(await res.json())
 }
 
+/** Documented error responses of `buyMuseumTickets`, for narrowing on `error.status`. */
+export type BuyMuseumTicketsError = ApiError<400, Error> | ApiError<404, Error>
+
 export async function getTicketCode(
   ticketId: string,
   config?: Partial<ClientConfig>
@@ -193,3 +216,6 @@ export async function getTicketCode(
   const res = await _request('GET', `/tickets/${encodeURIComponent(ticketId)}/qr`, {}, config)
   return res.blob()
 }
+
+/** Documented error responses of `getTicketCode`, for narrowing on `error.status`. */
+export type GetTicketCodeError = ApiError<400, Error> | ApiError<404, Error>

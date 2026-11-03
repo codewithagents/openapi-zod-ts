@@ -7,6 +7,7 @@ import {
   resolveBodyRefToWritableName,
   CLIENT_INTERNAL_NAMES,
   getParamPresence,
+  buildOperationErrorTypeNames,
 } from 'openapi-zod-ts'
 
 type OperationObject = OpenAPIV3_1.OperationObject
@@ -27,6 +28,25 @@ export interface HookGenOptions {
    * - false: never emit useXxxInfinite hooks.
    */
   infiniteQuery?: boolean | 'auto'
+  /**
+   * When true, hooks type their error as the client's per-operation error alias
+   * (e.g. `GetPetError = ApiError<404, NotFound> | ApiError<422, ...>`) instead of
+   * bare `ApiError`, so `error.status === 422` narrows `error.body`. Operations
+   * without documented 4xx/5xx responses keep `ApiError`. Default: false.
+   */
+  typedErrors?: boolean
+  /**
+   * When true, emits a `useXxxQueries(paramsList, options?, combine?)` hook per
+   * GET operation with parameters: a `useQueries` wrapper over the operation's
+   * queryOptions factory for a dynamic number of parallel queries. Default: false.
+   */
+  queries?: boolean
+  /**
+   * When true, mutation hooks accept an `optimistic: { queryKey, updater }` option
+   * that applies an optimistic cache update with snapshot rollback on error and
+   * invalidation on settle, composed with the caller's callbacks. Default: false.
+   */
+  optimisticUpdates?: boolean
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -113,6 +133,8 @@ interface OperationMeta {
   deprecated: boolean
   isPaginated: boolean
   pageParamName: string | undefined
+  /** TError for this operation's hooks: `ApiError` or the client's per-operation alias. */
+  errorType: string
 }
 
 // ── Pagination detection ───────────────────────────────────────────────────────
@@ -382,6 +404,16 @@ function buildKeyFactory(resource: string, entries: KeyEntry[]): string {
 // ── queryOptions factory generation ───────────────────────────────────────────
 
 /**
+ * The raw response type of a client function (the queryFn's resolved value).
+ * Every query hook / factory also takes a `TData` generic defaulting to this
+ * type, so a caller's `select` transform narrows the hook's `data` type
+ * (#195). The default keeps existing call sites source compatible.
+ */
+function queryDataType(funcName: string): string {
+  return `Awaited<ReturnType<typeof ${funcName}>>`
+}
+
+/**
  * Derives the factory function name for a GET operation.
  * e.g. funcName "listTasks" -> "listTasksQueryOptions"
  */
@@ -426,6 +458,7 @@ function buildQueryOptionsFactory(
   gcTime: number
 ): string {
   const lines: string[] = []
+  const dataType = queryDataType(op.funcName)
 
   const hasQueryParams = keyEntry.hasQueryParams
   const paramsRequired = keyEntry.hasRequiredQueryParams
@@ -443,7 +476,7 @@ function buildQueryOptionsFactory(
     sigParts.push(`${paramsToken}: Parameters<typeof ${op.funcName}>[${pathParams.length}]`)
   }
   sigParts.push(
-    `options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof ${op.funcName}>>, ApiError>, 'queryKey' | 'queryFn'>`
+    `options?: Omit<UseQueryOptions<${dataType}, ${op.errorType}, TData>, 'queryKey' | 'queryFn'>`
   )
 
   const queryKeyCall = buildQueryKeyCall(
@@ -463,10 +496,10 @@ function buildQueryOptionsFactory(
   if (op.deprecated) {
     lines.push(`/** @deprecated */`)
   }
-  lines.push(`export function ${factoryName}(`)
+  lines.push(`export function ${factoryName}<TData = ${dataType}>(`)
   lines.push(`  ${sigParts.join(',\n  ')},`)
   lines.push(`) {`)
-  lines.push(`  return queryOptions<Awaited<ReturnType<typeof ${op.funcName}>>, ApiError>({`)
+  lines.push(`  return queryOptions<${dataType}, ${op.errorType}, TData>({`)
   lines.push(`    queryKey: ${queryKeyCall},`)
   lines.push(`    queryFn: () => ${queryFnCall},`)
   lines.push(`    staleTime: ${staleTime},`)
@@ -488,6 +521,7 @@ function buildQueryHook(
   gcTime: number
 ): string {
   const lines: string[] = []
+  const dataType = queryDataType(op.funcName)
 
   const hasQueryParams = keyEntry.hasQueryParams
   const paramsRequired = keyEntry.hasRequiredQueryParams
@@ -506,7 +540,7 @@ function buildQueryHook(
     sigParts.push(`${paramsToken}: Parameters<typeof ${op.funcName}>[${pathParams.length}]`)
   }
   sigParts.push(
-    `options?: Omit<UseQueryOptions<Awaited<ReturnType<typeof ${op.funcName}>>, ApiError>, 'queryKey' | 'queryFn'>`
+    `options?: Omit<UseQueryOptions<${dataType}, ${op.errorType}, TData>, 'queryKey' | 'queryFn'>`
   )
 
   // Build queryKey call (with non-null assertions for path params, since hook has enabled guard)
@@ -526,10 +560,10 @@ function buildQueryHook(
   if (op.deprecated) {
     lines.push(`/** @deprecated */`)
   }
-  lines.push(`export function ${op.hookName}(`)
+  lines.push(`export function ${op.hookName}<TData = ${dataType}>(`)
   lines.push(`  ${sigParts.join(',\n  ')},`)
   lines.push(`) {`)
-  lines.push(`  return useQuery<Awaited<ReturnType<typeof ${op.funcName}>>, ApiError>({`)
+  lines.push(`  return useQuery<${dataType}, ${op.errorType}, TData>({`)
   lines.push(`    queryKey: ${queryKeyCall},`)
   lines.push(`    queryFn: () => ${queryFnCall},`)
   lines.push(`    staleTime: ${staleTime},`)
@@ -552,6 +586,7 @@ function buildSuspenseQueryHook(
   gcTime: number
 ): string {
   const lines: string[] = []
+  const dataType = queryDataType(op.funcName)
 
   const hasQueryParams = keyEntry.hasQueryParams
   const paramsRequired = keyEntry.hasRequiredQueryParams
@@ -568,7 +603,7 @@ function buildSuspenseQueryHook(
     sigParts.push(`${paramsToken}: Parameters<typeof ${op.funcName}>[${pathParams.length}]`)
   }
   sigParts.push(
-    `options?: Omit<UseSuspenseQueryOptions<Awaited<ReturnType<typeof ${op.funcName}>>, ApiError>, 'queryKey' | 'queryFn'>`
+    `options?: Omit<UseSuspenseQueryOptions<${dataType}, ${op.errorType}, TData>, 'queryKey' | 'queryFn'>`
   )
 
   // Build queryKey call (no non-null assertions — suspense params are always required strings)
@@ -590,10 +625,10 @@ function buildSuspenseQueryHook(
   if (op.deprecated) {
     lines.push(`/** @deprecated */`)
   }
-  lines.push(`export function ${suspenseHookName}(`)
+  lines.push(`export function ${suspenseHookName}<TData = ${dataType}>(`)
   lines.push(`  ${sigParts.join(',\n  ')},`)
   lines.push(`) {`)
-  lines.push(`  return useSuspenseQuery<Awaited<ReturnType<typeof ${op.funcName}>>, ApiError>({`)
+  lines.push(`  return useSuspenseQuery<${dataType}, ${op.errorType}, TData>({`)
   lines.push(`    queryKey: ${queryKeyCall},`)
   lines.push(`    queryFn: () => ${queryFnCall},`)
   lines.push(`    staleTime: ${staleTime},`)
@@ -602,6 +637,58 @@ function buildSuspenseQueryHook(
   lines.push(`  })`)
   lines.push(`}`)
 
+  return lines.join('\n')
+}
+
+// ── Dynamic parallel queries (useQueries) ─────────────────────────────────────
+
+/**
+ * Builds `useXxxQueries` for a GET operation: one query per entry of
+ * `paramsList`, each built by the operation's queryOptions factory so keys,
+ * timing and queryFn stay identical to the single-query hook.
+ *
+ * Entry shape: the bare argument when the factory takes exactly one (a path
+ * param, or the params object), otherwise a labeled tuple of the factory's
+ * positional arguments. Returns undefined for operations without parameters
+ * (there is nothing to vary between parallel queries).
+ */
+function buildQueriesHook(op: OperationMeta, hookName: string): string | undefined {
+  const { funcName, pathParams, hasQueryParams, hasRequiredQueryParams } = op
+  const argNames = hasQueryParams ? [...pathParams, 'params'] : [...pathParams]
+  if (argNames.length === 0) return undefined
+
+  const dataType = queryDataType(funcName)
+  const resultType = `UseQueryResult<${dataType}, ${op.errorType}>[]`
+  let entryType: string
+  let mapArg: string
+  if (argNames.length === 1) {
+    entryType = `Parameters<typeof ${funcName}>[0]`
+    mapArg = argNames[0]!
+  } else {
+    const labeled = argNames.map((name, i) => {
+      const optional = name === 'params' && !hasRequiredQueryParams ? '?' : ''
+      return `${name}${optional}: Parameters<typeof ${funcName}>[${i}]`
+    })
+    entryType = `readonly [${labeled.join(', ')}]`
+    mapArg = `[${argNames.join(', ')}]`
+  }
+
+  const lines: string[] = []
+  if (op.deprecated) lines.push(`/** @deprecated */`)
+  lines.push(`export function ${hookName}<TCombinedResult = ${resultType}>(`)
+  lines.push(`  paramsList: ReadonlyArray<${entryType}>,`)
+  lines.push(
+    `  options?: Omit<UseQueryOptions<${dataType}, ${op.errorType}>, 'queryKey' | 'queryFn'>,`
+  )
+  lines.push(`  combine?: (results: ${resultType}) => TCombinedResult,`)
+  lines.push(`): TCombinedResult {`)
+  lines.push(`  return useQueries({`)
+  lines.push(
+    `    queries: paramsList.map((${mapArg}) => ${queryOptionsFuncName(funcName)}(${argNames.join(', ')}, options)),`
+  )
+  lines.push(`    combine,`)
+  lines.push(`  })`)
+  lines.push(`}`)
   return lines.join('\n')
 }
 
@@ -643,6 +730,7 @@ function buildInfiniteQueryHook(
   const lines: string[] = []
   const { funcName, hasQueryParams, hasRequiredQueryParams, deprecated } = op
   const infiniteHookName = `use${capitalize(funcName)}Infinite`
+  const dataType = queryDataType(funcName)
 
   const sigParts: string[] = []
   if (hasQueryParams) {
@@ -650,7 +738,7 @@ function buildInfiniteQueryHook(
     sigParts.push(`${paramsToken}: Parameters<typeof ${funcName}>[0]`)
   }
   sigParts.push(
-    `options?: Omit<UseInfiniteQueryOptions<Awaited<ReturnType<typeof ${funcName}>>, ApiError, InfiniteData<Awaited<ReturnType<typeof ${funcName}>>>, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>`
+    `options?: Omit<UseInfiniteQueryOptions<${dataType}, ${op.errorType}, TData, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>`
   )
 
   const queryKeyCall = buildInfiniteQueryKeyCall(keyFactoryName, keyEntry, hasQueryParams)
@@ -666,12 +754,10 @@ function buildInfiniteQueryHook(
   if (deprecated) {
     lines.push(`/** @deprecated */`)
   }
-  lines.push(`export function ${infiniteHookName}(`)
+  lines.push(`export function ${infiniteHookName}<TData = InfiniteData<${dataType}>>(`)
   lines.push(`  ${sigParts.join(',\n  ')},`)
   lines.push(`) {`)
-  lines.push(
-    `  return useInfiniteQuery<Awaited<ReturnType<typeof ${funcName}>>, ApiError, InfiniteData<Awaited<ReturnType<typeof ${funcName}>>>, QueryKey, unknown>({`
-  )
+  lines.push(`  return useInfiniteQuery<${dataType}, ${op.errorType}, TData, QueryKey, unknown>({`)
   lines.push(`    queryKey: ${queryKeyCall},`)
   lines.push(`    queryFn: ${queryFnBody},`)
   lines.push(`    initialPageParam: undefined,`)
@@ -794,80 +880,195 @@ function buildMutationVars(
   }
 }
 
+/**
+ * Emits the auto-invalidation `onSuccess` for a mutation hook. `optionsRef` is
+ * the expression holding the caller's options (`options?`, or the optimistic
+ * wrapper's `mutationOptions`) whose `onSuccess` is composed inside.
+ */
+function buildAutoInvalidateOnSuccess(
+  op: OperationMeta,
+  invalidateInfo: MutationInvalidateInfo,
+  optionsRef: string
+): string[] {
+  const { pathParams, hasBody, hasQueryParams } = op
+  const { keyFactoryName, detailKeyName } = invalidateInfo
+  const canInvalidateDetail =
+    detailKeyName !== undefined &&
+    pathParams.length >= 1 &&
+    (op.method === 'put' || op.method === 'patch')
+
+  // How to reference the first path param from variables in onSuccess: a lone
+  // path param IS the variables value, otherwise it is a property.
+  const detailIdRef =
+    pathParams.length === 1 && !hasBody && !hasQueryParams
+      ? 'variables'
+      : `variables.${pathParams[0]}`
+
+  const lines: string[] = []
+  lines.push(`    onSuccess: (...args) => {`)
+  if (canInvalidateDetail) {
+    lines.push(`      const [, variables] = args`)
+  }
+  lines.push(`      queryClient.invalidateQueries({ queryKey: ${keyFactoryName}.all() })`)
+  if (canInvalidateDetail) {
+    lines.push(
+      `      queryClient.invalidateQueries({ queryKey: ${keyFactoryName}.${detailKeyName}(${detailIdRef}) })`
+    )
+  }
+  lines.push(`      ${optionsRef}.onSuccess?.(...args)`)
+  lines.push(`    },`)
+  return lines
+}
+
 function buildMutationHook(
   op: OperationMeta,
   autoInvalidate: boolean,
-  invalidateInfo: MutationInvalidateInfo | undefined
+  invalidateInfo: MutationInvalidateInfo | undefined,
+  optimistic = false
 ): string {
   const lines: string[] = []
-  const { funcName, hookName, pathParams, hasBody, hasQueryParams } = op
+  const { funcName, hookName, pathParams, hasBody } = op
 
   // Compute the index of the params argument in the client function signature
   const paramsArgIndex = pathParams.length + (hasBody ? 1 : 0)
 
   const { variablesType, mutationFnBody } = buildMutationVars(op, paramsArgIndex)
+  const dataType = `Awaited<ReturnType<typeof ${funcName}>>`
 
   // @deprecated JSDoc on deprecated operations
   if (op.deprecated) {
     lines.push(`/** @deprecated */`)
   }
-  lines.push(`export function ${hookName}(`)
-  lines.push(
-    `  options?: Omit<UseMutationOptions<Awaited<ReturnType<typeof ${funcName}>>, ApiError, ${variablesType}>, 'mutationFn'>,`
-  )
+  if (optimistic) {
+    // TContext types the caller's own onMutate result; TQueryData is inferred
+    // from the optimistic updater's `old` parameter annotation.
+    lines.push(`export function ${hookName}<TContext = unknown, TQueryData = unknown>(`)
+    lines.push(
+      `  options?: Omit<UseMutationOptions<${dataType}, ${op.errorType}, ${variablesType}, TContext>, 'mutationFn'> & { optimistic?: OptimisticUpdate<${variablesType}, TQueryData> },`
+    )
+  } else {
+    lines.push(`export function ${hookName}(`)
+    lines.push(
+      `  options?: Omit<UseMutationOptions<${dataType}, ${op.errorType}, ${variablesType}>, 'mutationFn'>,`
+    )
+  }
   lines.push(`) {`)
 
   const shouldInvalidate = autoInvalidate && invalidateInfo !== undefined
-  if (shouldInvalidate) {
+  if (shouldInvalidate || optimistic) {
     lines.push(`  const queryClient = useQueryClient()`)
   }
-
-  lines.push(
-    `  return useMutation<Awaited<ReturnType<typeof ${funcName}>>, ApiError, ${variablesType}>({`
-  )
+  if (optimistic) {
+    lines.push(`  const mutationOptions = _withOptimisticUpdate(queryClient, options)`)
+    lines.push(
+      `  return useMutation<${dataType}, ${op.errorType}, ${variablesType}, OptimisticContext<TContext>>({`
+    )
+  } else {
+    lines.push(`  return useMutation<${dataType}, ${op.errorType}, ${variablesType}>({`)
+  }
   lines.push(`    mutationFn: ${mutationFnBody},`)
   // Spread options first so caller can override mutationFn-unrelated options (e.g. retry, meta).
   // onSuccess must come AFTER the spread so the auto-invalidation logic always runs —
   // the caller's onSuccess is composed via options?.onSuccess?.(...args) inside.
-  lines.push(`    ...options,`)
+  lines.push(optimistic ? `    ...mutationOptions,` : `    ...options,`)
 
   if (shouldInvalidate) {
-    const { keyFactoryName, detailKeyName } = invalidateInfo
-    const canInvalidateDetail =
-      detailKeyName !== undefined &&
-      pathParams.length >= 1 &&
-      (op.method === 'put' || op.method === 'patch')
-
-    // Determine how to reference the first path param from variables in onSuccess
-    let detailIdRef: string
-    if (pathParams.length === 1 && !hasBody && !hasQueryParams) {
-      // variablesType is 'string' — variables IS the id directly
-      detailIdRef = 'variables'
-    } else if (pathParams.length >= 1) {
-      // variablesType is an object — access via property name
-      detailIdRef = `variables.${pathParams[0]}`
-    } else {
-      detailIdRef = 'variables'
-    }
-
-    lines.push(`    onSuccess: (...args) => {`)
-    if (canInvalidateDetail) {
-      lines.push(`      const [, variables] = args`)
-    }
-    lines.push(`      queryClient.invalidateQueries({ queryKey: ${keyFactoryName}.all() })`)
-    if (canInvalidateDetail) {
-      lines.push(
-        `      queryClient.invalidateQueries({ queryKey: ${keyFactoryName}.${detailKeyName}(${detailIdRef}) })`
+    lines.push(
+      ...buildAutoInvalidateOnSuccess(
+        op,
+        invalidateInfo,
+        optimistic ? 'mutationOptions' : 'options?'
       )
-    }
-    lines.push(`      options?.onSuccess?.(...args)`)
-    lines.push(`    },`)
+    )
   }
 
   lines.push(`  })`)
   lines.push(`}`)
 
   return lines.join('\n')
+}
+
+/**
+ * Shared optimistic-update helpers, emitted once when `optimisticUpdates` is on.
+ *
+ * Follows the TanStack Query v5 optimistic-update recipe: onMutate cancels
+ * in-flight queries for the key, snapshots the cached value and applies the
+ * updater; onError rolls back (or resets an entry that was not cached before);
+ * onSettled invalidates the key so the server state wins. The caller's own
+ * onMutate / onError / onSuccess / onSettled still run, receiving their own
+ * onMutate result as context. Extra callback arguments are forwarded with rest
+ * parameters so the helper works across @tanstack/react-query 5.x signatures.
+ */
+function buildOptimisticHelpers(): string {
+  return `/** Optimistic cache update for a generated mutation hook (the \`optimistic\` option). */
+export interface OptimisticUpdate<TVariables, TQueryData = unknown> {
+  /** Cache entry to update before the request runs; may be derived from the variables. */
+  queryKey: QueryKey | ((variables: TVariables) => QueryKey)
+  /** Next cache value, from the current one (undefined when not cached) and the variables. */
+  updater: (old: TQueryData | undefined, variables: TVariables) => TQueryData | undefined
+}
+
+/** Mutation context threaded from onMutate to onError / onSettled by optimistic hooks. */
+export interface OptimisticContext<TContext> {
+  /** The optimistically updated key, when an \`optimistic\` option was given. */
+  queryKey: QueryKey | undefined
+  /** Whether the key held data before the optimistic update. */
+  hadPrevious: boolean
+  /** Snapshot taken before the optimistic update, restored on error. */
+  previous: unknown
+  /** The caller's own onMutate result. */
+  context: TContext | undefined
+}
+
+function _withOptimisticUpdate<TData, TError, TVariables, TContext, TQueryData>(
+  queryClient: QueryClient,
+  options:
+    | (Omit<UseMutationOptions<TData, TError, TVariables, TContext>, 'mutationFn'> & {
+        optimistic?: OptimisticUpdate<TVariables, TQueryData>
+      })
+    | undefined,
+): Omit<UseMutationOptions<TData, TError, TVariables, OptimisticContext<TContext>>, 'mutationFn'> {
+  const { optimistic, onMutate, onError, onSuccess, onSettled, ...rest } = options ?? {}
+  return {
+    ...rest,
+    onMutate: async (variables, ...args) => {
+      let queryKey: QueryKey | undefined
+      let previous: unknown
+      let hadPrevious = false
+      if (optimistic !== undefined) {
+        const key =
+          typeof optimistic.queryKey === 'function'
+            ? optimistic.queryKey(variables)
+            : optimistic.queryKey
+        queryKey = key
+        await queryClient.cancelQueries({ queryKey: key })
+        previous = queryClient.getQueryData(key)
+        hadPrevious = previous !== undefined
+        queryClient.setQueryData<TQueryData>(key, (old) => optimistic.updater(old, variables))
+      }
+      const context = await onMutate?.(variables, ...args)
+      return { queryKey, hadPrevious, previous, context }
+    },
+    onError: (error, variables, result, ...args) => {
+      if (result?.queryKey !== undefined) {
+        if (result.hadPrevious) {
+          queryClient.setQueryData(result.queryKey, result.previous)
+        } else {
+          void queryClient.resetQueries({ queryKey: result.queryKey, exact: true })
+        }
+      }
+      return onError?.(error, variables, result?.context, ...args)
+    },
+    onSuccess: (data, variables, result, ...args) =>
+      onSuccess?.(data, variables, result.context as TContext, ...args),
+    onSettled: (data, error, variables, result, ...args) => {
+      if (result?.queryKey !== undefined) {
+        void queryClient.invalidateQueries({ queryKey: result.queryKey })
+      }
+      return onSettled?.(data, error, variables, result?.context, ...args)
+    },
+  }
+}`
 }
 
 // ── Main generator ─────────────────────────────────────────────────────────────
@@ -883,7 +1084,8 @@ function buildMutationHook(
  */
 function collectOperations(
   spec: OpenAPIV3_1.Document,
-  infiniteQuery: boolean | 'auto' = 'auto'
+  infiniteQuery: boolean | 'auto' = 'auto',
+  errorTypeNames: ReadonlyMap<string, string> = new Map()
 ): OperationMeta[] {
   const paths = spec.paths as Record<string, Record<string, OperationObject>> | undefined
 
@@ -956,12 +1158,54 @@ function collectOperations(
           deprecated,
           isPaginated,
           pageParamName,
+          errorType: errorTypeNames.get(funcName) ?? 'ApiError',
         })
       }
     }
   }
 
   return operations
+}
+
+/** Which @tanstack/react-query exports the generated file uses. */
+interface ReactQueryImportNeeds {
+  queries: boolean
+  useQueries: boolean
+  suspense: boolean
+  infinite: boolean
+  mutations: boolean
+  queryClient: boolean
+  optimistic: boolean
+}
+
+function buildReactQueryImports(needs: ReactQueryImportNeeds): string[] {
+  const groups: Array<[boolean, string[]]> = [
+    [needs.queries, ['queryOptions', 'useQuery', 'type UseQueryOptions']],
+    [needs.useQueries, ['useQueries', 'type UseQueryResult']],
+    [needs.suspense, ['useSuspenseQuery', 'type UseSuspenseQueryOptions']],
+    [
+      needs.infinite,
+      ['useInfiniteQuery', 'type UseInfiniteQueryOptions', 'type InfiniteData', 'type QueryKey'],
+    ],
+    [needs.mutations, ['useMutation', 'type UseMutationOptions']],
+    [needs.queryClient, ['useQueryClient']],
+    // The optimistic helpers need QueryKey too; infinite hooks may already import it.
+    [
+      needs.optimistic,
+      needs.infinite ? ['type QueryClient'] : ['type QueryClient', 'type QueryKey'],
+    ],
+  ]
+  return groups.flatMap(([needed, names]) => (needed ? names : []))
+}
+
+/** Client imports: every operation function, ApiError, and per-operation error aliases in use. */
+function buildClientImports(operations: OperationMeta[]): string[] {
+  const funcNames = operations.map((op) => op.funcName).sort()
+  const errorAliases = [...new Set(operations.map((op) => op.errorType))]
+    .filter((t) => t !== 'ApiError')
+    .sort()
+    .map((t) => `type ${t}`)
+  return [...funcNames, 'type ApiError', ...errorAliases]
 }
 
 export function generateHooks(
@@ -974,10 +1218,14 @@ export function generateHooks(
     suspense = false,
     autoInvalidate = false,
     infiniteQuery = 'auto',
+    typedErrors = false,
+    queries = false,
+    optimisticUpdates = false,
   } = options
 
   // Collect all operations (metadata extraction separated from string emission)
-  const operations = collectOperations(spec, infiniteQuery)
+  const errorTypeNames = typedErrors ? buildOperationErrorTypeNames(spec) : undefined
+  const operations = collectOperations(spec, infiniteQuery, errorTypeNames)
 
   // Separate GET vs mutation operations
   const getOps = operations.filter((op) => op.method === 'get')
@@ -1062,6 +1310,9 @@ export function generateHooks(
   const queryOptionsBlocks: string[] = []
   const queryHookBlocks: string[] = []
   let needsUseInfiniteQuery = false
+  let needsUseQueries = false
+  // useXxxQueries names must not collide with any operation's own hook name.
+  const usedHookNames = new Set(operations.map((op) => op.hookName))
   for (const op of getOps) {
     const info = opToKeyInfo.get(op.funcName)
     if (info === undefined) continue
@@ -1080,6 +1331,14 @@ export function generateHooks(
       queryHookBlocks.push(
         buildSuspenseQueryHook(op, factoryName, keyEntry, effectiveStaleTime, effectiveGcTime)
       )
+    }
+    if (queries) {
+      const queriesHookName = uniquifyName(`${op.hookName}Queries`, usedHookNames)
+      const queriesHook = buildQueriesHook(op, queriesHookName)
+      if (queriesHook !== undefined) {
+        needsUseQueries = true
+        queryHookBlocks.push(queriesHook)
+      }
     }
     if (op.isPaginated && op.pageParamName !== undefined) {
       needsUseInfiniteQuery = true
@@ -1120,31 +1379,24 @@ export function generateHooks(
         invalidateInfo = { keyFactoryName, detailKeyName }
       }
     }
-    mutationHookBlocks.push(buildMutationHook(op, autoInvalidate, invalidateInfo))
+    mutationHookBlocks.push(
+      buildMutationHook(op, autoInvalidate, invalidateInfo, optimisticUpdates)
+    )
   }
 
   // Determine which react-query exports to import
-  const needsQueryOptions = getOps.length > 0
-  const needsUseQuery = getOps.length > 0
-  const needsUseMutation = mutationOps.length > 0
-  const needsUseSuspenseQuery = suspense && getOps.length > 0
-  const needsUseQueryClient = autoInvalidate && needsUseMutation
-  const rqImports: string[] = []
-  if (needsQueryOptions) rqImports.push('queryOptions')
-  if (needsUseQuery) rqImports.push('useQuery', 'type UseQueryOptions')
-  if (needsUseSuspenseQuery) rqImports.push('useSuspenseQuery', 'type UseSuspenseQueryOptions')
-  if (needsUseInfiniteQuery)
-    rqImports.push(
-      'useInfiniteQuery',
-      'type UseInfiniteQueryOptions',
-      'type InfiniteData',
-      'type QueryKey'
-    )
-  if (needsUseMutation) rqImports.push('useMutation', 'type UseMutationOptions')
-  if (needsUseQueryClient) rqImports.push('useQueryClient')
-
-  // Collect all function names for client import
-  const allFuncNames = operations.map((op) => op.funcName).sort()
+  const hasQueries = getOps.length > 0
+  const hasMutations = mutationOps.length > 0
+  const needsOptimistic = optimisticUpdates && hasMutations
+  const rqImports = buildReactQueryImports({
+    queries: hasQueries,
+    useQueries: needsUseQueries,
+    suspense: suspense && hasQueries,
+    infinite: needsUseInfiniteQuery,
+    mutations: hasMutations,
+    queryClient: (autoInvalidate || optimisticUpdates) && hasMutations,
+    optimistic: needsOptimistic,
+  })
 
   // Build file content
   const lines: string[] = []
@@ -1153,11 +1405,7 @@ export function generateHooks(
   if (rqImports.length > 0) {
     lines.push(`import { ${rqImports.join(', ')} } from '@tanstack/react-query'`)
   }
-  if (allFuncNames.length > 0) {
-    lines.push(`import { ${allFuncNames.join(', ')}, type ApiError } from './client.js'`)
-  } else {
-    lines.push(`import { type ApiError } from './client.js'`)
-  }
+  lines.push(`import { ${buildClientImports(operations).join(', ')} } from './client.js'`)
   lines.push('')
 
   if (keyFactoryBlocks.length > 0) {
@@ -1184,6 +1432,10 @@ export function generateHooks(
   if (mutationHookBlocks.length > 0) {
     lines.push('// ── Mutations ────────────────────────────────────────────────')
     lines.push('')
+    if (needsOptimistic) {
+      lines.push(buildOptimisticHelpers())
+      lines.push('')
+    }
     lines.push(mutationHookBlocks.join('\n\n'))
     lines.push('')
   }

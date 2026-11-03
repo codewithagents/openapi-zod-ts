@@ -95,3 +95,6 @@ export async function getLatestByBaseCurrency(
   const res = await _request('GET', `/latest/${encodeURIComponent(baseCurrency)}`, {}, config)
   return res.json()
 }
+
+/** Documented error responses of `getLatestByBaseCurrency`, for narrowing on `error.status`. */
+export type GetLatestByBaseCurrencyError = ApiError<404, { error_type?: string; result?: string }>

@@ -126,9 +126,10 @@ describe('generateClientFiles: splitByTag', () => {
 
   it('tag modules import only what they use, from rebased paths', () => {
     const pets = files.get('client/pets.ts')!
-    expect(pets).toContain("import type { Pet, PetWritable } from '../models.js'")
+    // Error (the 422 body) is imported for the additive CreatePetError alias (#195).
+    expect(pets).toContain("import type { Error, Pet, PetWritable } from '../models.js'")
     expect(pets).toContain("import type { ClientConfig } from '../client-config.js'")
-    expect(pets).toContain("import { _request, _requestForm } from './_runtime.js'")
+    expect(pets).toContain("import { type ApiError, _request, _requestForm } from './_runtime.js'")
 
     const orders = files.get('client/store-orders.ts')!
     expect(orders).toContain("import type { Order } from '../models.js'")

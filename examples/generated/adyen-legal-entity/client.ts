@@ -31,6 +31,7 @@ import type {
   OnboardingThemes,
   PciSigningRequest,
   PciSigningResponse,
+  ServiceError,
   SetTaxElectronicDeliveryConsentRequest,
   TransferInstrument,
   TransferInstrumentInfoWritable,
@@ -180,6 +181,14 @@ export async function postBusinessLines(
   return BusinessLineSchema.parse(await res.json())
 }
 
+/** Documented error responses of `postBusinessLines`, for narrowing on `error.status`. */
+export type PostBusinessLinesError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -194,6 +203,14 @@ export async function getBusinessLinesId(
   const res = await _request('GET', `/businessLines/${encodeURIComponent(id)}`, {}, config)
   return BusinessLineSchema.parse(await res.json())
 }
+
+/** Documented error responses of `getBusinessLinesId`, for narrowing on `error.status`. */
+export type GetBusinessLinesIdError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -212,6 +229,14 @@ export async function patchBusinessLinesId(
   return BusinessLineSchema.parse(await res.json())
 }
 
+/** Documented error responses of `patchBusinessLinesId`, for narrowing on `error.status`. */
+export type PatchBusinessLinesIdError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -225,6 +250,14 @@ export async function deleteBusinessLinesId(
 ): Promise<void> {
   await _request('DELETE', `/businessLines/${encodeURIComponent(id)}`, {}, config)
 }
+
+/** Documented error responses of `deleteBusinessLinesId`, for narrowing on `error.status`. */
+export type DeleteBusinessLinesIdError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -250,6 +283,14 @@ export async function postDocuments(
   return DocumentSchema.parse(await res.json())
 }
 
+/** Documented error responses of `postDocuments`, for narrowing on `error.status`. */
+export type PostDocumentsError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -274,6 +315,14 @@ export async function getDocumentsId(
   )
   return DocumentSchema.parse(await res.json())
 }
+
+/** Documented error responses of `getDocumentsId`, for narrowing on `error.status`. */
+export type GetDocumentsIdError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -305,6 +354,14 @@ export async function patchDocumentsId(
   return DocumentSchema.parse(await res.json())
 }
 
+/** Documented error responses of `patchDocumentsId`, for narrowing on `error.status`. */
+export type PatchDocumentsIdError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -315,6 +372,14 @@ export async function patchDocumentsId(
 export async function deleteDocumentsId(id: string, config?: Partial<ClientConfig>): Promise<void> {
   await _request('DELETE', `/documents/${encodeURIComponent(id)}`, {}, config)
 }
+
+/** Documented error responses of `deleteDocumentsId`, for narrowing on `error.status`. */
+export type DeleteDocumentsIdError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -340,6 +405,14 @@ export async function postLegalEntities(
   return LegalEntitySchema.parse(await res.json())
 }
 
+/** Documented error responses of `postLegalEntities`, for narrowing on `error.status`. */
+export type PostLegalEntitiesError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -354,6 +427,14 @@ export async function getLegalEntitiesId(
   const res = await _request('GET', `/legalEntities/${encodeURIComponent(id)}`, {}, config)
   return LegalEntitySchema.parse(await res.json())
 }
+
+/** Documented error responses of `getLegalEntitiesId`, for narrowing on `error.status`. */
+export type GetLegalEntitiesIdError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -385,6 +466,14 @@ export async function patchLegalEntitiesId(
   return LegalEntitySchema.parse(await res.json())
 }
 
+/** Documented error responses of `patchLegalEntitiesId`, for narrowing on `error.status`. */
+export type PatchLegalEntitiesIdError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -412,6 +501,14 @@ export async function getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofser
   return GetAcceptedTermsOfServiceDocumentResponseSchema.parse(await res.json())
 }
 
+/** Documented error responses of `getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereference`, for narrowing on `error.status`. */
+export type GetLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereferenceError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -431,6 +528,14 @@ export async function getLegalEntitiesIdBusinessLines(
   )
   return BusinessLinesSchema.parse(await res.json())
 }
+
+/** Documented error responses of `getLegalEntitiesIdBusinessLines`, for narrowing on `error.status`. */
+export type GetLegalEntitiesIdBusinessLinesError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -452,6 +557,14 @@ export async function postLegalEntitiesIdCheckTaxElectronicDeliveryConsent(
   return CheckTaxElectronicDeliveryConsentResponseSchema.parse(await res.json())
 }
 
+/** Documented error responses of `postLegalEntitiesIdCheckTaxElectronicDeliveryConsent`, for narrowing on `error.status`. */
+export type PostLegalEntitiesIdCheckTaxElectronicDeliveryConsentError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -472,6 +585,14 @@ export async function postLegalEntitiesIdCheckVerificationErrors(
   return VerificationErrorsSchema.parse(await res.json())
 }
 
+/** Documented error responses of `postLegalEntitiesIdCheckVerificationErrors`, for narrowing on `error.status`. */
+export type PostLegalEntitiesIdCheckVerificationErrorsError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -491,6 +612,14 @@ export async function postLegalEntitiesIdConfirmDataReview(
   )
   return DataReviewConfirmationResponseSchema.parse(await res.json())
 }
+
+/** Documented error responses of `postLegalEntitiesIdConfirmDataReview`, for narrowing on `error.status`. */
+export type PostLegalEntitiesIdConfirmDataReviewError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -514,6 +643,14 @@ export async function postLegalEntitiesIdOnboardingLinks(
   return OnboardingLinkSchema.parse(await res.json())
 }
 
+/** Documented error responses of `postLegalEntitiesIdOnboardingLinks`, for narrowing on `error.status`. */
+export type PostLegalEntitiesIdOnboardingLinksError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -533,6 +670,14 @@ export async function getLegalEntitiesIdPciQuestionnaires(
   )
   return GetPciQuestionnaireInfosResponseSchema.parse(await res.json())
 }
+
+/** Documented error responses of `getLegalEntitiesIdPciQuestionnaires`, for narrowing on `error.status`. */
+export type GetLegalEntitiesIdPciQuestionnairesError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -556,6 +701,14 @@ export async function postLegalEntitiesIdPciQuestionnairesGeneratePciTemplates(
   return GeneratePciDescriptionResponseSchema.parse(await res.json())
 }
 
+/** Documented error responses of `postLegalEntitiesIdPciQuestionnairesGeneratePciTemplates`, for narrowing on `error.status`. */
+export type PostLegalEntitiesIdPciQuestionnairesGeneratePciTemplatesError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -577,6 +730,14 @@ export async function postLegalEntitiesIdPciQuestionnairesSignPciTemplates(
   )
   return PciSigningResponseSchema.parse(await res.json())
 }
+
+/** Documented error responses of `postLegalEntitiesIdPciQuestionnairesSignPciTemplates`, for narrowing on `error.status`. */
+export type PostLegalEntitiesIdPciQuestionnairesSignPciTemplatesError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -600,6 +761,14 @@ export async function postLegalEntitiesIdPciQuestionnairesSigningRequired(
   return CalculatePciStatusResponseSchema.parse(await res.json())
 }
 
+/** Documented error responses of `postLegalEntitiesIdPciQuestionnairesSigningRequired`, for narrowing on `error.status`. */
+export type PostLegalEntitiesIdPciQuestionnairesSigningRequiredError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -620,6 +789,14 @@ export async function getLegalEntitiesIdPciQuestionnairesPciid(
   )
   return GetPciQuestionnaireResponseSchema.parse(await res.json())
 }
+
+/** Documented error responses of `getLegalEntitiesIdPciQuestionnairesPciid`, for narrowing on `error.status`. */
+export type GetLegalEntitiesIdPciQuestionnairesPciidError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -642,6 +819,14 @@ export async function postLegalEntitiesIdSetTaxElectronicDeliveryConsent(
   )
 }
 
+/** Documented error responses of `postLegalEntitiesIdSetTaxElectronicDeliveryConsent`, for narrowing on `error.status`. */
+export type PostLegalEntitiesIdSetTaxElectronicDeliveryConsentError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -663,6 +848,14 @@ export async function postLegalEntitiesIdTermsOfService(
   )
   return GetTermsOfServiceDocumentResponseSchema.parse(await res.json())
 }
+
+/** Documented error responses of `postLegalEntitiesIdTermsOfService`, for narrowing on `error.status`. */
+export type PostLegalEntitiesIdTermsOfServiceError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -687,6 +880,14 @@ export async function patchLegalEntitiesIdTermsOfServiceTermsofservicedocumentid
   return AcceptTermsOfServiceResponseSchema.parse(await res.json())
 }
 
+/** Documented error responses of `patchLegalEntitiesIdTermsOfServiceTermsofservicedocumentid`, for narrowing on `error.status`. */
+export type PatchLegalEntitiesIdTermsOfServiceTermsofservicedocumentidError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -706,6 +907,14 @@ export async function getLegalEntitiesIdTermsOfServiceAcceptanceInfos(
   )
   return GetTermsOfServiceAcceptanceInfosResponseSchema.parse(await res.json())
 }
+
+/** Documented error responses of `getLegalEntitiesIdTermsOfServiceAcceptanceInfos`, for narrowing on `error.status`. */
+export type GetLegalEntitiesIdTermsOfServiceAcceptanceInfosError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -727,6 +936,14 @@ export async function getLegalEntitiesIdTermsOfServiceStatus(
   return CalculateTermsOfServiceStatusResponseSchema.parse(await res.json())
 }
 
+/** Documented error responses of `getLegalEntitiesIdTermsOfServiceStatus`, for narrowing on `error.status`. */
+export type GetLegalEntitiesIdTermsOfServiceStatusError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -738,6 +955,14 @@ export async function getThemes(config?: Partial<ClientConfig>): Promise<Onboard
   const res = await _request('GET', '/themes', {}, config)
   return OnboardingThemesSchema.parse(await res.json())
 }
+
+/** Documented error responses of `getThemes`, for narrowing on `error.status`. */
+export type GetThemesError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -753,6 +978,14 @@ export async function getThemesId(
   const res = await _request('GET', `/themes/${encodeURIComponent(id)}`, {}, config)
   return OnboardingThemeSchema.parse(await res.json())
 }
+
+/** Documented error responses of `getThemesId`, for narrowing on `error.status`. */
+export type GetThemesIdError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -778,6 +1011,14 @@ export async function postTransferInstruments(
   return TransferInstrumentSchema.parse(await res.json())
 }
 
+/** Documented error responses of `postTransferInstruments`, for narrowing on `error.status`. */
+export type PostTransferInstrumentsError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -792,6 +1033,14 @@ export async function getTransferInstrumentsId(
   const res = await _request('GET', `/transferInstruments/${encodeURIComponent(id)}`, {}, config)
   return TransferInstrumentSchema.parse(await res.json())
 }
+
+/** Documented error responses of `getTransferInstrumentsId`, for narrowing on `error.status`. */
+export type GetTransferInstrumentsIdError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 /**
  * @throws {ApiError<400, ServiceError>}
@@ -823,6 +1072,14 @@ export async function patchTransferInstrumentsId(
   return TransferInstrumentSchema.parse(await res.json())
 }
 
+/** Documented error responses of `patchTransferInstrumentsId`, for narrowing on `error.status`. */
+export type PatchTransferInstrumentsIdError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
+
 /**
  * @throws {ApiError<400, ServiceError>}
  * @throws {ApiError<401, ServiceError>}
@@ -836,6 +1093,14 @@ export async function deleteTransferInstrumentsId(
 ): Promise<void> {
   await _request('DELETE', `/transferInstruments/${encodeURIComponent(id)}`, {}, config)
 }
+
+/** Documented error responses of `deleteTransferInstrumentsId`, for narrowing on `error.status`. */
+export type DeleteTransferInstrumentsIdError =
+  | ApiError<400, ServiceError>
+  | ApiError<401, ServiceError>
+  | ApiError<403, ServiceError>
+  | ApiError<422, ServiceError>
+  | ApiError<500, ServiceError>
 
 export async function postLegalEntitiesIdRequestPeriodicReview(
   id: string,
