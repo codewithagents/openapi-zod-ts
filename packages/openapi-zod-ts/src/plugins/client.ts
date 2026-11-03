@@ -1,3 +1,4 @@
+import { posix } from 'node:path'
 import type { OpenAPIV3_1 } from 'openapi-types'
 import {
   toPropertyKey,
@@ -13,6 +14,7 @@ import {
 } from '../utils/writable-variants.js'
 import type { GeneratedFile } from './types.js'
 import { generateTypes } from './types.js'
+import { EVENT_STREAM_HELPER_NAMES, EVENT_STREAM_HELPER_SOURCE } from './event-stream.js'
 
 type OperationObject = OpenAPIV3_1.OperationObject
 type ParameterObject = OpenAPIV3_1.ParameterObject
@@ -929,12 +931,7 @@ function trackErrorBodyImports(names: Set<string>, imports: ErrorBodyImports): M
     }
     let alias = imports.aliased.get(name)
     if (alias === undefined) {
-      const taken = new Set([
-        ...imports.localNames,
-        ...imports.modelNames,
-        ...imports.aliased.values(),
-      ])
-      alias = uniquifyName(`${name}Model`, taken)
+      alias = uniquifyName(`${name}Model`, new Set([...imports.localNames, ...imports.modelNames]))
       imports.aliased.set(name, alias)
     }
     renames.set(name, alias)
@@ -1538,6 +1535,65 @@ function generateRequestHelpers(features: HelperFeatures): string {
   return lines.join('\n')
 }
 
+/**
+ * Build the parameter list of an endpoint function: positional path params, body,
+ * the shared params object (query + header params) and the trailing config override.
+ */
+function buildSignatureParts(
+  pathParams: PathParam[],
+  queryParams: QueryParam[],
+  headerParams: HeaderParam[],
+  bodyInfo: RequestBodyInfo | undefined
+): string[] {
+  // Path params first (positional) — use sanitized TS name with schema-derived type
+  const sigParts = pathParams.map((param) => `${param.name}: ${param.type}`)
+  // Body param
+  if (bodyInfo !== undefined) sigParts.push(`body: ${bodyInfo.typeName}`)
+  const paramsField = buildParamsField(queryParams, headerParams)
+  if (paramsField !== undefined) sigParts.push(paramsField)
+  // Per-request config override — enables SSR without mutating the global singleton
+  sigParts.push(`config?: Partial<ClientConfig>`)
+  return sigParts
+}
+
+/**
+ * The shared `params` object for query + header params, or undefined when there are none.
+ * When the wire name ends with '[]' (PHP/Rails bracket notation), preserve the wire
+ * name as the interface key so callers see params["ids[]"] — the original API name.
+ * For all other params, use the normalized camelCase identifier (qp.name).
+ */
+function buildParamsField(
+  queryParams: QueryParam[],
+  headerParams: HeaderParam[]
+): string | undefined {
+  const fields: string[] = []
+  for (const qp of queryParams) {
+    const fieldKey = qp.urlName.endsWith('[]') ? toPropertyKey(qp.urlName) : toPropertyKey(qp.name)
+    fields.push(`  ${fieldKey}${qp.required ? '' : '?'}: ${qp.type}`)
+  }
+  for (const hp of headerParams) {
+    fields.push(`  ${hp.name}${hp.required ? '' : '?'}: ${hp.type}`)
+  }
+  if (fields.length === 0) return undefined
+  const hasRequired =
+    queryParams.some((qp) => qp.required) || headerParams.some((hp) => hp.required)
+  return `params${hasRequired ? '' : '?'}: {\n${fields.join('\n')}\n}`
+}
+
+/**
+ * Argument list that forwards every non-config parameter of buildSignatureParts.
+ */
+function buildForwardedArgs(
+  pathParams: PathParam[],
+  hasParams: boolean,
+  bodyInfo: RequestBodyInfo | undefined
+): string[] {
+  const args = pathParams.map((p) => p.name)
+  if (bodyInfo !== undefined) args.push('body')
+  if (hasParams) args.push('params')
+  return args
+}
+
 // fallow-ignore-next-line complexity
 function generateFunctionCode(
   funcName: string,
@@ -1562,38 +1618,7 @@ function generateFunctionCode(
 ): string {
   const lines: string[] = []
 
-  // Build function signature
-  const sigParts: string[] = []
-  // Path params first (positional) — use sanitized TS name with schema-derived type
-  for (const param of pathParams) {
-    sigParts.push(`${param.name}: ${param.type}`)
-  }
-  // Body param
-  if (bodyInfo !== undefined) {
-    sigParts.push(`body: ${bodyInfo.typeName}`)
-  }
-
-  // Query params + header params share the same params object.
-  // When the wire name ends with '[]' (PHP/Rails bracket notation), preserve the wire
-  // name as the interface key so callers see params["ids[]"] — the original API name.
-  // For all other params, use the normalized camelCase identifier (qp.name).
-  const allParamFields: string[] = []
-  for (const qp of queryParams) {
-    const fieldKey = qp.urlName.endsWith('[]') ? toPropertyKey(qp.urlName) : toPropertyKey(qp.name)
-    allParamFields.push(`  ${fieldKey}${qp.required ? '' : '?'}: ${qp.type}`)
-  }
-  for (const hp of headerParams) {
-    allParamFields.push(`  ${hp.name}${hp.required ? '' : '?'}: ${hp.type}`)
-  }
-
-  if (allParamFields.length > 0) {
-    const hasRequired =
-      queryParams.some((qp) => qp.required) || headerParams.some((hp) => hp.required)
-    sigParts.push(`params${hasRequired ? '' : '?'}: {\n${allParamFields.join('\n')}\n}`)
-  }
-
-  // Per-request config override — enables SSR without mutating the global singleton
-  sigParts.push(`config?: Partial<ClientConfig>`)
+  const sigParts = buildSignatureParts(pathParams, queryParams, headerParams, bodyInfo)
 
   // For non-json body kinds, isArray is always false; the typeName is the full type string.
   // When mayBeEmpty, the operation can return a 204 at runtime: union the body type with undefined.
@@ -1749,8 +1774,8 @@ function generateFunctionCode(
       if (returnType.mayBeEmpty) lines.push(`  if (res.status === 204) return undefined`)
       lines.push(`  return res.blob()`)
     } else if (kind === 'event-stream') {
-      // Full SSE parsing (EventSource / TransformStream) is tracked separately.
-      // Expose the raw ReadableStream so callers can implement their own consumer.
+      // Expose the raw ReadableStream (unchanged contract). The additive <op>Events
+      // wrapper (generateEventsFunctionCode) parses it into events via parseEventStream.
       if (returnType.mayBeEmpty) lines.push(`  if (res.status === 204) return undefined`)
       lines.push(`  return res.body`)
     } else {
@@ -1795,6 +1820,14 @@ export interface ClientOptions {
    * at the top of the generated client. Ignored when errorBodyType is 'laravel' or absent.
    */
   errorBodyTypeImport?: string
+  /**
+   * When true, generateClientFiles emits one module per OpenAPI tag under client/
+   * (client/<tag>.ts, untagged operations in client/default.ts), the shared runtime in
+   * client/_runtime.ts, and client.ts as a barrel re-exporting all of them. Relative
+   * schemaImportPath / errorBodyTypeImport values are rebased for the subdirectory.
+   * Ignored by generateClient, which always returns the single client.ts.
+   */
+  splitByTag?: boolean
 }
 
 /** Built-in TypeScript types that must NOT be imported from ./models */
@@ -1850,28 +1883,282 @@ export const CLIENT_INTERNAL_NAMES: ReadonlySet<string> = new Set([
   '_requestForm', // private helper
   '_buildSignal', // private helper
   '_FetchResponse', // private type alias
+  // text/event-stream helper; only emitted when the spec has an event-stream operation,
+  // but always reserved so client and hooks name operations identically either way.
+  ...EVENT_STREAM_HELPER_NAMES,
 ])
 
-// fallow-ignore-next-line complexity
-export function generateClient(
+/** Directory (relative to the output dir) that holds the per-tag modules in split mode. */
+export const SPLIT_CLIENT_DIR = 'client'
+/** Module inside SPLIT_CLIENT_DIR holding the shared runtime (ApiError + request helpers). */
+const SPLIT_RUNTIME_MODULE = '_runtime'
+/** Module that collects operations without a (usable) tag in split mode. */
+const UNTAGGED_MODULE = 'default'
+/** Device names Windows refuses as file names, regardless of extension. */
+const WINDOWS_RESERVED_NAMES = new Set([
+  'con',
+  'prn',
+  'aux',
+  'nul',
+  ...Array.from({ length: 9 }, (_, i) => `com${i + 1}`),
+  ...Array.from({ length: 9 }, (_, i) => `lpt${i + 1}`),
+])
+
+const GENERATED_HEADER = '// This file is auto-generated by openapi-zod-ts — do not edit'
+
+/**
+ * Map an OpenAPI tag to a file-safe kebab-case module name for split_by_tag output:
+ * camelCase boundaries and every run of characters outside [a-z0-9] become a single
+ * dash ('Pet Store' -> 'pet-store', 'userAccounts' -> 'user-accounts'). A missing tag
+ * or one that sanitizes to nothing maps to 'default'. Windows device names get a
+ * '-tag' suffix. The leading-underscore runtime module can never collide with a tag.
+ */
+export function tagToModuleName(tag: string | undefined): string {
+  if (tag === undefined) return UNTAGGED_MODULE
+  const spaced = tag.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
+  let out = ''
+  for (const ch of spaced) {
+    if ((ch >= 'a' && ch <= 'z') || (ch >= '0' && ch <= '9')) out += ch
+    else if (out !== '' && !out.endsWith('-')) out += '-'
+  }
+  if (out.endsWith('-')) out = out.slice(0, -1)
+  if (out === '') return UNTAGGED_MODULE
+  return WINDOWS_RESERVED_NAMES.has(out) ? `${out}-tag` : out
+}
+
+/** Pick the module an operation belongs to: its first string tag, else 'default'. */
+function operationModuleName(operation: OperationObject): string {
+  const first = Array.isArray(operation.tags) ? operation.tags[0] : undefined
+  return tagToModuleName(typeof first === 'string' ? first : undefined)
+}
+
+/**
+ * Rebase a relative import specifier written for the output dir so it resolves from a
+ * module one directory deeper (SPLIT_CLIENT_DIR). Bare package specifiers are unchanged.
+ */
+function rebaseImportForSubdir(specifier: string): string {
+  return specifier.startsWith('./') || specifier.startsWith('../')
+    ? posix.join('..', specifier)
+    : specifier
+}
+
+/** One generated endpoint function plus the imports it needs. */
+interface ClientOperation {
+  funcName: string
+  moduleName: string
+  code: string
+  typeNames: Set<string>
+  schemaNames: Set<string>
+  needsZ: boolean
+  isMultipart: boolean
+  /** Set for text/event-stream operations: what the additive <op>Events wrapper needs. */
+  eventStream?: { sigParts: string[]; forwardedArgs: string[]; deprecated: boolean }
+  /** The <op>Events wrapper, assigned after every operation name is final. */
+  eventsCode?: string
+  /** Colliding error-body models imported under an alias: model name -> local alias. */
+  aliasedTypeNames: Map<string, string>
+  /** The `export type <Op>Error = ...` alias (#195), when errors are documented. */
+  errorTypeCode?: string
+}
+
+/** Spec-wide inputs for the per-operation error aliases. */
+interface ErrorAliasContext {
+  names: Map<string, string>
+  localNames: ReadonlySet<string>
+  modelNames: ReadonlySet<string>
+  fallbackBodyType: string
+}
+
+function errorAliasContext(
   spec: OpenAPIV3_1.Document,
-  options?: ClientOptions,
-  writableVariantMap?: Map<string, string>
-): GeneratedFile {
+  options: ClientOptions | undefined
+): ErrorAliasContext {
+  const modelNames = modelExportNames(spec)
+  const names = buildOperationErrorTypeNames(spec, modelNames)
+  const custom = options?.errorBodyType
+  const localNames = new Set([
+    ...CLIENT_INTERNAL_NAMES,
+    'LaravelValidationError',
+    ...names.values(),
+  ])
+  if (custom !== undefined && custom !== 'laravel') localNames.add(custom)
+  const fallbackBodyType = custom === 'laravel' ? 'LaravelValidationError' : (custom ?? 'unknown')
+  return { names, localNames, modelNames, fallbackBodyType }
+}
+
+/** Per-operation error alias (#195): additive, only for documented 4xx/5xx. */
+function attachErrorAlias(
+  op: ClientOperation,
+  operation: OperationObject,
+  spec: OpenAPIV3_1.Document,
+  ctx: ErrorAliasContext
+): void {
+  const aliasName = ctx.names.get(op.funcName)
+  if (aliasName === undefined) return
+  const imports: ErrorBodyImports = {
+    plain: op.typeNames,
+    aliased: op.aliasedTypeNames,
+    localNames: ctx.localNames,
+    modelNames: ctx.modelNames,
+  }
+  const union = operationErrorUnion(operation, spec, imports, ctx.fallbackBodyType)!
+  op.errorTypeCode = `/** Documented error responses of \`${op.funcName}\`, for narrowing on \`error.status\`. */\nexport type ${aliasName} = ${union}`
+}
+
+/** Everything generateClient/generateClientFiles need, collected in one pass over the spec. */
+interface CollectedClient {
+  operations: ClientOperation[]
+  /** Undefined when the spec has no endpoints: no request helpers are emitted then. */
+  helperFeatures: HelperFeatures | undefined
+  /** True when at least one operation streams text/event-stream (emits parseEventStream). */
+  hasEventStream: boolean
+}
+
+/** Collect the type names (models.ts imports) an operation's body and return type reference. */
+function addOperationTypeNames(
+  bodyInfo: RequestBodyInfo | undefined,
+  returnType: ReturnType<typeof getReturnType>,
+  typeNames: Set<string>
+): void {
+  // Only simple schema identifiers (e.g. "Task"), never inline type expressions
+  // (e.g. "Record<string, unknown>") or primitives. Both JSON and form-urlencoded
+  // bodies may reference a named schema type that must be imported from ./models.js.
+  if (bodyInfo !== undefined && (bodyInfo.kind === 'json' || bodyInfo.kind === 'form')) {
+    // Strip a trailing "[]" suffix so array-body types like "WannabeEnvVar[]"
+    // still contribute their base name "WannabeEnvVar" to the import list.
+    const bodyBaseName = bodyInfo.typeName.endsWith('[]')
+      ? bodyInfo.typeName.slice(0, -2)
+      : bodyInfo.typeName
+    if (isImportableType(bodyBaseName)) typeNames.add(bodyBaseName)
+  }
+  if (!returnType.isVoid && isImportableType(returnType.typeName)) {
+    typeNames.add(returnType.typeName)
+  }
+}
+
+/** Collect the Zod schema names an operation uses (drift-safe: only if in schemaNames). */
+function addOperationSchemaNames(
+  options: ClientOptions | undefined,
+  requestBodySchemaName: string | undefined,
+  responseSchemaName: { name: string; isArray: boolean } | undefined,
+  schemaNames: Set<string>
+): boolean {
+  if (options?.schemaNames === undefined) return false
+  let needsZ = false
+  if (
+    requestBodySchemaName !== undefined &&
+    options.schemaNames.has(`${requestBodySchemaName}Schema`)
+  ) {
+    schemaNames.add(`${requestBodySchemaName}Schema`)
+  }
+  if (
+    responseSchemaName !== undefined &&
+    options.schemaNames.has(`${responseSchemaName.name}Schema`)
+  ) {
+    schemaNames.add(`${responseSchemaName.name}Schema`)
+    if (responseSchemaName.isArray) needsZ = true
+  }
+  return needsZ
+}
+
+/** Input for buildOperation: one path/method pair plus its uniquified function name. */
+interface OperationInput {
+  path: string
+  method: string
+  pathItem: PathItemObject
+  operation: OperationObject
+  funcName: string
+}
+
+/** Build one ClientOperation (function code + its imports) for a path/method pair. */
+function buildOperation(
+  spec: OpenAPIV3_1.Document,
+  input: OperationInput,
+  options: ClientOptions | undefined,
+  writableVariantMap: Map<string, string>
+): { op: ClientOperation; bodyInfo: RequestBodyInfo | undefined; headerCount: number } {
+  const { path, method, pathItem, operation, funcName } = input
+  const typeNames = new Set<string>()
+  const schemaNames = new Set<string>()
+
+  const pathParams = getPathParams(pathItem, operation, spec)
+  const queryParams = getQueryParams(pathItem, operation, spec)
+  const headerParams = getHeaderParams(pathItem, operation, spec)
+  const bodyInfo = getRequestBodyInfo(operation, spec, writableVariantMap, typeNames)
+  const returnType = getReturnType(operation, spec, typeNames)
+
+  // Schema-enhanced: compute request body and response schema names for this operation
+  const requestBodySchemaName =
+    options?.schemaNames !== undefined ? getRequestBodySchemaName(operation) : undefined
+  const responseSchemaName =
+    options?.schemaNames !== undefined ? getResponseSchemaName(operation) : undefined
+
+  addOperationTypeNames(bodyInfo, returnType, typeNames)
+  const needsZ = addOperationSchemaNames(
+    options,
+    requestBodySchemaName,
+    responseSchemaName,
+    schemaNames
+  )
+
+  const code = generateFunctionCode(
+    funcName,
+    method,
+    path,
+    pathParams,
+    queryParams,
+    headerParams,
+    bodyInfo,
+    returnType,
+    operation.deprecated === true,
+    getThrowsTags(operation),
+    options,
+    requestBodySchemaName,
+    responseSchemaName
+  )
+
+  const eventStream =
+    returnType.bodyKind === 'event-stream'
+      ? {
+          sigParts: buildSignatureParts(pathParams, queryParams, headerParams, bodyInfo),
+          forwardedArgs: buildForwardedArgs(
+            pathParams,
+            queryParams.length + headerParams.length > 0,
+            bodyInfo
+          ),
+          deprecated: operation.deprecated === true,
+        }
+      : undefined
+
+  return {
+    op: {
+      funcName,
+      moduleName: operationModuleName(operation),
+      code,
+      typeNames,
+      schemaNames,
+      needsZ,
+      isMultipart: bodyInfo !== undefined && bodyInfo.kind === 'multipart',
+      eventStream,
+      aliasedTypeNames: new Map(),
+    },
+    bodyInfo,
+    headerCount: headerParams.length,
+  }
+}
+
+/** Walk every supported operation in the spec and build its function code + imports. */
+// fallow-ignore-next-line complexity
+function collectClient(
+  spec: OpenAPIV3_1.Document,
+  options: ClientOptions | undefined,
+  writableVariantMap: Map<string, string>
+): CollectedClient {
   const paths = spec.paths as Record<string, Record<string, OperationObject>> | undefined
-
-  // Use the pre-computed map when provided (single source of truth via generator.ts).
-  // Fall back to building it internally so existing callers without the map still work.
-  const resolvedWritableVariantMap = writableVariantMap ?? buildWritableVariantMap(spec)
-
-  const collectedTypeNames = new Set<string>()
-  const collectedSchemaNames = new Set<string>()
-  let needsZImport = false
-  let hasMultipartEndpoints = false
-  let hasFormUrlencodedEndpoints = false
-  let hasHeaderParamEndpoints = false
-  let hasAnyEndpoints = false
-  const functionBlocks: string[] = []
+  const operations: ClientOperation[] = []
+  let hasMultipart = false
+  let hasFormUrlencoded = false
+  let hasHeaderParams = false
 
   // Pre-seed used names with client-internal identifiers so that spec-derived
   // operation names cannot collide with them. Any spec operation whose sanitized
@@ -1879,220 +2166,379 @@ export function generateClient(
   // The CLIENT_INTERNAL_NAMES set is defined at module level and exported so that
   // the hooks generator can reuse the same set (single source of truth).
   const usedFuncNames = new Set<string>(CLIENT_INTERNAL_NAMES)
-  const modelNames = modelExportNames(spec)
-  const errorTypeNames = buildOperationErrorTypeNames(spec, modelNames)
-  const customErrorBodyType =
-    options?.errorBodyType !== undefined && options.errorBodyType !== 'laravel'
-      ? [options.errorBodyType]
-      : []
-  const errorBodyImports: ErrorBodyImports = {
-    plain: collectedTypeNames,
-    aliased: new Map(),
-    localNames: new Set([
-      ...CLIENT_INTERNAL_NAMES,
-      'LaravelValidationError',
-      ...customErrorBodyType,
-      ...errorTypeNames.values(),
-    ]),
-    modelNames,
-  }
+  const errorAliases = errorAliasContext(spec, options)
 
-  if (paths !== undefined) {
-    for (const [path, pathItem] of Object.entries(paths)) {
-      for (const method of SUPPORTED_METHODS) {
-        const operation = pathItem[method] as OperationObject | undefined
-        if (operation === undefined) continue
+  for (const [path, pathItem] of Object.entries(paths ?? {})) {
+    for (const method of SUPPORTED_METHODS) {
+      const operation = pathItem[method] as OperationObject | undefined
+      if (operation === undefined) continue
 
-        hasAnyEndpoints = true
+      // Derive function name and ensure it is unique across all operations.
+      const baseName =
+        operation.operationId !== undefined
+          ? sanitizeOperationId(operation.operationId)
+          : deriveOperationName(method, path)
+      const funcName = uniquifyName(baseName, usedFuncNames)
 
-        // Derive function name and ensure it is unique across all operations.
-        const funcName = uniquifyName(operationFuncName(operation, method, path), usedFuncNames)
+      const built = buildOperation(
+        spec,
+        { path, method, pathItem: pathItem as PathItemObject, operation, funcName },
+        options,
+        writableVariantMap
+      )
+      operations.push(built.op)
+      attachErrorAlias(built.op, operation, spec, errorAliases)
 
-        const pathParams = getPathParams(pathItem, operation, spec)
-        const queryParams = getQueryParams(pathItem, operation, spec)
-        const headerParams = getHeaderParams(pathItem, operation, spec)
-        const bodyInfo = getRequestBodyInfo(
-          operation,
-          spec,
-          resolvedWritableVariantMap,
-          collectedTypeNames
-        )
-        const returnType = getReturnType(operation, spec, collectedTypeNames)
-        const deprecated = operation.deprecated === true
-        const throwsTags = getThrowsTags(operation)
-
-        // Track which features are used across the spec (drives conditional helper code-gen)
-        if (bodyInfo !== undefined && bodyInfo.kind === 'multipart') hasMultipartEndpoints = true
-        if (bodyInfo !== undefined && bodyInfo.kind === 'form') hasFormUrlencodedEndpoints = true
-        if (headerParams.length > 0) hasHeaderParamEndpoints = true
-
-        // Schema-enhanced: compute request body and response schema names for this operation
-        const requestBodySchemaName =
-          options?.schemaNames !== undefined ? getRequestBodySchemaName(operation) : undefined
-        const responseSchemaName =
-          options?.schemaNames !== undefined ? getResponseSchemaName(operation) : undefined
-
-        // Collect type names for import — only simple schema identifiers (e.g. "Task"),
-        // never inline type expressions (e.g. "Record<string, unknown>") or primitives.
-        // Both JSON and form-urlencoded bodies may reference a named schema type that
-        // must be imported from ./models.js (e.g. a $ref schema used as the form body).
-        if (bodyInfo !== undefined && (bodyInfo.kind === 'json' || bodyInfo.kind === 'form')) {
-          // Strip a trailing "[]" suffix so array-body types like "WannabeEnvVar[]"
-          // still contribute their base name "WannabeEnvVar" to the import list.
-          const bodyBaseName = bodyInfo.typeName.endsWith('[]')
-            ? bodyInfo.typeName.slice(0, -2)
-            : bodyInfo.typeName
-          if (isImportableType(bodyBaseName)) {
-            collectedTypeNames.add(bodyBaseName)
-          }
-        }
-        if (!returnType.isVoid && isImportableType(returnType.typeName)) {
-          collectedTypeNames.add(returnType.typeName)
-        }
-
-        // Collect schema names actually used (drift-safe: only if in schemaNames set)
-        if (options?.schemaNames !== undefined) {
-          if (
-            requestBodySchemaName !== undefined &&
-            options.schemaNames.has(`${requestBodySchemaName}Schema`)
-          ) {
-            collectedSchemaNames.add(`${requestBodySchemaName}Schema`)
-          }
-          if (
-            responseSchemaName !== undefined &&
-            options.schemaNames.has(`${responseSchemaName.name}Schema`)
-          ) {
-            collectedSchemaNames.add(`${responseSchemaName.name}Schema`)
-            if (responseSchemaName.isArray) needsZImport = true
-          }
-        }
-
-        const fnCode = generateFunctionCode(
-          funcName,
-          method,
-          path,
-          pathParams,
-          queryParams,
-          headerParams,
-          bodyInfo,
-          returnType,
-          deprecated,
-          throwsTags,
-          options,
-          requestBodySchemaName,
-          responseSchemaName
-        )
-        functionBlocks.push(fnCode)
-
-        // Per-operation error alias (#195): additive, only for documented 4xx/5xx.
-        const errorTypeName = errorTypeNames.get(funcName)
-        if (errorTypeName !== undefined) {
-          const fallbackBodyType =
-            options?.errorBodyType === 'laravel'
-              ? 'LaravelValidationError'
-              : (options?.errorBodyType ?? 'unknown')
-          const union = operationErrorUnion(operation, spec, errorBodyImports, fallbackBodyType)!
-          functionBlocks.push(
-            `/** Documented error responses of \`${funcName}\`, for narrowing on \`error.status\`. */\nexport type ${errorTypeName} = ${union}`
-          )
-        }
-      }
+      // Track which features are used across the spec (drives conditional helper code-gen)
+      if (built.op.isMultipart) hasMultipart = true
+      if (built.bodyInfo !== undefined && built.bodyInfo.kind === 'form') hasFormUrlencoded = true
+      if (built.headerCount > 0) hasHeaderParams = true
     }
   }
 
-  // Build file content
-  const lines: string[] = []
-  lines.push('// This file is auto-generated by openapi-zod-ts — do not edit')
-  lines.push('')
+  if (operations.length === 0)
+    return { operations, helperFeatures: undefined, hasEventStream: false }
 
-  const aliasedModelImports = Array.from(
-    errorBodyImports.aliased,
-    ([name, alias]) => `${name} as ${alias}`
-  )
-  if (collectedTypeNames.size > 0 || aliasedModelImports.length > 0) {
-    const sortedTypes = [...Array.from(collectedTypeNames), ...aliasedModelImports].sort()
-    lines.push(`import type { ${sortedTypes.join(', ')} } from './models.js'`)
+  // The additive <op>Events wrappers are named only after every operation has its final
+  // name, so adding them can never shift an operation name (hooks rely on that).
+  let hasEventStream = false
+  for (const op of operations) {
+    if (op.eventStream === undefined) continue
+    hasEventStream = true
+    const eventsName = uniquifyName(`${op.funcName}Events`, usedFuncNames)
+    op.eventsCode = generateEventsFunctionCode(op.funcName, eventsName, op.eventStream)
   }
-  lines.push(`import { getConfig, type ClientConfig } from './client-config.js'`)
 
-  // Schema-enhanced imports
+  // Resolve the actual TS type name for the error body cast.
+  // 'laravel' is a config shorthand for the built-in LaravelValidationError type.
+  const resolvedErrorBodyType =
+    options?.errorBodyType === 'laravel' ? 'LaravelValidationError' : options?.errorBodyType
+  return {
+    operations,
+    hasEventStream,
+    helperFeatures: {
+      authSchemes: detectAuthSchemes(spec),
+      hasCookieAuth: hasCookieAuth(spec),
+      hasHeaderParams,
+      hasMultipart,
+      hasFormUrlencoded,
+      errorBodyType: resolvedErrorBodyType,
+    },
+  }
+}
+
+/** Union of the models/schema imports needed by a group of operations. */
+function mergeOperationImports(ops: ClientOperation[]): {
+  typeNames: string[]
+  schemaNames: Set<string>
+  needsZ: boolean
+} {
+  const typeNames = new Set<string>()
+  const schemaNames = new Set<string>()
+  let needsZ = false
+  for (const op of ops) {
+    for (const t of op.typeNames) typeNames.add(t)
+    for (const [name, alias] of op.aliasedTypeNames) typeNames.add(`${name} as ${alias}`)
+    for (const s of op.schemaNames) schemaNames.add(s)
+    if (op.needsZ) needsZ = true
+  }
+  return { typeNames: Array.from(typeNames).sort(), schemaNames, needsZ }
+}
+
+/** Emit the Zod schema imports (and `z` when an array response is parsed) for a module. */
+function emitSchemaImports(
+  lines: string[],
+  options: ClientOptions | undefined,
+  imports: { schemaNames: Set<string>; needsZ: boolean },
+  schemaImportPath: string | undefined
+): void {
   if (
-    options?.schemaNames !== undefined &&
-    collectedSchemaNames.size > 0 &&
-    options.schemaImportPath !== undefined
-  ) {
-    if (needsZImport) {
-      lines.push(`import { z } from 'zod'`)
-    }
-    const sortedSchemas = Array.from(collectedSchemaNames).sort()
-    lines.push(`import { ${sortedSchemas.join(', ')} } from '${options.schemaImportPath}'`)
-  }
+    options?.schemaNames === undefined ||
+    imports.schemaNames.size === 0 ||
+    schemaImportPath === undefined
+  )
+    return
+  if (imports.needsZ) lines.push(`import { z } from 'zod'`)
+  const sorted = Array.from(imports.schemaNames).sort()
+  lines.push(`import { ${sorted.join(', ')} } from '${schemaImportPath}'`)
+}
 
-  // When a custom error body type with an import path is configured, emit the import.
-  // The 'laravel' value uses a built-in type emitted inline and needs no import.
+/** Emit the custom error-body type import ('laravel' is built in and needs none). */
+function emitErrorBodyTypeImport(
+  lines: string[],
+  options: ClientOptions | undefined,
+  importPath: string | undefined
+): void {
   if (
     options?.errorBodyType !== undefined &&
     options.errorBodyType !== 'laravel' &&
-    options.errorBodyTypeImport !== undefined
+    importPath !== undefined
   ) {
-    lines.push(`import type { ${options.errorBodyType} } from '${options.errorBodyTypeImport}'`)
+    lines.push(`import type { ${options.errorBodyType} } from '${importPath}'`)
   }
+}
 
-  lines.push('')
+/**
+ * ApiError class — generic so callers can type-narrow caught errors.
+ * Default type params (number, unknown) preserve full back-compat.
+ */
+const API_ERROR_LINES = [
+  `export class ApiError<Status extends number = number, Body = unknown> extends Error {`,
+  `  constructor(`,
+  `    public readonly status: Status,`,
+  `    public readonly body: Body,`,
+  `  ) {`,
+  `    super(\`API error \${status}\`)`,
+  `    this.name = 'ApiError'`,
+  `  }`,
+  `}`,
+]
 
-  // ApiError class — generic so callers can type-narrow caught errors.
-  // Default type params (number, unknown) preserve full back-compat.
-  lines.push(
-    `export class ApiError<Status extends number = number, Body = unknown> extends Error {`
-  )
-  lines.push(`  constructor(`)
-  lines.push(`    public readonly status: Status,`)
-  lines.push(`    public readonly body: Body,`)
-  lines.push(`  ) {`)
-  lines.push(`    super(\`API error \${status}\`)`)
-  lines.push(`    this.name = 'ApiError'`)
-  lines.push(`  }`)
-  lines.push(`}`)
+/** Built-in error body type for error_body_type: 'laravel' (preceded by a blank line). */
+const LARAVEL_ERROR_LINES = [
+  ``,
+  `export type LaravelValidationError = {`,
+  `  message: string`,
+  `  errors: Record<string, string[]>`,
+  `}`,
+]
 
+/**
+ * Emit the shared runtime body: ApiError, the optional LaravelValidationError type and
+ * the private request helpers. In split mode the helpers are exported so the per-tag
+ * modules can import them from the runtime module.
+ */
+function emitRuntimeBody(
+  lines: string[],
+  options: ClientOptions | undefined,
+  collected: CollectedClient,
+  exportHelpers: boolean
+): void {
+  const { helperFeatures } = collected
+  lines.push(...API_ERROR_LINES)
   // When error_body_type is 'laravel', emit the built-in LaravelValidationError type
   // immediately after ApiError so it is available for the typed error body cast.
-  if (options?.errorBodyType === 'laravel') {
-    lines.push(``)
-    lines.push(`export type LaravelValidationError = {`)
-    lines.push(`  message: string`)
-    lines.push(`  errors: Record<string, string[]>`)
-    lines.push(`}`)
-  }
+  if (options?.errorBodyType === 'laravel') lines.push(...LARAVEL_ERROR_LINES)
 
   // Shared private request helpers — emitted once, called by every endpoint function.
   // Code inside the helpers is feature-conditional: only emit auth/credentials/extraHeaders
   // when the spec actually declares those features.
-  if (hasAnyEndpoints) {
-    // Resolve the actual TS type name for the error body cast.
-    // 'laravel' is a config shorthand for the built-in LaravelValidationError type.
-    const resolvedErrorBodyType =
-      options?.errorBodyType === 'laravel' ? 'LaravelValidationError' : options?.errorBodyType
-    const helperFeatures: HelperFeatures = {
-      authSchemes: detectAuthSchemes(spec),
-      hasCookieAuth: hasCookieAuth(spec),
-      hasHeaderParams: hasHeaderParamEndpoints,
-      hasMultipart: hasMultipartEndpoints,
-      hasFormUrlencoded: hasFormUrlencodedEndpoints,
-      errorBodyType: resolvedErrorBodyType,
+  if (helperFeatures !== undefined) {
+    const helpers = generateRequestHelpers(helperFeatures)
+    lines.push('')
+    lines.push(exportHelpers ? helpers.replace(/^async function _request/gm, 'export $&') : helpers)
+  }
+
+  // text/event-stream parser: only when an operation streams events, so every other
+  // spec's output is unchanged.
+  if (collected.hasEventStream) {
+    lines.push('')
+    lines.push(EVENT_STREAM_HELPER_SOURCE)
+  }
+}
+
+/** Emit each endpoint function, followed by its <op>Events wrapper when it has one. */
+function emitOperations(lines: string[], ops: ClientOperation[]): void {
+  for (const op of ops) {
+    lines.push('')
+    lines.push(op.code)
+    if (op.eventsCode !== undefined) {
+      lines.push('')
+      lines.push(op.eventsCode)
     }
-    lines.push('')
-    lines.push(generateRequestHelpers(helperFeatures))
+    if (op.errorTypeCode !== undefined) {
+      lines.push('')
+      lines.push(op.errorTypeCode)
+    }
   }
+}
 
-  for (const fn of functionBlocks) {
-    lines.push('')
-    lines.push(fn)
+/**
+ * Emit the additive `<op>Events` async generator for a text/event-stream operation. It
+ * calls the unchanged base function with `Accept: text/event-stream` (caller headers
+ * still win) and parses the body with parseEventStream.
+ */
+function generateEventsFunctionCode(
+  funcName: string,
+  eventsName: string,
+  info: NonNullable<ClientOperation['eventStream']>
+): string {
+  const lines: string[] = []
+  lines.push(`/**`)
+  lines.push(` * Like \`${funcName}\`, but parses the text/event-stream body into events.`)
+  lines.push(` * Breaking out of the \`for await\` loop closes the connection.`)
+  if (info.deprecated) lines.push(` * @deprecated`)
+  lines.push(` */`)
+  lines.push(
+    `export async function* ${eventsName}(${info.sigParts.join(', ')}): AsyncGenerator<EventStreamMessage, void, undefined> {`
+  )
+  const args = [
+    ...info.forwardedArgs,
+    `{ ...config, headers: { Accept: 'text/event-stream', ...(config?.headers ?? getConfig().headers) } }`,
+  ]
+  lines.push(`  const _stream = await ${funcName}(${args.join(', ')})`)
+  lines.push(`  if (_stream == null) return`)
+  lines.push(`  yield* parseEventStream(_stream)`)
+  lines.push(`}`)
+  return lines.join('\n')
+}
+
+/** Assemble the classic single client.ts (the default output). */
+function assembleSingleClient(
+  collected: CollectedClient,
+  options: ClientOptions | undefined
+): GeneratedFile {
+  const imports = mergeOperationImports(collected.operations)
+
+  const lines: string[] = [GENERATED_HEADER, '']
+  if (imports.typeNames.length > 0) {
+    lines.push(`import type { ${imports.typeNames.join(', ')} } from './models.js'`)
   }
-
+  lines.push(`import { getConfig, type ClientConfig } from './client-config.js'`)
+  emitSchemaImports(lines, options, imports, options?.schemaImportPath)
+  emitErrorBodyTypeImport(lines, options, options?.errorBodyTypeImport)
   lines.push('')
 
+  emitRuntimeBody(lines, options, collected, false)
+  emitOperations(lines, collected.operations)
+  lines.push('')
+
+  return { filename: 'client.ts', content: lines.join('\n') }
+}
+
+/** Assemble the shared runtime module of a split client (client/_runtime.ts). */
+function assembleSplitRuntime(
+  collected: CollectedClient,
+  options: ClientOptions | undefined
+): GeneratedFile {
+  const lines: string[] = [GENERATED_HEADER, '']
+  if (collected.helperFeatures !== undefined) {
+    lines.push(`import { getConfig, type ClientConfig } from '../client-config.js'`)
+  }
+  const errorImport =
+    options?.errorBodyTypeImport !== undefined
+      ? rebaseImportForSubdir(options.errorBodyTypeImport)
+      : undefined
+  emitErrorBodyTypeImport(lines, options, errorImport)
+  if (lines.length > 2) lines.push('')
+  emitRuntimeBody(lines, options, collected, true)
+  lines.push('')
   return {
-    filename: 'client.ts',
+    filename: `${SPLIT_CLIENT_DIR}/${SPLIT_RUNTIME_MODULE}.ts`,
     content: lines.join('\n'),
   }
+}
+
+/** Sort import specifiers by name, ignoring a leading `type ` modifier. */
+function compareImportNames(a: string, b: string): number {
+  const key = (s: string): string => s.replace(/^type /, '')
+  return key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0
+}
+
+/** Assemble one per-tag module of a split client (client/<tag>.ts). */
+function assembleSplitModule(
+  moduleName: string,
+  ops: ClientOperation[],
+  options: ClientOptions | undefined
+): GeneratedFile {
+  const imports = mergeOperationImports(ops)
+  const runtimeImports = new Set<string>()
+  for (const op of ops) runtimeImports.add(op.isMultipart ? '_requestForm' : '_request')
+  const hasEvents = ops.some((op) => op.eventsCode !== undefined)
+  // Error aliases reference the ApiError class from the shared runtime module.
+  if (ops.some((op) => op.errorTypeCode !== undefined)) runtimeImports.add('type ApiError')
+  if (hasEvents) {
+    runtimeImports.add('parseEventStream')
+    runtimeImports.add('type EventStreamMessage')
+  }
+
+  const lines: string[] = [GENERATED_HEADER, '']
+  if (imports.typeNames.length > 0) {
+    lines.push(`import type { ${imports.typeNames.join(', ')} } from '../models.js'`)
+  }
+  lines.push(
+    hasEvents
+      ? `import { getConfig, type ClientConfig } from '../client-config.js'`
+      : `import type { ClientConfig } from '../client-config.js'`
+  )
+  lines.push(
+    `import { ${Array.from(runtimeImports).sort(compareImportNames).join(', ')} } from './${SPLIT_RUNTIME_MODULE}.js'`
+  )
+  const schemaImportPath =
+    options?.schemaImportPath !== undefined
+      ? rebaseImportForSubdir(options.schemaImportPath)
+      : undefined
+  emitSchemaImports(lines, options, imports, schemaImportPath)
+  emitOperations(lines, ops)
+  lines.push('')
+  return { filename: `${SPLIT_CLIENT_DIR}/${moduleName}.ts`, content: lines.join('\n') }
+}
+
+/**
+ * Assemble a split client: client/_runtime.ts (shared runtime), one client/<tag>.ts per
+ * tag, and client.ts as a barrel re-exporting all of them so every existing import of
+ * './client.js' (react-query hooks, server.ts, index.ts, user code) keeps working.
+ */
+function assembleSplitClient(
+  collected: CollectedClient,
+  options: ClientOptions | undefined
+): GeneratedFile[] {
+  const byModule = new Map<string, ClientOperation[]>()
+  for (const op of collected.operations) {
+    const list = byModule.get(op.moduleName)
+    if (list === undefined) byModule.set(op.moduleName, [op])
+    else list.push(op)
+  }
+  const moduleNames = Array.from(byModule.keys()).sort()
+
+  const runtimeExports = ['ApiError']
+  if (options?.errorBodyType === 'laravel') runtimeExports.push('type LaravelValidationError')
+  if (collected.hasEventStream) runtimeExports.push('parseEventStream', 'type EventStreamMessage')
+
+  const barrel: string[] = [GENERATED_HEADER, '']
+  barrel.push(
+    `export { ${runtimeExports.join(', ')} } from './${SPLIT_CLIENT_DIR}/${SPLIT_RUNTIME_MODULE}.js'`
+  )
+  for (const name of moduleNames) {
+    barrel.push(`export * from './${SPLIT_CLIENT_DIR}/${name}.js'`)
+  }
+  barrel.push('')
+
+  return [
+    { filename: 'client.ts', content: barrel.join('\n') },
+    assembleSplitRuntime(collected, options),
+    ...moduleNames.map((name) => assembleSplitModule(name, byModule.get(name)!, options)),
+  ]
+}
+
+/**
+ * Generate the fetch client as a single client.ts. This always produces one file;
+ * use generateClientFiles to honor ClientOptions.splitByTag.
+ */
+export function generateClient(
+  spec: OpenAPIV3_1.Document,
+  options?: ClientOptions,
+  writableVariantMap?: Map<string, string>
+): GeneratedFile {
+  // Use the pre-computed map when provided (single source of truth via generator.ts).
+  // Fall back to building it internally so existing callers without the map still work.
+  const wvm = writableVariantMap ?? buildWritableVariantMap(spec)
+  return assembleSingleClient(collectClient(spec, options, wvm), options)
+}
+
+/**
+ * Generate every client file. Default: [client.ts], identical to generateClient.
+ * With options.splitByTag: client.ts (barrel), client/_runtime.ts and one
+ * client/<tag>.ts per OpenAPI tag (filenames use '/' separators, relative to output).
+ */
+export function generateClientFiles(
+  spec: OpenAPIV3_1.Document,
+  options?: ClientOptions,
+  writableVariantMap?: Map<string, string>
+): GeneratedFile[] {
+  const wvm = writableVariantMap ?? buildWritableVariantMap(spec)
+  const collected = collectClient(spec, options, wvm)
+  return options?.splitByTag === true
+    ? assembleSplitClient(collected, options)
+    : [assembleSingleClient(collected, options)]
 }

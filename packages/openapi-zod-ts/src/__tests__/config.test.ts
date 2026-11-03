@@ -91,6 +91,18 @@ describe('loadConfig', () => {
     await expect(loadConfig(tmpDir)).rejects.toThrow('"server_client" must be a boolean')
   })
 
+  it('loads split_by_tag and defaults it to undefined', async () => {
+    writeConfig({ input_openapi: 'openapi.json', output: 'src/api', split_by_tag: true })
+    expect((await loadConfig(tmpDir)).split_by_tag).toBe(true)
+    writeConfig({ input_openapi: 'openapi.json', output: 'src/api' })
+    expect((await loadConfig(tmpDir)).split_by_tag).toBeUndefined()
+  })
+
+  it('throws when split_by_tag is not a boolean', async () => {
+    writeConfig({ input_openapi: 'openapi.json', output: 'src/api', split_by_tag: 'yes' })
+    await expect(loadConfig(tmpDir)).rejects.toThrow('"split_by_tag" must be a boolean')
+  })
+
   it('loads error_body_type field', async () => {
     writeConfig({ input_openapi: 'openapi.json', output: 'src/api', error_body_type: 'laravel' })
     const config = await loadConfig(tmpDir)

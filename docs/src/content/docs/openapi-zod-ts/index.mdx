@@ -99,6 +99,7 @@ export default defineConfig({
 | `input_schema`  | `string`  | No       | none    | Path to a user-owned Zod schema file. Bootstrapped on first run if the file does not exist; never overwritten after that |
 | `baseUrl`       | `string`  | No       | `""`    | Default base URL embedded in the generated `client-config.ts`                                                            |
 | `server_client` | `boolean` | No       | `false` | When `true`, also generates `server.ts` with a `createServerClient()` factory                                            |
+| `split_by_tag`  | `boolean` | No       | `false` | When `true`, splits the client into one `client/<tag>.ts` module per OpenAPI tag; `client.ts` becomes a re-export barrel |
 
 **Full config example:**
 
@@ -233,6 +234,38 @@ export async function createTask(
   config?: Partial<ClientConfig>,
 ): Promise<Task> { ... }
 ```
+
+#### Server-Sent Events (`text/event-stream`)
+
+An operation whose success response is `text/event-stream` (and offers no JSON alternative) keeps its existing method, which resolves to the raw `ReadableStream<Uint8Array> | null` body. Alongside it the client gets an additive `<op>Events()` async generator that yields parsed events:
+
+```typescript
+import { streamChatEvents } from './src/api'
+
+for await (const msg of streamChatEvents(roomId, { prompt: 'hi' })) {
+  // msg: EventStreamMessage = { event?: string; data: string; id?: string; retry?: number }
+  if (msg.event === 'done') break      // breaking out closes the connection
+  console.log(JSON.parse(msg.data))
+}
+```
+
+- `<op>Events()` takes the same arguments as `<op>()`, sends `Accept: text/event-stream` (per-call `config.headers` still win) and throws `ApiError` on non-2xx before yielding anything. A 204 yields nothing.
+- The exported `parseEventStream(body)` helper does the parsing and can be used on any `ReadableStream<Uint8Array>`. It follows the WHATWG event-stream rules: CRLF / LF / CR line endings (also when a CRLF is split across chunks), a leading BOM, `:` comments, multi-line `data:` joined with `\n`, `id` persisting across events like `EventSource#lastEventId`, digit-only `retry`, and an unterminated final event is discarded.
+- `data` is always a string: parse JSON payloads yourself (`JSON.parse(msg.data)`, or a Zod schema).
+- The helper and the `<op>Events()` wrappers are only emitted when the spec has at least one streaming operation, so other clients are unchanged. If the name `<op>Events` is already taken by an operation, the wrapper gets a numeric suffix (`<op>Events_2`).
+
+#### Splitting the client by tag (`split_by_tag: true`)
+
+Large specs produce one very large `client.ts`. Set `split_by_tag: true` to emit one module per OpenAPI tag instead:
+
+| File                 | Contents                                                                |
+| -------------------- | ----------------------------------------------------------------------- |
+| `client/<tag>.ts`    | The operations whose **first** tag is `<tag>` (kebab-case file name)    |
+| `client/default.ts`  | Operations without a tag                                                |
+| `client/_runtime.ts` | Shared runtime: `ApiError` and the request helpers (emitted once)       |
+| `client.ts`          | Barrel that re-exports `ApiError` and every tag module                  |
+
+Every existing import of `./client.js` (your code, `index.ts`, `server.ts`, react-query hooks) keeps working unchanged. For smaller bundles, import from the tag module directly (`import { listPets } from './api/client/pets.js'`): that module pulls in only its own operations plus the shared runtime. Tag names are sanitized to kebab-case (`Store Orders` and `storeOrders` both become `store-orders.ts`, and tags that collide this way share one module). Stale generated tag modules are removed on regeneration, and `--check-drift` checks the `client/` directory too.
 
 ## Error handling
 

@@ -40,6 +40,15 @@ export interface Config {
    * Omit this field to keep the default warn-only behavior.
    */
   drift?: 'error' | 'warn'
+  /**
+   * When true, split the fetch client into one module per OpenAPI tag:
+   * client/<tag>.ts (kebab-case; untagged operations go to client/default.ts, operations
+   * with several tags go to their first tag), the shared runtime (ApiError + request
+   * helpers) in client/_runtime.ts, and client.ts as a barrel re-exporting everything so
+   * existing imports keep working. Import a tag module directly for better tree-shaking.
+   * Default: false (a single client.ts).
+   */
+  split_by_tag?: boolean
 }
 
 /**
@@ -106,6 +115,9 @@ function parseConfig(
   if (raw['server_client'] !== undefined && typeof raw['server_client'] !== 'boolean') {
     throw new Error('"server_client" must be a boolean')
   }
+  if (raw['split_by_tag'] !== undefined && typeof raw['split_by_tag'] !== 'boolean') {
+    throw new Error('"split_by_tag" must be a boolean')
+  }
   validateErrorBodyConfig(raw)
   validateDriftConfig(raw)
   return {
@@ -116,6 +128,7 @@ function parseConfig(
     error_body_type: raw['error_body_type'] as string | undefined,
     error_body_type_import: raw['error_body_type_import'] as string | undefined,
     drift: raw['drift'] as 'error' | 'warn' | undefined,
+    split_by_tag: raw['split_by_tag'] as boolean | undefined,
   }
 }
 

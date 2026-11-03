@@ -73,6 +73,7 @@ npx openapi-zod-ts --input ./openapi.yaml --output ./src/api
 | `client-config.ts` | `configureClient()`: call once at startup to set base URL and auth |
 | `client.ts` | One `async function` per API operation, using native `fetch` |
 | `server.ts` *(optional)* | `createServerClient()` factory, generated when `server_client: true` |
+| `client/<tag>.ts` *(optional)* | One module per OpenAPI tag, generated when `split_by_tag: true` (see [Splitting the client by tag](#splitting-the-client-by-tag)) |
 
 ---
 
@@ -229,6 +230,56 @@ Without this, you would pass config to every call manually. With it, bind once p
 
 ---
 
+## Server-Sent Events (`text/event-stream`)
+
+An operation whose success response is `text/event-stream` (and offers no JSON alternative) keeps its existing method, which resolves to the raw `ReadableStream<Uint8Array> | null` body. Alongside it the client gets an additive `<op>Events()` async generator that yields parsed events:
+
+```typescript
+import { streamChatEvents } from './src/api'
+
+for await (const msg of streamChatEvents(roomId, { prompt: 'hi' })) {
+  // msg: EventStreamMessage = { event?: string; data: string; id?: string; retry?: number }
+  if (msg.event === 'done') break      // breaking out closes the connection
+  console.log(JSON.parse(msg.data))
+}
+```
+
+- `<op>Events()` takes the same arguments as `<op>()`, sends `Accept: text/event-stream` (per-call `config.headers` still win) and throws `ApiError` on non-2xx before yielding anything. A 204 yields nothing.
+- The exported `parseEventStream(body)` helper does the parsing and can be used on any `ReadableStream<Uint8Array>`. It follows the WHATWG event-stream rules: CRLF / LF / CR line endings (also when a CRLF is split across chunks), a leading BOM, `:` comments, multi-line `data:` joined with `\n`, `id` persisting across events like `EventSource#lastEventId`, digit-only `retry`, and an unterminated final event is discarded.
+- `data` is always a string: parse JSON payloads yourself (`JSON.parse(msg.data)`, or a Zod schema).
+- The helper and the `<op>Events()` wrappers are only emitted when the spec has at least one streaming operation, so other clients are unchanged. If the name `<op>Events` is already taken by an operation, the wrapper gets a numeric suffix (`<op>Events_2`).
+
+---
+
+## Splitting the client by tag
+
+Large specs produce one very large `client.ts`. Opt in to one module per OpenAPI tag with `"split_by_tag": true`:
+
+```
+src/api/
+  client.ts            # barrel: re-exports ApiError + every tag module
+  client/_runtime.ts   # shared runtime: ApiError and the request helpers (emitted once)
+  client/pets.ts       # operations whose first tag is "pets"
+  client/store-orders.ts
+  client/default.ts    # operations without a tag
+```
+
+- Operations with several tags go to their **first** tag.
+- Tag names become kebab-case file names (`Store Orders` and `storeOrders` both become `store-orders.ts`; tags that sanitize to the same name share a module, and tags with no ASCII letters or digits land in `default.ts`).
+- `client.ts` re-exports everything, so all existing imports keep working unchanged: your own code, `index.ts`, `server.ts`, and `@codewithagents/openapi-react-query` hooks (which import from `./client.js`).
+- **Tree-shaking:** import from a tag module directly to pull in only that tag's operations plus the shared runtime:
+
+  ```typescript
+  import { listPets } from './api/client/pets.js'   // only the pets operations
+  import { listPets as viaBarrel } from './api'     // still works, same function
+  ```
+
+- Regeneration removes tag modules that are no longer produced (only files carrying the generator header), and `--check-drift` also checks the `client/` directory.
+
+The default (`split_by_tag` omitted or `false`) is the single `client.ts`, unchanged.
+
+---
+
 ## CLI flags
 
 ```
@@ -298,7 +349,8 @@ See the [full configuration reference](https://openapi.codewithagents.de#configu
   "output": "./src/api",                
   "input_schema": "./src/api/zod.ts",   
   "baseUrl": "https://api.example.com", 
-  "server_client": false                
+  "server_client": false,
+  "split_by_tag": false
 }
 ```
 

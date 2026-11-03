@@ -7,6 +7,8 @@ export { generateClientConfig } from './plugins/client-config.js'
 export type { GenerateClientConfigOptions } from './plugins/client-config.js'
 export {
   generateClient,
+  generateClientFiles,
+  tagToModuleName,
   hasCookieAuth,
   detectAuthSchemes,
   CLIENT_INTERNAL_NAMES,

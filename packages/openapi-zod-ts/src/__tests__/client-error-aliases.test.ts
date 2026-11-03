@@ -7,7 +7,11 @@
  */
 import { describe, it, expect } from 'vitest'
 import type { OpenAPIV3_1 } from 'openapi-types'
-import { generateClient, buildOperationErrorTypeNames } from '../plugins/client.js'
+import {
+  generateClient,
+  generateClientFiles,
+  buildOperationErrorTypeNames,
+} from '../plugins/client.js'
 import { generateClientConfig } from '../plugins/client-config.js'
 import { generateTypes } from '../plugins/types.js'
 import { generateIndexBarrel } from '../plugins/index-barrel.js'
@@ -224,5 +228,96 @@ describe('error-body models whose names collide with client.ts declarations', ()
       'usage.ts': usage,
     })
     assertNoTsDiagnostics(diagnostics, 'colliding error-body models')
+  }, 30_000)
+})
+
+describe('error aliases with split_by_tag', () => {
+  // Fictional tagged spec: a colliding `ApiError` model as an error body in one tag
+  // module, a plain model in another, and an untagged op without documented errors.
+  const taggedSpec: OpenAPIV3_1.Document = {
+    openapi: '3.1.0',
+    info: { title: 'Tagged', version: '1.0.0' },
+    paths: {
+      '/gadgets/{id}': {
+        get: {
+          operationId: 'getGadget',
+          tags: ['gadgets'],
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+          responses: {
+            '200': { description: 'ok', ...json('#/components/schemas/Gadget') },
+            '404': { description: 'missing', ...json('#/components/schemas/ApiError') },
+          },
+        },
+      },
+      '/orders': {
+        post: {
+          operationId: 'createOrder',
+          tags: ['orders'],
+          responses: {
+            '201': { description: 'created' },
+            '422': { description: 'invalid', ...json('#/components/schemas/Problem') },
+          },
+        },
+      },
+      '/ping': { get: { operationId: 'ping', responses: { '200': { description: 'ok' } } } },
+    },
+    components: {
+      schemas: {
+        Gadget: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
+        ApiError: {
+          type: 'object',
+          properties: { code: { type: 'integer' } },
+          required: ['code'],
+        },
+        Problem: {
+          type: 'object',
+          properties: { detail: { type: 'string' } },
+          required: ['detail'],
+        },
+      },
+    },
+  }
+  const files = new Map(
+    generateClientFiles(taggedSpec, { splitByTag: true }).map((f) => [f.filename, f.content])
+  )
+
+  it('declares each alias in the tag module of its operation, importing ApiError and ../models.js', () => {
+    const gadgets = files.get('client/gadgets.ts')!
+    expect(gadgets).toContain('export type GetGadgetError = ApiError<404, ApiErrorModel>')
+    expect(gadgets).toContain(
+      "import type { ApiError as ApiErrorModel, Gadget } from '../models.js'"
+    )
+    expect(gadgets).toContain("import { type ApiError, _request } from './_runtime.js'")
+
+    const orders = files.get('client/orders.ts')!
+    expect(orders).toContain('export type CreateOrderError = ApiError<422, Problem>')
+    expect(orders).toContain("import type { Problem } from '../models.js'")
+    expect(orders).toContain("import { type ApiError, _request } from './_runtime.js'")
+  })
+
+  it('modules without documented errors do not import ApiError', () => {
+    expect(files.get('client/default.ts')).not.toContain('ApiError')
+  })
+
+  it('the aliases are reachable through client.ts and compile under tsc --strict', () => {
+    const consumer = `
+      import { ApiError, type GetGadgetError, type CreateOrderError } from './client.js'
+      export function code(error: GetGadgetError): number {
+        return error.body.code
+      }
+      export function detail(error: CreateOrderError): string {
+        const status: 422 = error.status
+        void status
+        return error.body.detail
+      }
+      export const e: CreateOrderError = new ApiError(422 as const, { detail: 'x' })
+    `
+    const diagnostics = compileFiles({
+      'models.ts': generateTypes(taggedSpec).content,
+      'client-config.ts': generateClientConfig().content,
+      ...Object.fromEntries(files),
+      'consumer.ts': consumer,
+    })
+    assertNoTsDiagnostics(diagnostics, 'split client error aliases')
   }, 30_000)
 })
