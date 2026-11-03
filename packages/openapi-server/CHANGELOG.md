@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.3.0](https://github.com/codewithagents/openapi-zod-ts/compare/openapi-server-v2.2.2...openapi-server-v2.3.0) (2026-11-03)
+
+
+### Features
+
+* **openapi-server:** opt-in RFC 7807 problem+json errors ([9a1b937](https://github.com/codewithagents/openapi-zod-ts/commit/9a1b937ed486d801af9e360cfe7a2dd2f7b082df))
+* **openapi-server:** response validation for Hono and Express ([9a1b937](https://github.com/codewithagents/openapi-zod-ts/commit/9a1b937ed486d801af9e360cfe7a2dd2f7b082df))
+* **openapi-server:** spec_prefix for sharing one schemas.ts across specs ([9a1b937](https://github.com/codewithagents/openapi-zod-ts/commit/9a1b937ed486d801af9e360cfe7a2dd2f7b082df))
+
+
+### Bug Fixes
+
+* **openapi-server:** coerce scalar boolean query params in Hono and Fastify ([9a1b937](https://github.com/codewithagents/openapi-zod-ts/commit/9a1b937ed486d801af9e360cfe7a2dd2f7b082df))
+* **openapi-server:** keep absent optional query params undefined in Express ([9a1b937](https://github.com/codewithagents/openapi-zod-ts/commit/9a1b937ed486d801af9e360cfe7a2dd2f7b082df))
+
 ## [2.2.2](https://github.com/codewithagents/openapi-zod-ts/compare/openapi-server-v2.2.1...openapi-server-v2.2.2) (2026-11-03)
 
 

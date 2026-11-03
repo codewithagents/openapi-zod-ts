@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.3.0](https://github.com/codewithagents/openapi-zod-ts/compare/openapi-msw-v0.2.2...openapi-msw-v0.3.0) (2026-11-03)
+
+
+### Features
+
+* **openapi-msw:** emit per-schema fixture builders ([bfc1ef5](https://github.com/codewithagents/openapi-zod-ts/commit/bfc1ef5f89859e88425d29304fd2ed4a557c8525))
+
+
+### Bug Fixes
+
+* **openapi-msw:** anchor handler paths to an origin so they match in Node ([bfc1ef5](https://github.com/codewithagents/openapi-zod-ts/commit/bfc1ef5f89859e88425d29304fd2ed4a557c8525))
+* **openapi-msw:** escape spec-derived literals fully in generated code ([bfc1ef5](https://github.com/codewithagents/openapi-zod-ts/commit/bfc1ef5f89859e88425d29304fd2ed4a557c8525))
+
 ## [0.2.2](https://github.com/codewithagents/openapi-zod-ts/compare/openapi-msw-v0.2.1...openapi-msw-v0.2.2) (2026-11-03)
 
 

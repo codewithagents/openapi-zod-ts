@@ -1,6 +1,6 @@
 {
   "name": "openapi-zod-ts",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "Generate TypeScript models, native fetch client and Zod schemas from OpenAPI 3.1, zero runtime footprint",
   "type": "module",
   "engines": {

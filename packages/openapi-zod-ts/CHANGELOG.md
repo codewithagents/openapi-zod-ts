@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.4.0](https://github.com/codewithagents/openapi-zod-ts/compare/openapi-zod-ts-v2.3.1...openapi-zod-ts-v2.4.0) (2026-11-03)
+
+
+### Features
+
+* **openapi-react-query:** generate useXxxQueries for dynamic parallel queries ([7b3dd83](https://github.com/codewithagents/openapi-zod-ts/commit/7b3dd83453e04b55992e8b4a336cfdf8989ed4a6))
+* **openapi-react-query:** opt-in optimistic update scaffolding ([7b3dd83](https://github.com/codewithagents/openapi-zod-ts/commit/7b3dd83453e04b55992e8b4a336cfdf8989ed4a6))
+* **openapi-react-query:** opt-in typed per-status errors ([7b3dd83](https://github.com/codewithagents/openapi-zod-ts/commit/7b3dd83453e04b55992e8b4a336cfdf8989ed4a6))
+* **openapi-react-query:** typed select transforms ([7b3dd83](https://github.com/codewithagents/openapi-zod-ts/commit/7b3dd83453e04b55992e8b4a336cfdf8989ed4a6))
+* **openapi-zod-ts:** export per-operation error type aliases ([7b3dd83](https://github.com/codewithagents/openapi-zod-ts/commit/7b3dd83453e04b55992e8b4a336cfdf8989ed4a6))
+* **openapi-zod-ts:** opt-in tag-based client splitting ([f9a80e2](https://github.com/codewithagents/openapi-zod-ts/commit/f9a80e2307c7c38fee6dab684daf5226c120b647))
+* **openapi-zod-ts:** parse text/event-stream responses ([f9a80e2](https://github.com/codewithagents/openapi-zod-ts/commit/f9a80e2307c7c38fee6dab684daf5226c120b647))
+
 ## [2.3.1](https://github.com/codewithagents/openapi-zod-ts/compare/openapi-zod-ts-v2.3.0...openapi-zod-ts-v2.3.1) (2026-11-03)
 
 
