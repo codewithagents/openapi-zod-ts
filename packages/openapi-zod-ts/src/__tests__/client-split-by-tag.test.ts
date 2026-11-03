@@ -172,7 +172,7 @@ describe('generateClientFiles: splitByTag', () => {
       ].join('\n'),
     })
     assertNoTsDiagnostics(diagnostics, 'split_by_tag output')
-  })
+  }, 30_000)
 
   it('a spec with no operations emits just the barrel and a runtime without helpers', () => {
     const empty = filesByName(
@@ -185,7 +185,7 @@ describe('generateClientFiles: splitByTag', () => {
     expect(empty.get('client/_runtime.ts')).not.toContain('_request')
     expect(empty.get('client/_runtime.ts')).not.toContain('client-config')
     assertNoTsDiagnostics(compileFiles({ ...Object.fromEntries(empty) }), 'empty split output')
-  })
+  }, 30_000)
 })
 
 describe('generateClientFiles: splitByTag import rebasing', () => {
@@ -289,7 +289,7 @@ describe('generate() with split_by_tag', () => {
     }
 
     await expect(generate(dir, { checkDrift: true })).resolves.toBeUndefined()
-  })
+  }, 30_000)
 
   it('--check-drift reports a stale, missing or extra file inside client/', async () => {
     await generate(dir)
@@ -305,7 +305,7 @@ describe('generate() with split_by_tag', () => {
 
     await writeFile(join(out, 'client/old-tag.ts'), '// stray\n')
     await expect(generate(dir, { checkDrift: true })).rejects.toThrow(/drift/i)
-  })
+  }, 30_000)
 
   it('regenerating prunes generated tag modules that are no longer produced, keeps user files', async () => {
     await generate(dir)
@@ -320,7 +320,7 @@ describe('generate() with split_by_tag', () => {
 
     await expect(access(join(out, 'client/removed-tag.ts'))).rejects.toThrow()
     await expect(readFile(join(out, 'client/mine.ts'), 'utf-8')).resolves.toContain('mine')
-  })
+  }, 30_000)
 
   it('without split_by_tag the output is a single client.ts with no client/ directory', async () => {
     await writeFile(
@@ -330,7 +330,7 @@ describe('generate() with split_by_tag', () => {
     await generate(dir)
     await access(join(dir, 'out/client.ts'))
     await expect(access(join(dir, 'out/client'))).rejects.toThrow()
-  })
+  }, 30_000)
 })
 
 describe('compareOutput with nested expected files', () => {

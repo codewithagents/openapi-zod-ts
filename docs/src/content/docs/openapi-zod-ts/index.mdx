@@ -235,6 +235,25 @@ export async function createTask(
 ): Promise<Task> { ... }
 ```
 
+#### Server-Sent Events (`text/event-stream`)
+
+An operation whose success response is `text/event-stream` (and offers no JSON alternative) keeps its existing method, which resolves to the raw `ReadableStream<Uint8Array> | null` body. Alongside it the client gets an additive `<op>Events()` async generator that yields parsed events:
+
+```typescript
+import { streamChatEvents } from './src/api'
+
+for await (const msg of streamChatEvents(roomId, { prompt: 'hi' })) {
+  // msg: EventStreamMessage = { event?: string; data: string; id?: string; retry?: number }
+  if (msg.event === 'done') break      // breaking out closes the connection
+  console.log(JSON.parse(msg.data))
+}
+```
+
+- `<op>Events()` takes the same arguments as `<op>()`, sends `Accept: text/event-stream` (per-call `config.headers` still win) and throws `ApiError` on non-2xx before yielding anything. A 204 yields nothing.
+- The exported `parseEventStream(body)` helper does the parsing and can be used on any `ReadableStream<Uint8Array>`. It follows the WHATWG event-stream rules: CRLF / LF / CR line endings (also when a CRLF is split across chunks), a leading BOM, `:` comments, multi-line `data:` joined with `\n`, `id` persisting across events like `EventSource#lastEventId`, digit-only `retry`, and an unterminated final event is discarded.
+- `data` is always a string: parse JSON payloads yourself (`JSON.parse(msg.data)`, or a Zod schema).
+- The helper and the `<op>Events()` wrappers are only emitted when the spec has at least one streaming operation, so other clients are unchanged. If the name `<op>Events` is already taken by an operation, the wrapper gets a numeric suffix (`<op>Events_2`).
+
 #### Splitting the client by tag (`split_by_tag: true`)
 
 Large specs produce one very large `client.ts`. Set `split_by_tag: true` to emit one module per OpenAPI tag instead:

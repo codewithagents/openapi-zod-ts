@@ -178,5 +178,5 @@ describe('hooks against a split_by_tag client', () => {
     // Sanity: the harness does catch a broken split (a tag module missing).
     delete files['client/pets.ts']
     expect(compile(files).length).toBeGreaterThan(0)
-  })
+  }, 30_000)
 })

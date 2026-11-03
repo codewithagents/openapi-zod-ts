@@ -13,6 +13,7 @@ import {
   resolveBodyRefToWritableName,
 } from '../utils/writable-variants.js'
 import type { GeneratedFile } from './types.js'
+import { EVENT_STREAM_HELPER_NAMES, EVENT_STREAM_HELPER_SOURCE } from './event-stream.js'
 
 type OperationObject = OpenAPIV3_1.OperationObject
 type ParameterObject = OpenAPIV3_1.ParameterObject
@@ -1376,6 +1377,65 @@ function generateRequestHelpers(features: HelperFeatures): string {
   return lines.join('\n')
 }
 
+/**
+ * Build the parameter list of an endpoint function: positional path params, body,
+ * the shared params object (query + header params) and the trailing config override.
+ */
+function buildSignatureParts(
+  pathParams: PathParam[],
+  queryParams: QueryParam[],
+  headerParams: HeaderParam[],
+  bodyInfo: RequestBodyInfo | undefined
+): string[] {
+  // Path params first (positional) — use sanitized TS name with schema-derived type
+  const sigParts = pathParams.map((param) => `${param.name}: ${param.type}`)
+  // Body param
+  if (bodyInfo !== undefined) sigParts.push(`body: ${bodyInfo.typeName}`)
+  const paramsField = buildParamsField(queryParams, headerParams)
+  if (paramsField !== undefined) sigParts.push(paramsField)
+  // Per-request config override — enables SSR without mutating the global singleton
+  sigParts.push(`config?: Partial<ClientConfig>`)
+  return sigParts
+}
+
+/**
+ * The shared `params` object for query + header params, or undefined when there are none.
+ * When the wire name ends with '[]' (PHP/Rails bracket notation), preserve the wire
+ * name as the interface key so callers see params["ids[]"] — the original API name.
+ * For all other params, use the normalized camelCase identifier (qp.name).
+ */
+function buildParamsField(
+  queryParams: QueryParam[],
+  headerParams: HeaderParam[]
+): string | undefined {
+  const fields: string[] = []
+  for (const qp of queryParams) {
+    const fieldKey = qp.urlName.endsWith('[]') ? toPropertyKey(qp.urlName) : toPropertyKey(qp.name)
+    fields.push(`  ${fieldKey}${qp.required ? '' : '?'}: ${qp.type}`)
+  }
+  for (const hp of headerParams) {
+    fields.push(`  ${hp.name}${hp.required ? '' : '?'}: ${hp.type}`)
+  }
+  if (fields.length === 0) return undefined
+  const hasRequired =
+    queryParams.some((qp) => qp.required) || headerParams.some((hp) => hp.required)
+  return `params${hasRequired ? '' : '?'}: {\n${fields.join('\n')}\n}`
+}
+
+/**
+ * Argument list that forwards every non-config parameter of buildSignatureParts.
+ */
+function buildForwardedArgs(
+  pathParams: PathParam[],
+  hasParams: boolean,
+  bodyInfo: RequestBodyInfo | undefined
+): string[] {
+  const args = pathParams.map((p) => p.name)
+  if (bodyInfo !== undefined) args.push('body')
+  if (hasParams) args.push('params')
+  return args
+}
+
 // fallow-ignore-next-line complexity
 function generateFunctionCode(
   funcName: string,
@@ -1400,38 +1460,7 @@ function generateFunctionCode(
 ): string {
   const lines: string[] = []
 
-  // Build function signature
-  const sigParts: string[] = []
-  // Path params first (positional) — use sanitized TS name with schema-derived type
-  for (const param of pathParams) {
-    sigParts.push(`${param.name}: ${param.type}`)
-  }
-  // Body param
-  if (bodyInfo !== undefined) {
-    sigParts.push(`body: ${bodyInfo.typeName}`)
-  }
-
-  // Query params + header params share the same params object.
-  // When the wire name ends with '[]' (PHP/Rails bracket notation), preserve the wire
-  // name as the interface key so callers see params["ids[]"] — the original API name.
-  // For all other params, use the normalized camelCase identifier (qp.name).
-  const allParamFields: string[] = []
-  for (const qp of queryParams) {
-    const fieldKey = qp.urlName.endsWith('[]') ? toPropertyKey(qp.urlName) : toPropertyKey(qp.name)
-    allParamFields.push(`  ${fieldKey}${qp.required ? '' : '?'}: ${qp.type}`)
-  }
-  for (const hp of headerParams) {
-    allParamFields.push(`  ${hp.name}${hp.required ? '' : '?'}: ${hp.type}`)
-  }
-
-  if (allParamFields.length > 0) {
-    const hasRequired =
-      queryParams.some((qp) => qp.required) || headerParams.some((hp) => hp.required)
-    sigParts.push(`params${hasRequired ? '' : '?'}: {\n${allParamFields.join('\n')}\n}`)
-  }
-
-  // Per-request config override — enables SSR without mutating the global singleton
-  sigParts.push(`config?: Partial<ClientConfig>`)
+  const sigParts = buildSignatureParts(pathParams, queryParams, headerParams, bodyInfo)
 
   // For non-json body kinds, isArray is always false; the typeName is the full type string.
   // When mayBeEmpty, the operation can return a 204 at runtime: union the body type with undefined.
@@ -1587,8 +1616,8 @@ function generateFunctionCode(
       if (returnType.mayBeEmpty) lines.push(`  if (res.status === 204) return undefined`)
       lines.push(`  return res.blob()`)
     } else if (kind === 'event-stream') {
-      // Full SSE parsing (EventSource / TransformStream) is tracked separately.
-      // Expose the raw ReadableStream so callers can implement their own consumer.
+      // Expose the raw ReadableStream (unchanged contract). The additive <op>Events
+      // wrapper (generateEventsFunctionCode) parses it into events via parseEventStream.
       if (returnType.mayBeEmpty) lines.push(`  if (res.status === 204) return undefined`)
       lines.push(`  return res.body`)
     } else {
@@ -1696,6 +1725,9 @@ export const CLIENT_INTERNAL_NAMES: ReadonlySet<string> = new Set([
   '_requestForm', // private helper
   '_buildSignal', // private helper
   '_FetchResponse', // private type alias
+  // text/event-stream helper; only emitted when the spec has an event-stream operation,
+  // but always reserved so client and hooks name operations identically either way.
+  ...EVENT_STREAM_HELPER_NAMES,
 ])
 
 /** Directory (relative to the output dir) that holds the per-tag modules in split mode. */
@@ -1761,6 +1793,10 @@ interface ClientOperation {
   schemaNames: Set<string>
   needsZ: boolean
   isMultipart: boolean
+  /** Set for text/event-stream operations: what the additive <op>Events wrapper needs. */
+  eventStream?: { sigParts: string[]; forwardedArgs: string[]; deprecated: boolean }
+  /** The <op>Events wrapper, assigned after every operation name is final. */
+  eventsCode?: string
 }
 
 /** Everything generateClient/generateClientFiles need, collected in one pass over the spec. */
@@ -1768,6 +1804,8 @@ interface CollectedClient {
   operations: ClientOperation[]
   /** Undefined when the spec has no endpoints: no request helpers are emitted then. */
   helperFeatures: HelperFeatures | undefined
+  /** True when at least one operation streams text/event-stream (emits parseEventStream). */
+  hasEventStream: boolean
 }
 
 /** Collect the type names (models.ts imports) an operation's body and return type reference. */
@@ -1873,6 +1911,19 @@ function buildOperation(
     responseSchemaName
   )
 
+  const eventStream =
+    returnType.bodyKind === 'event-stream'
+      ? {
+          sigParts: buildSignatureParts(pathParams, queryParams, headerParams, bodyInfo),
+          forwardedArgs: buildForwardedArgs(
+            pathParams,
+            queryParams.length + headerParams.length > 0,
+            bodyInfo
+          ),
+          deprecated: operation.deprecated === true,
+        }
+      : undefined
+
   return {
     op: {
       funcName,
@@ -1882,6 +1933,7 @@ function buildOperation(
       schemaNames,
       needsZ,
       isMultipart: bodyInfo !== undefined && bodyInfo.kind === 'multipart',
+      eventStream,
     },
     bodyInfo,
     headerCount: headerParams.length,
@@ -1935,7 +1987,18 @@ function collectClient(
     }
   }
 
-  if (operations.length === 0) return { operations, helperFeatures: undefined }
+  if (operations.length === 0)
+    return { operations, helperFeatures: undefined, hasEventStream: false }
+
+  // The additive <op>Events wrappers are named only after every operation has its final
+  // name, so adding them can never shift an operation name (hooks rely on that).
+  let hasEventStream = false
+  for (const op of operations) {
+    if (op.eventStream === undefined) continue
+    hasEventStream = true
+    const eventsName = uniquifyName(`${op.funcName}Events`, usedFuncNames)
+    op.eventsCode = generateEventsFunctionCode(op.funcName, eventsName, op.eventStream)
+  }
 
   // Resolve the actual TS type name for the error body cast.
   // 'laravel' is a config shorthand for the built-in LaravelValidationError type.
@@ -1943,6 +2006,7 @@ function collectClient(
     options?.errorBodyType === 'laravel' ? 'LaravelValidationError' : options?.errorBodyType
   return {
     operations,
+    hasEventStream,
     helperFeatures: {
       authSchemes: detectAuthSchemes(spec),
       hasCookieAuth: hasCookieAuth(spec),
@@ -2037,9 +2101,10 @@ const LARAVEL_ERROR_LINES = [
 function emitRuntimeBody(
   lines: string[],
   options: ClientOptions | undefined,
-  helperFeatures: HelperFeatures | undefined,
+  collected: CollectedClient,
   exportHelpers: boolean
 ): void {
+  const { helperFeatures } = collected
   lines.push(...API_ERROR_LINES)
   // When error_body_type is 'laravel', emit the built-in LaravelValidationError type
   // immediately after ApiError so it is available for the typed error body cast.
@@ -2053,6 +2118,55 @@ function emitRuntimeBody(
     lines.push('')
     lines.push(exportHelpers ? helpers.replace(/^async function _request/gm, 'export $&') : helpers)
   }
+
+  // text/event-stream parser: only when an operation streams events, so every other
+  // spec's output is unchanged.
+  if (collected.hasEventStream) {
+    lines.push('')
+    lines.push(EVENT_STREAM_HELPER_SOURCE)
+  }
+}
+
+/** Emit each endpoint function, followed by its <op>Events wrapper when it has one. */
+function emitOperations(lines: string[], ops: ClientOperation[]): void {
+  for (const op of ops) {
+    lines.push('')
+    lines.push(op.code)
+    if (op.eventsCode !== undefined) {
+      lines.push('')
+      lines.push(op.eventsCode)
+    }
+  }
+}
+
+/**
+ * Emit the additive `<op>Events` async generator for a text/event-stream operation. It
+ * calls the unchanged base function with `Accept: text/event-stream` (caller headers
+ * still win) and parses the body with parseEventStream.
+ */
+function generateEventsFunctionCode(
+  funcName: string,
+  eventsName: string,
+  info: NonNullable<ClientOperation['eventStream']>
+): string {
+  const lines: string[] = []
+  lines.push(`/**`)
+  lines.push(` * Like \`${funcName}\`, but parses the text/event-stream body into events.`)
+  lines.push(` * Breaking out of the \`for await\` loop closes the connection.`)
+  if (info.deprecated) lines.push(` * @deprecated`)
+  lines.push(` */`)
+  lines.push(
+    `export async function* ${eventsName}(${info.sigParts.join(', ')}): AsyncGenerator<EventStreamMessage, void, undefined> {`
+  )
+  const args = [
+    ...info.forwardedArgs,
+    `{ ...config, headers: { Accept: 'text/event-stream', ...(config?.headers ?? getConfig().headers) } }`,
+  ]
+  lines.push(`  const _stream = await ${funcName}(${args.join(', ')})`)
+  lines.push(`  if (_stream == null) return`)
+  lines.push(`  yield* parseEventStream(_stream)`)
+  lines.push(`}`)
+  return lines.join('\n')
 }
 
 /** Assemble the classic single client.ts (the default output). */
@@ -2071,12 +2185,8 @@ function assembleSingleClient(
   emitErrorBodyTypeImport(lines, options, options?.errorBodyTypeImport)
   lines.push('')
 
-  emitRuntimeBody(lines, options, collected.helperFeatures, false)
-
-  for (const op of collected.operations) {
-    lines.push('')
-    lines.push(op.code)
-  }
+  emitRuntimeBody(lines, options, collected, false)
+  emitOperations(lines, collected.operations)
   lines.push('')
 
   return { filename: 'client.ts', content: lines.join('\n') }
@@ -2097,12 +2207,18 @@ function assembleSplitRuntime(
       : undefined
   emitErrorBodyTypeImport(lines, options, errorImport)
   if (lines.length > 2) lines.push('')
-  emitRuntimeBody(lines, options, collected.helperFeatures, true)
+  emitRuntimeBody(lines, options, collected, true)
   lines.push('')
   return {
     filename: `${SPLIT_CLIENT_DIR}/${SPLIT_RUNTIME_MODULE}.ts`,
     content: lines.join('\n'),
   }
+}
+
+/** Sort import specifiers by name, ignoring a leading `type ` modifier. */
+function compareImportNames(a: string, b: string): number {
+  const key = (s: string): string => s.replace(/^type /, '')
+  return key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0
 }
 
 /** Assemble one per-tag module of a split client (client/<tag>.ts). */
@@ -2114,25 +2230,30 @@ function assembleSplitModule(
   const imports = mergeOperationImports(ops)
   const runtimeImports = new Set<string>()
   for (const op of ops) runtimeImports.add(op.isMultipart ? '_requestForm' : '_request')
+  const hasEvents = ops.some((op) => op.eventsCode !== undefined)
+  if (hasEvents) {
+    runtimeImports.add('parseEventStream')
+    runtimeImports.add('type EventStreamMessage')
+  }
 
   const lines: string[] = [GENERATED_HEADER, '']
   if (imports.typeNames.length > 0) {
     lines.push(`import type { ${imports.typeNames.join(', ')} } from '../models.js'`)
   }
-  lines.push(`import type { ClientConfig } from '../client-config.js'`)
   lines.push(
-    `import { ${Array.from(runtimeImports).sort().join(', ')} } from './${SPLIT_RUNTIME_MODULE}.js'`
+    hasEvents
+      ? `import { getConfig, type ClientConfig } from '../client-config.js'`
+      : `import type { ClientConfig } from '../client-config.js'`
+  )
+  lines.push(
+    `import { ${Array.from(runtimeImports).sort(compareImportNames).join(', ')} } from './${SPLIT_RUNTIME_MODULE}.js'`
   )
   const schemaImportPath =
     options?.schemaImportPath !== undefined
       ? rebaseImportForSubdir(options.schemaImportPath)
       : undefined
   emitSchemaImports(lines, options, imports, schemaImportPath)
-
-  for (const op of ops) {
-    lines.push('')
-    lines.push(op.code)
-  }
+  emitOperations(lines, ops)
   lines.push('')
   return { filename: `${SPLIT_CLIENT_DIR}/${moduleName}.ts`, content: lines.join('\n') }
 }
@@ -2156,6 +2277,7 @@ function assembleSplitClient(
 
   const runtimeExports = ['ApiError']
   if (options?.errorBodyType === 'laravel') runtimeExports.push('type LaravelValidationError')
+  if (collected.hasEventStream) runtimeExports.push('parseEventStream', 'type EventStreamMessage')
 
   const barrel: string[] = [GENERATED_HEADER, '']
   barrel.push(

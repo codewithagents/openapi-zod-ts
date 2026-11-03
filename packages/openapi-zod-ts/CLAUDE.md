@@ -15,7 +15,8 @@ Published to npm as `openapi-zod-ts` (unscoped, v2.1.0). This is the core genera
 | File | Generates |
 |---|---|
 | `types.ts` | models.ts |
-| `client.ts` | client.ts |
+| `client.ts` | client.ts (or, with `split_by_tag`, a barrel + `client/_runtime.ts` + `client/<tag>.ts`) |
+| `event-stream.ts` | `parseEventStream` source, emitted into the client only when the spec has a text/event-stream op |
 | `client-config.ts` | client-config.ts |
 | `zod.ts` | zod.ts |
 | `index-barrel.ts` | index.ts |
