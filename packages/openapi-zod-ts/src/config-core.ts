@@ -174,7 +174,11 @@ function parseBaseConfig(raw: Record<string, unknown>, cwd: string): BaseConfig 
 }
 
 /** Resolve the config path, optionally validate it, and load the raw object. */
-async function prepareRaw(opts: { configPath?: string; cwd: string; defaultFileName: string }): Promise<{ raw: Record<string, unknown> }> {
+async function prepareRaw(opts: {
+  configPath?: string
+  cwd: string
+  defaultFileName: string
+}): Promise<{ raw: Record<string, unknown> }> {
   const resolvedConfigPath = opts.configPath ?? join(opts.cwd, opts.defaultFileName)
   if (opts.configPath !== undefined) {
     validateConfigPath(opts.configPath)
@@ -190,11 +194,7 @@ export async function loadConfigFile<T>(opts: LoadConfigOptions<T>): Promise<T> 
 }
 
 /** Parse a single project entry from a projects array, wrapping errors with the entry index. */
-function parseProjectEntry<T>(
-  entry: unknown,
-  index: number,
-  opts: LoadConfigOptions<T>
-): T {
+function parseProjectEntry<T>(entry: unknown, index: number, opts: LoadConfigOptions<T>): T {
   if (typeof entry !== 'object' || entry === null || Array.isArray(entry)) {
     throw new Error(`projects[${index}]: entry must be a config object`)
   }
@@ -237,10 +237,7 @@ export async function loadConfigsFile<T>(opts: LoadConfigOptions<T>): Promise<T[
   return [opts.parse(raw, base, opts.cwd)]
 }
 
-function parseProjectsArray<T>(
-  raw: Record<string, unknown>,
-  opts: LoadConfigOptions<T>
-): T[] {
+function parseProjectsArray<T>(raw: Record<string, unknown>, opts: LoadConfigOptions<T>): T[] {
   const hasTopLevelInput = 'input_openapi' in raw && raw['input_openapi'] !== undefined
   const hasTopLevelOutput = 'output' in raw && raw['output'] !== undefined
   if (hasTopLevelInput || hasTopLevelOutput) {
@@ -258,9 +255,7 @@ function parseProjectsArray<T>(
     throw new Error('"projects" array must contain at least one config entry')
   }
 
-  return projects.map((entry: unknown, index: number) =>
-    parseProjectEntry(entry, index, opts)
-  )
+  return projects.map((entry: unknown, index: number) => parseProjectEntry(entry, index, opts))
 }
 
 /**

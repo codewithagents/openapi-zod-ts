@@ -29,11 +29,7 @@ function buildOverrides(
   return Object.keys(overrides).length > 0 ? overrides : undefined
 }
 
-async function generateOne(
-  cwd: string,
-  config: ReactQueryConfig,
-  label?: string
-): Promise<void> {
+async function generateOne(cwd: string, config: ReactQueryConfig, label?: string): Promise<void> {
   const inputPath = resolve(cwd, config.input_openapi)
   const outputDir = resolve(cwd, config.output)
   const prefix = label !== undefined ? `[${label}] ` : ''

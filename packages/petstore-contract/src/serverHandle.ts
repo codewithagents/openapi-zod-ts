@@ -6,11 +6,13 @@ type ClosableServer = { close: (cb: (err?: unknown) => void) => void }
 
 export function makeHandle(
   baseUrl: string,
-  server: ClosableServer,
+  server: ClosableServer
 ): { baseUrl: string; close: () => Promise<void> } {
   return {
     baseUrl,
     close: () =>
-      new Promise<void>((resolve, reject) => server.close((err) => (err ? reject(err) : resolve()))),
+      new Promise<void>((resolve, reject) =>
+        server.close((err) => (err ? reject(err) : resolve()))
+      ),
   }
 }

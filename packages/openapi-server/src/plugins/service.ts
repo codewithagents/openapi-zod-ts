@@ -56,8 +56,7 @@ function collectContentfulTwoxxCodes(
 // fallow-ignore-next-line complexity
 function getReturnInfo(operation: OperationObject): ReturnInfo {
   const responses = operation.responses as
-    | Record<string, ResponseObject | ReferenceObject>
-    | undefined
+    Record<string, ResponseObject | ReferenceObject> | undefined
   if (responses === undefined) return { typeName: undefined, isArray: false, isVoid: true }
 
   // Detect multi-status: more than one 2xx response code (excluding 204).
@@ -80,8 +79,7 @@ function getReturnInfo(operation: OperationObject): ReturnInfo {
 
     const resp = response as ResponseObject
     const content = resp.content as
-      | Record<string, { schema?: OpenAPIV3_1.SchemaObject | ReferenceObject }>
-      | undefined
+      Record<string, { schema?: OpenAPIV3_1.SchemaObject | ReferenceObject }> | undefined
     if (content === undefined) continue
 
     const jsonContent = content['application/json']

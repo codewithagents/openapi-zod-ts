@@ -76,7 +76,7 @@ describe('normalizeQueryParamName', () => {
   it('handles a long alternating pattern of separators and digits in linear time', () => {
     // Digit segments after separators are NOT letters, so the regex previously had to
     // backtrack repeatedly. With the linear scan, each character is visited at most twice.
-    const input = ('_1'.repeat(25_000)) + 'z'
+    const input = '_1'.repeat(25_000) + 'z'
     const start = Date.now()
     const result = normalizeQueryParamName(input)
     const elapsed = Date.now() - start

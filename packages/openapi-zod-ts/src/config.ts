@@ -93,7 +93,10 @@ function validateDriftConfig(raw: Record<string, unknown>): void {
   }
 }
 
-function parseConfig(raw: Record<string, unknown>, base: import('./config-core.js').BaseConfig): Config {
+function parseConfig(
+  raw: Record<string, unknown>,
+  base: import('./config-core.js').BaseConfig
+): Config {
   if (
     raw['input_schema'] !== undefined &&
     (typeof raw['input_schema'] !== 'string' || !raw['input_schema'])

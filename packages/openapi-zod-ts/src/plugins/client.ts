@@ -107,9 +107,7 @@ function inlineSchemaToTs(
   }
   if (s.type === 'array') {
     const items = (s as OpenAPIV3_1.ArraySchemaObject).items as
-      | SchemaObject
-      | ReferenceObject
-      | undefined
+      SchemaObject | ReferenceObject | undefined
     if (items !== undefined) return `${inlineSchemaToTs(items, spec, visited)}[]`
     return 'unknown[]'
   }
@@ -140,9 +138,7 @@ function resolveSchema(
   const s = schema as SchemaObject
   if (s.type === 'array') {
     const items = (s as OpenAPIV3_1.ArraySchemaObject).items as
-      | SchemaObject
-      | ReferenceObject
-      | undefined
+      SchemaObject | ReferenceObject | undefined
     if (items !== undefined) {
       if (isRef(items)) {
         return {
@@ -196,9 +192,7 @@ function collectComponentRefNames(
   const s = schema as SchemaObject
   if (s.type === 'array') {
     const items = (s as OpenAPIV3_1.ArraySchemaObject).items as
-      | SchemaObject
-      | ReferenceObject
-      | undefined
+      SchemaObject | ReferenceObject | undefined
     collectComponentRefNames(items, spec, out, visitedSet)
     return
   }
@@ -378,8 +372,7 @@ function getReturnType(
   mayBeEmpty: boolean
 } {
   const responses = operation.responses as
-    | Record<string, ResponseObject | ReferenceObject>
-    | undefined
+    Record<string, ResponseObject | ReferenceObject> | undefined
   if (responses === undefined)
     return {
       typeName: 'unknown',
@@ -402,8 +395,7 @@ function getReturnType(
 
     const resp = response as ResponseObject
     const content = resp.content as
-      | Record<string, { schema?: SchemaObject | ReferenceObject }>
-      | undefined
+      Record<string, { schema?: SchemaObject | ReferenceObject }> | undefined
     if (content === undefined) continue
 
     const picked = pickResponseContent(content)
@@ -477,8 +469,7 @@ function resolveParamRef(
   if (match !== null) {
     const name = match[1]!
     const params = spec.components?.parameters as
-      | Record<string, ParameterObject | ReferenceObject>
-      | undefined
+      Record<string, ParameterObject | ReferenceObject> | undefined
     const resolved = params?.[name]
     if (resolved === undefined) return null
     // The target may itself be a ref (chained), so resolve recursively.
@@ -772,8 +763,7 @@ function getRequestBodyInfo(
 
   const rb = requestBody as RequestBodyObject
   const content = rb.content as
-    | Record<string, { schema?: SchemaObject | ReferenceObject }>
-    | undefined
+    Record<string, { schema?: SchemaObject | ReferenceObject }> | undefined
   if (content === undefined) return undefined
 
   // Check for multipart/form-data first
@@ -869,8 +859,7 @@ function getRequestBodyInfo(
 // fallow-ignore-next-line complexity
 function getThrowsTags(operation: OperationObject): string[] {
   const responses = operation.responses as
-    | Record<string, ResponseObject | ReferenceObject>
-    | undefined
+    Record<string, ResponseObject | ReferenceObject> | undefined
   if (responses === undefined) return []
 
   const errorStatusCodes = ['400', '401', '403', '404', '409', '422', '429', '500']
@@ -883,8 +872,7 @@ function getThrowsTags(operation: OperationObject): string[] {
 
     const resp = response as ResponseObject
     const content = resp.content as
-      | Record<string, { schema?: SchemaObject | ReferenceObject }>
-      | undefined
+      Record<string, { schema?: SchemaObject | ReferenceObject }> | undefined
     if (content === undefined) continue
 
     const jsonContent = content['application/json']
@@ -907,8 +895,7 @@ function getRequestBodySchemaName(operation: OperationObject): string | undefine
   if (requestBody === undefined || isRef(requestBody)) return undefined
   const rb = requestBody as RequestBodyObject
   const content = rb.content as
-    | Record<string, { schema?: SchemaObject | ReferenceObject }>
-    | undefined
+    Record<string, { schema?: SchemaObject | ReferenceObject }> | undefined
   if (content === undefined) return undefined
   const jsonContent = content['application/json']
   if (jsonContent === undefined || jsonContent.schema === undefined) return undefined
@@ -922,16 +909,14 @@ function getResponseSchemaName(
   operation: OperationObject
 ): { name: string; isArray: boolean } | undefined {
   const responses = operation.responses as
-    | Record<string, ResponseObject | ReferenceObject>
-    | undefined
+    Record<string, ResponseObject | ReferenceObject> | undefined
   if (responses === undefined) return undefined
   for (const code of ['200', '201']) {
     const response = responses[code]
     if (response === undefined || isRef(response)) continue
     const resp = response as ResponseObject
     const content = resp.content as
-      | Record<string, { schema?: SchemaObject | ReferenceObject }>
-      | undefined
+      Record<string, { schema?: SchemaObject | ReferenceObject }> | undefined
     if (content === undefined) continue
     const jsonContent = content['application/json']
     if (jsonContent === undefined || jsonContent.schema === undefined) continue
@@ -943,9 +928,7 @@ function getResponseSchemaName(
     const s = schema as SchemaObject
     if (s.type === 'array') {
       const items = (s as OpenAPIV3_1.ArraySchemaObject).items as
-        | SchemaObject
-        | ReferenceObject
-        | undefined
+        SchemaObject | ReferenceObject | undefined
       if (items !== undefined && isRef(items)) {
         return { name: refToTypeName((items as ReferenceObject).$ref), isArray: true }
       }

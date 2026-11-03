@@ -156,8 +156,7 @@ describe('property-based tests — generateService invariants', () => {
         for (const pathItem of Object.values(spec.paths ?? {})) {
           for (const method of ['get', 'post', 'put', 'patch', 'delete'] as const) {
             const op = (pathItem as Record<string, unknown>)[method] as
-              | { operationId?: string }
-              | undefined
+              { operationId?: string } | undefined
             if (!op?.operationId) continue
             const methodName = op.operationId.charAt(0).toLowerCase() + op.operationId.slice(1)
             expect(content).toContain(`${methodName}(`)
@@ -180,8 +179,7 @@ describe('property-based tests — generateService invariants', () => {
 
           for (const method of ['get', 'post', 'put', 'patch', 'delete'] as const) {
             const op = (pathItem as Record<string, unknown>)[method] as
-              | { operationId?: string }
-              | undefined
+              { operationId?: string } | undefined
             if (!op?.operationId) continue
 
             // Each path param should appear as "paramName: string" in the content

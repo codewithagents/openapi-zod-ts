@@ -22,9 +22,9 @@ if (parsed.action === 'help') {
 }
 
 if (parsed.action === 'version') {
-  const pkg = JSON.parse(
-    readFileSync(new URL('../package.json', import.meta.url), 'utf-8')
-  ) as { version: string }
+  const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf-8')) as {
+    version: string
+  }
   console.log(pkg.version)
   process.exit(0)
 }

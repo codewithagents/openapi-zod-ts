@@ -5,7 +5,13 @@ export type { GeneratedFile } from './plugins/types.js'
 export { generateTypes } from './plugins/types.js'
 export { generateClientConfig } from './plugins/client-config.js'
 export type { GenerateClientConfigOptions } from './plugins/client-config.js'
-export { generateClient, hasCookieAuth, detectAuthSchemes, CLIENT_INTERNAL_NAMES, getParamPresence } from './plugins/client.js'
+export {
+  generateClient,
+  hasCookieAuth,
+  detectAuthSchemes,
+  CLIENT_INTERNAL_NAMES,
+  getParamPresence,
+} from './plugins/client.js'
 export type { AuthSchemes } from './plugins/client.js'
 export { generateZodSchemas } from './plugins/zod.js'
 export { generateServer } from './plugins/server.js'

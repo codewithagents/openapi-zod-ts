@@ -73,7 +73,9 @@ export const petService: PetstoreService = {
   },
   async labResponseUnion(input) {
     // Echo: pick a concrete variant based on the requested selector.
-    return input.body.want === 'circle' ? { kind: 'circle', radius: 1 } : { kind: 'square', side: 1 }
+    return input.body.want === 'circle'
+      ? { kind: 'circle', radius: 1 }
+      : { kind: 'square', side: 1 }
   },
   async labBackedEnum(_input) {
     throw new Error('not implemented')

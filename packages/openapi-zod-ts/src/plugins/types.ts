@@ -33,8 +33,7 @@ function isRef(schema: SchemaObject | ReferenceObject): schema is ReferenceObjec
  */
 function buildSchemaRenameMap(spec: OpenAPIV3_1.Document): Map<string, string> {
   const schemas = spec.components?.schemas as
-    | Record<string, SchemaObject | ReferenceObject>
-    | undefined
+    Record<string, SchemaObject | ReferenceObject> | undefined
   const map = new Map<string, string>()
   if (schemas === undefined) return map
   const used = new Set<string>()
@@ -190,8 +189,7 @@ function schemaToTypeString(
     )
     // Sibling properties live outside the allOf array and must be included as an extra member
     const siblingProps = schema.properties as
-      | Record<string, SchemaObject | ReferenceObject>
-      | undefined
+      Record<string, SchemaObject | ReferenceObject> | undefined
     if (siblingProps !== undefined && Object.keys(siblingProps).length > 0) {
       parts.push(inlineObjectType(schema, renameMap, spec, visited))
     }
@@ -702,8 +700,7 @@ export function generateTypes(
   writableVariantMap?: Map<string, string>
 ): GeneratedFile {
   const schemas = spec.components?.schemas as
-    | Record<string, SchemaObject | ReferenceObject>
-    | undefined
+    Record<string, SchemaObject | ReferenceObject> | undefined
 
   // Build rename map so duplicate sanitized identifiers get deterministic suffixes.
   // E.g. schemas 'String' and 'string' both sanitize to 'String'; the second becomes 'String_2'.

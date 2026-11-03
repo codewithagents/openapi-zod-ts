@@ -5,11 +5,13 @@
 
 import { z } from 'zod'
 
-export const PetSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  species: z.string(),
-}).passthrough()
+export const PetSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    species: z.string(),
+  })
+  .passthrough()
 
 export const CreatePetRequestSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -33,17 +35,18 @@ export const LabStringSchema = z.object({
 
 export const LabArraySchema = z.object({
   bag: z.array(z.string()).min(2).max(4),
-  distinct: z.array(z.number().int()).refine(
-    (arr) => new Set(arr).size === arr.length,
-    { message: 'Array items must be unique' },
-  ),
+  distinct: z
+    .array(z.number().int())
+    .refine((arr) => new Set(arr).size === arr.length, { message: 'Array items must be unique' }),
 })
 
 // Custom regex for formats the generator does not natively validate
 const ISO_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/
 const TIME_REGEX = /^([01]\d|2[0-3]):[0-5]\d:[0-5]\d(\.\d+)?(Z|[+-]([01]\d|2[0-3]):[0-5]\d)?$/
-const DURATION_REGEX = /^P(?:\d+Y)?(?:\d+M)?(?:\d+W)?(?:\d+D)?(?:T(?:\d+H)?(?:\d+M)?(?:\d+(?:\.\d+)?S)?)?$/
-const HOSTNAME_REGEX = /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$|^localhost$/
+const DURATION_REGEX =
+  /^P(?:\d+Y)?(?:\d+M)?(?:\d+W)?(?:\d+D)?(?:T(?:\d+H)?(?:\d+M)?(?:\d+(?:\.\d+)?S)?)?$/
+const HOSTNAME_REGEX =
+  /^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$|^localhost$/
 
 export const LabFormatsSchema = z.object({
   day: z.string().regex(ISO_DATE_REGEX, 'Invalid date format (expected YYYY-MM-DD)'),
@@ -60,14 +63,19 @@ export const LabEnumConstSchema = z.object({
   version: z.literal('v2'),
 })
 
-export const LabClosedSchema = z.object({
-  known: z.string(),
-}).strict()
+export const LabClosedSchema = z
+  .object({
+    known: z.string(),
+  })
+  .strict()
 
 export const LabPresenceSchema = z.object({
   mandatory: z.string(),
   nullableField: z.string().nullable().optional().default(null),
-  optionalField: z.string().optional().default(null as unknown as string),
+  optionalField: z
+    .string()
+    .optional()
+    .default(null as unknown as string),
   withDefault: z.string().optional().default('fallback'),
 })
 
@@ -95,10 +103,7 @@ export const LabSquareSchema = z.object({
   side: z.number().gt(0),
 })
 
-export const LabShapeSchema = z.discriminatedUnion('kind', [
-  LabCircleSchema,
-  LabSquareSchema,
-])
+export const LabShapeSchema = z.discriminatedUnion('kind', [LabCircleSchema, LabSquareSchema])
 
 // Inline-union discriminated shape (dog/cat)
 const LabDogSchema = z.object({
@@ -109,10 +114,7 @@ const LabCatSchema = z.object({
   petType: z.literal('cat'),
   meow: z.string(),
 })
-export const LabInlineShapeSchema = z.discriminatedUnion('petType', [
-  LabDogSchema,
-  LabCatSchema,
-])
+export const LabInlineShapeSchema = z.discriminatedUnion('petType', [LabDogSchema, LabCatSchema])
 
 // allOf-inheritance vehicle union (hand-written merged Zod with discriminator)
 export const LabVehicleBaseSchema = z.discriminatedUnion('vehicleType', [

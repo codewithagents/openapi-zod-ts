@@ -105,7 +105,8 @@ function refNameOfSchemaOrArrayItem(
   if (schema === undefined) return undefined
   if (isRef(schema)) return rawSchemaNameFromRef(schema.$ref)
   const obj = schema as SchemaObject
-  const items = obj.type === 'array' ? (obj.items as SchemaObject | ReferenceObject | undefined) : undefined
+  const items =
+    obj.type === 'array' ? (obj.items as SchemaObject | ReferenceObject | undefined) : undefined
   if (items !== undefined && isRef(items)) return rawSchemaNameFromRef(items.$ref)
   return undefined
 }
@@ -115,8 +116,7 @@ function compositeMembers(obj: SchemaObject): Array<SchemaObject | ReferenceObje
   const members: Array<SchemaObject | ReferenceObject> = []
   for (const key of ['allOf', 'oneOf', 'anyOf'] as const) {
     const group = (obj as Record<string, unknown>)[key] as
-      | (SchemaObject | ReferenceObject)[]
-      | undefined
+      (SchemaObject | ReferenceObject)[] | undefined
     if (group !== undefined) members.push(...group)
   }
   return members
@@ -168,14 +168,14 @@ function collectComponentRefNames(schema: SchemaObject | ReferenceObject): Set<s
  */
 export function buildWritableVariantMap(spec: OpenAPIV3_1.Document): Map<string, string> {
   const schemas = spec.components?.schemas as
-    | Record<string, SchemaObject | ReferenceObject>
-    | undefined
+    Record<string, SchemaObject | ReferenceObject> | undefined
   const map = new Map<string, string>()
   if (schemas === undefined) return map
 
   const used = new Set<string>()
   for (const name of Object.keys(schemas)) used.add(toTypeName(name))
-  const writableNameFor = (name: string): string => uniquifyName(`${toTypeName(name)}Writable`, used)
+  const writableNameFor = (name: string): string =>
+    uniquifyName(`${toTypeName(name)}Writable`, used)
 
   // Seed: direct-split schemas (have readOnly or writeOnly properties directly).
   for (const [name, schema] of Object.entries(schemas)) {

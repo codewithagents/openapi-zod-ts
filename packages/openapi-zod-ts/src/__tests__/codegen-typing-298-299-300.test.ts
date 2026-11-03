@@ -322,9 +322,7 @@ describe('Bug #300: inline path param with integer schema also typed number', ()
       '/posts/{postId}': {
         get: {
           operationId: 'getPost',
-          parameters: [
-            { name: 'postId', in: 'path', required: true, schema: { type: 'integer' } },
-          ],
+          parameters: [{ name: 'postId', in: 'path', required: true, schema: { type: 'integer' } }],
           responses: {
             '200': {
               content: {

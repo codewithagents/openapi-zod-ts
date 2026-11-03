@@ -9,10 +9,10 @@ body:
       description: Which package is affected?
       options:
         - openapi-zod-ts (core generator)
-        - "@codewithagents/openapi-server"
-        - "@codewithagents/openapi-react-query"
-        - "@codewithagents/openapi-msw"
-        - "@codewithagents/api-errors"
+        - '@codewithagents/openapi-server'
+        - '@codewithagents/openapi-react-query'
+        - '@codewithagents/openapi-msw'
+        - '@codewithagents/api-errors'
     validations:
       required: true
 
@@ -22,9 +22,9 @@ body:
       label: OpenAPI spec version
       description: Which OpenAPI version does your spec use?
       options:
-        - "3.1.1"
-        - "3.1.0"
-        - "3.0.x"
+        - '3.1.1'
+        - '3.1.0'
+        - '3.0.x'
         - Not applicable
     validations:
       required: true
@@ -65,7 +65,7 @@ body:
     id: version
     attributes:
       label: Package version
-      placeholder: "e.g. 2.2.0"
+      placeholder: 'e.g. 2.2.0'
     validations:
       required: true
 
@@ -73,6 +73,6 @@ body:
     id: node-version
     attributes:
       label: Node.js version
-      placeholder: "e.g. 22.0.0"
+      placeholder: 'e.g. 22.0.0'
     validations:
       required: false

@@ -223,8 +223,7 @@ describe('property-based tests — openapi-zod-ts generator invariants', () => {
         for (const pathItem of Object.values(spec.paths ?? {})) {
           for (const method of ['get', 'post', 'put', 'patch', 'delete'] as const) {
             const op = (pathItem as Record<string, unknown>)[method] as
-              | { operationId?: string }
-              | undefined
+              { operationId?: string } | undefined
             if (!op?.operationId) continue
             // Generator lowercases the first character of the operationId
             const id = op.operationId
@@ -245,8 +244,7 @@ describe('property-based tests — openapi-zod-ts generator invariants', () => {
         for (const pathItem of Object.values(spec.paths ?? {})) {
           for (const method of ['get', 'post', 'put', 'patch', 'delete'] as const) {
             const op = (pathItem as Record<string, unknown>)[method] as
-              | { operationId?: string; parameters?: Array<{ in: string; name: string }> }
-              | undefined
+              { operationId?: string; parameters?: Array<{ in: string; name: string }> } | undefined
             if (!op?.operationId) continue
             const pathParams = (op.parameters ?? []).filter((p) => p.in === 'path')
             if (pathParams.length === 0) continue
@@ -275,8 +273,7 @@ describe('property-based tests — openapi-zod-ts generator invariants', () => {
         for (const pathItem of Object.values(spec.paths ?? {})) {
           for (const method of ['post', 'put', 'patch'] as const) {
             const op = (pathItem as Record<string, unknown>)[method] as
-              | { operationId?: string; requestBody?: unknown }
-              | undefined
+              { operationId?: string; requestBody?: unknown } | undefined
             if (!op?.operationId || !op.requestBody) continue
             const id = op.operationId
             const funcName = id.charAt(0).toLowerCase() + id.slice(1)

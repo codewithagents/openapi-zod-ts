@@ -60,8 +60,13 @@ async function req(
   method: string,
   path: string,
   body?: unknown,
-  headers?: Record<string, string>,
-): Promise<{ status: number; contentType: string | null; json: () => Promise<Record<string, unknown>>; text: () => Promise<string> }> {
+  headers?: Record<string, string>
+): Promise<{
+  status: number
+  contentType: string | null
+  json: () => Promise<Record<string, unknown>>
+  text: () => Promise<string>
+}> {
   const opts: RequestInit = { method }
   const hdrs: Record<string, string> = headers ?? {}
 
@@ -115,7 +120,7 @@ describe.each(['fastify', 'hono', 'express'] as const)('%s', (fw: Framework) => 
 
     const listRes = await req(handle.baseUrl, 'GET', '/api/pets')
     expect(listRes.status).toBe(200)
-    const list = await listRes.json() as unknown as Array<Record<string, unknown>>
+    const list = (await listRes.json()) as unknown as Array<Record<string, unknown>>
     const ids = list.map((p) => p['id'])
     expect(ids).toContain(p1['id'])
     expect(ids).toContain(p2['id'])
@@ -123,20 +128,26 @@ describe.each(['fastify', 'hono', 'express'] as const)('%s', (fw: Framework) => 
 
   // 3. GET /api/pets?species=cat filters to only cats, including the cat we created
   it('GET /api/pets?species=cat returns only cats', async () => {
-    const catRes = await req(handle.baseUrl, 'POST', '/api/pets', { name: 'Whiskers', species: 'cat' })
+    const catRes = await req(handle.baseUrl, 'POST', '/api/pets', {
+      name: 'Whiskers',
+      species: 'cat',
+    })
     const cat = await catRes.json()
     await req(handle.baseUrl, 'POST', '/api/pets', { name: 'Rex', species: 'dog' })
 
     const listRes = await req(handle.baseUrl, 'GET', '/api/pets?species=cat')
     expect(listRes.status).toBe(200)
-    const list = await listRes.json() as unknown as Array<Record<string, unknown>>
+    const list = (await listRes.json()) as unknown as Array<Record<string, unknown>>
     expect(list.every((p) => p['species'] === 'cat')).toBe(true)
     expect(list.some((p) => p['id'] === cat['id'])).toBe(true)
   })
 
   // 4. GET /api/pets/:id returns the exact pet by id
   it('GET /api/pets/:id returns 200 with the correct pet', async () => {
-    const createRes = await req(handle.baseUrl, 'POST', '/api/pets', { name: 'Spot', species: 'dog' })
+    const createRes = await req(handle.baseUrl, 'POST', '/api/pets', {
+      name: 'Spot',
+      species: 'dog',
+    })
     const created = await createRes.json()
     const id = created['id'] as string
 
@@ -148,7 +159,10 @@ describe.each(['fastify', 'hono', 'express'] as const)('%s', (fw: Framework) => 
 
   // 5. DELETE /api/pets/:id returns 204 with empty body
   it('DELETE /api/pets/:id returns 204 with empty body', async () => {
-    const createRes = await req(handle.baseUrl, 'POST', '/api/pets', { name: 'Temp', species: 'bird' })
+    const createRes = await req(handle.baseUrl, 'POST', '/api/pets', {
+      name: 'Temp',
+      species: 'bird',
+    })
     const created = await createRes.json()
     const id = created['id'] as string
 
@@ -171,13 +185,9 @@ describe.each(['fastify', 'hono', 'express'] as const)('%s', (fw: Framework) => 
   // 7. Wrong content-type divergence: fastify 400, hono 415, express 422
   it('POST /api/pets with wrong content-type returns framework-specific status', async () => {
     const expected = DIVERGENCE[fw].wrongContentType
-    const res = await req(
-      handle.baseUrl,
-      'POST',
-      '/api/pets',
-      '{"name":"Ghost","species":"cat"}',
-      { 'content-type': 'text/plain' },
-    )
+    const res = await req(handle.baseUrl, 'POST', '/api/pets', '{"name":"Ghost","species":"cat"}', {
+      'content-type': 'text/plain',
+    })
     expect(res.status).toBe(expected.status)
   })
 

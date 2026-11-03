@@ -48,8 +48,7 @@ function getServiceInParams(
   inKind: 'header' | 'cookie'
 ): { rawName: string; required: boolean }[] {
   const parameters = operation.parameters as
-    | (OpenAPIV3_1.ParameterObject | OpenAPIV3_1.ReferenceObject)[]
-    | undefined
+    (OpenAPIV3_1.ParameterObject | OpenAPIV3_1.ReferenceObject)[] | undefined
   if (parameters === undefined) return []
   const result: { rawName: string; required: boolean }[] = []
   for (const p of parameters) {
@@ -101,8 +100,7 @@ function collectContentfulTwoxxCodes(
 // fallow-ignore-next-line complexity
 function getReturnInfo(operation: OperationObject): ReturnInfo {
   const responses = operation.responses as
-    | Record<string, ResponseObject | ReferenceObject>
-    | undefined
+    Record<string, ResponseObject | ReferenceObject> | undefined
   if (responses === undefined) return { typeName: undefined, isArray: false, isVoid: true }
 
   const contentfulCodes = collectContentfulTwoxxCodes(responses)
@@ -123,8 +121,7 @@ function getReturnInfo(operation: OperationObject): ReturnInfo {
 
     const resp = response as ResponseObject
     const content = resp.content as
-      | Record<string, { schema?: OpenAPIV3_1.SchemaObject | ReferenceObject }>
-      | undefined
+      Record<string, { schema?: OpenAPIV3_1.SchemaObject | ReferenceObject }> | undefined
     if (content === undefined) continue
 
     const jsonContent = content['application/json']

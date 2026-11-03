@@ -19,9 +19,13 @@ const cases = readdirSync(configsDir)
 
 const DEFAULT_OPTS = { seed: 42, maxArrayItems: 3, depthCap: 30 }
 
-describe.each(cases)('compat: $name', ({ specPath }) => {
-  it('generates handlers without throwing', async () => {
-    const spec = await parseSpec(specPath)
-    generateHandlers(spec, DEFAULT_OPTS)
-  })
-}, 120_000)
+describe.each(cases)(
+  'compat: $name',
+  ({ specPath }) => {
+    it('generates handlers without throwing', async () => {
+      const spec = await parseSpec(specPath)
+      generateHandlers(spec, DEFAULT_OPTS)
+    })
+  },
+  120_000
+)

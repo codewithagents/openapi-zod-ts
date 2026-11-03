@@ -707,10 +707,7 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": [
-                    "label",
-                    "generated_at"
-                  ],
+                  "required": ["label", "generated_at"],
                   "properties": {
                     "label": {
                       "type": "string"
@@ -774,11 +771,7 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": [
-                "bronze",
-                "silver",
-                "gold"
-              ]
+              "enum": ["bronze", "silver", "gold"]
             }
           },
           {
@@ -860,10 +853,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "title",
-                  "rank"
-                ],
+                "required": ["title", "rank"],
                 "properties": {
                   "title": {
                     "type": "string",
@@ -979,10 +969,7 @@
             "explode": true,
             "schema": {
               "type": "object",
-              "required": [
-                "gte",
-                "lte"
-              ],
+              "required": ["gte", "lte"],
               "properties": {
                 "gte": {
                   "type": "number"
@@ -1057,10 +1044,7 @@
             "application/x-www-form-urlencoded": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "label",
-                  "quantity"
-                ],
+                "required": ["label", "quantity"],
                 "properties": {
                   "label": {
                     "type": "string"
@@ -1108,9 +1092,7 @@
             "multipart/form-data": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "photos"
-                ],
+                "required": ["photos"],
                 "properties": {
                   "photos": {
                     "type": "array",
@@ -1204,10 +1186,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "immediate",
-                "async"
-              ]
+              "enum": ["immediate", "async"]
             },
             "description": "Pass async to request a 202 (still running) response; omit or pass immediate for 200 (done)."
           }
@@ -1287,11 +1266,7 @@
     "schemas": {
       "Pet": {
         "type": "object",
-        "required": [
-          "id",
-          "name",
-          "species"
-        ],
+        "required": ["id", "name", "species"],
         "properties": {
           "id": {
             "type": "string"
@@ -1306,10 +1281,7 @@
       },
       "CreatePetRequest": {
         "type": "object",
-        "required": [
-          "name",
-          "species"
-        ],
+        "required": ["name", "species"],
         "properties": {
           "name": {
             "type": "string"
@@ -1321,11 +1293,7 @@
       },
       "LabNumeric": {
         "type": "object",
-        "required": [
-          "bounded",
-          "exclusive",
-          "multiple"
-        ],
+        "required": ["bounded", "exclusive", "multiple"],
         "properties": {
           "bounded": {
             "type": "integer",
@@ -1345,10 +1313,7 @@
       },
       "LabString": {
         "type": "object",
-        "required": [
-          "sized",
-          "coded"
-        ],
+        "required": ["sized", "coded"],
         "properties": {
           "sized": {
             "type": "string",
@@ -1363,10 +1328,7 @@
       },
       "LabArray": {
         "type": "object",
-        "required": [
-          "bag",
-          "distinct"
-        ],
+        "required": ["bag", "distinct"],
         "properties": {
           "bag": {
             "type": "array",
@@ -1387,15 +1349,7 @@
       },
       "LabFormats": {
         "type": "object",
-        "required": [
-          "day",
-          "moment",
-          "clock",
-          "span",
-          "mail",
-          "identifier",
-          "host"
-        ],
+        "required": ["day", "moment", "clock", "span", "mail", "identifier", "host"],
         "properties": {
           "day": {
             "type": "string",
@@ -1429,18 +1383,11 @@
       },
       "LabEnumConst": {
         "type": "object",
-        "required": [
-          "color",
-          "version"
-        ],
+        "required": ["color", "version"],
         "properties": {
           "color": {
             "type": "string",
-            "enum": [
-              "red",
-              "green",
-              "blue"
-            ]
+            "enum": ["red", "green", "blue"]
           },
           "version": {
             "type": "string",
@@ -1451,9 +1398,7 @@
       "LabClosed": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "known"
-        ],
+        "required": ["known"],
         "properties": {
           "known": {
             "type": "string"
@@ -1462,9 +1407,7 @@
       },
       "LabPresence": {
         "type": "object",
-        "required": [
-          "mandatory"
-        ],
+        "required": ["mandatory"],
         "properties": {
           "mandatory": {
             "type": "string"
@@ -1484,9 +1427,7 @@
       },
       "LabMap": {
         "type": "object",
-        "required": [
-          "label"
-        ],
+        "required": ["label"],
         "properties": {
           "label": {
             "type": "string"
@@ -1501,9 +1442,7 @@
       },
       "LabUnion": {
         "type": "object",
-        "required": [
-          "value"
-        ],
+        "required": ["value"],
         "properties": {
           "value": {
             "oneOf": [
@@ -1519,9 +1458,7 @@
       },
       "LabAnyOf": {
         "type": "object",
-        "required": [
-          "value"
-        ],
+        "required": ["value"],
         "properties": {
           "value": {
             "anyOf": [
@@ -1537,10 +1474,7 @@
       },
       "LabCircle": {
         "type": "object",
-        "required": [
-          "kind",
-          "radius"
-        ],
+        "required": ["kind", "radius"],
         "properties": {
           "kind": {
             "type": "string",
@@ -1554,10 +1488,7 @@
       },
       "LabSquare": {
         "type": "object",
-        "required": [
-          "kind",
-          "side"
-        ],
+        "required": ["kind", "side"],
         "properties": {
           "kind": {
             "type": "string",
@@ -1590,10 +1521,7 @@
         "oneOf": [
           {
             "type": "object",
-            "required": [
-              "petType",
-              "bark"
-            ],
+            "required": ["petType", "bark"],
             "properties": {
               "petType": {
                 "type": "string",
@@ -1606,10 +1534,7 @@
           },
           {
             "type": "object",
-            "required": [
-              "petType",
-              "meow"
-            ],
+            "required": ["petType", "meow"],
             "properties": {
               "petType": {
                 "type": "string",
@@ -1627,9 +1552,7 @@
       },
       "LabVehicleBase": {
         "type": "object",
-        "required": [
-          "vehicleType"
-        ],
+        "required": ["vehicleType"],
         "properties": {
           "vehicleType": {
             "type": "string"
@@ -1650,9 +1573,7 @@
           },
           {
             "type": "object",
-            "required": [
-              "wheels"
-            ],
+            "required": ["wheels"],
             "properties": {
               "wheels": {
                 "type": "integer",
@@ -1669,9 +1590,7 @@
           },
           {
             "type": "object",
-            "required": [
-              "draft"
-            ],
+            "required": ["draft"],
             "properties": {
               "draft": {
                 "type": "number",
@@ -1683,9 +1602,7 @@
       },
       "LabBackedEnum": {
         "type": "object",
-        "required": [
-          "priority"
-        ],
+        "required": ["priority"],
         "properties": {
           "priority": {
             "$ref": "#/components/schemas/LabPriority"
@@ -1694,17 +1611,11 @@
       },
       "LabPriority": {
         "type": "string",
-        "enum": [
-          "low",
-          "medium",
-          "high"
-        ]
+        "enum": ["low", "medium", "high"]
       },
       "LabBase": {
         "type": "object",
-        "required": [
-          "baseField"
-        ],
+        "required": ["baseField"],
         "properties": {
           "baseField": {
             "type": "string"
@@ -1718,9 +1629,7 @@
           },
           {
             "type": "object",
-            "required": [
-              "extraField"
-            ],
+            "required": ["extraField"],
             "properties": {
               "extraField": {
                 "type": "integer"
@@ -1731,10 +1640,7 @@
       },
       "LabVariantItem": {
         "type": "object",
-        "required": [
-          "name",
-          "secret"
-        ],
+        "required": ["name", "secret"],
         "properties": {
           "name": {
             "type": "string"
@@ -1751,10 +1657,7 @@
       },
       "LabNestedVariant": {
         "type": "object",
-        "required": [
-          "title",
-          "items"
-        ],
+        "required": ["title", "items"],
         "properties": {
           "title": {
             "type": "string"
@@ -1769,9 +1672,7 @@
       },
       "LabTuple": {
         "type": "object",
-        "required": [
-          "pair"
-        ],
+        "required": ["pair"],
         "properties": {
           "pair": {
             "type": "array",
@@ -1789,32 +1690,23 @@
       },
       "LabUnionSelector": {
         "type": "object",
-        "required": [
-          "want"
-        ],
+        "required": ["want"],
         "properties": {
           "want": {
             "type": "string",
-            "enum": [
-              "circle",
-              "square"
-            ]
+            "enum": ["circle", "square"]
           }
         }
       },
       "LabLooseUnion": {
         "type": "object",
-        "required": [
-          "payload"
-        ],
+        "required": ["payload"],
         "properties": {
           "payload": {
             "oneOf": [
               {
                 "type": "object",
-                "required": [
-                  "alpha"
-                ],
+                "required": ["alpha"],
                 "properties": {
                   "alpha": {
                     "type": "string"
@@ -1823,9 +1715,7 @@
               },
               {
                 "type": "object",
-                "required": [
-                  "beta"
-                ],
+                "required": ["beta"],
                 "properties": {
                   "beta": {
                     "type": "integer"
@@ -1838,11 +1728,7 @@
       },
       "LabQueryEcho": {
         "type": "object",
-        "required": [
-          "tier",
-          "count",
-          "code"
-        ],
+        "required": ["tier", "count", "code"],
         "properties": {
           "tier": {
             "type": "string"
@@ -1857,9 +1743,7 @@
       },
       "LabHeaderEcho": {
         "type": "object",
-        "required": [
-          "token"
-        ],
+        "required": ["token"],
         "properties": {
           "token": {
             "type": "string"
@@ -1868,11 +1752,7 @@
       },
       "LabDelimitedEcho": {
         "type": "object",
-        "required": [
-          "csv",
-          "ssv",
-          "psv"
-        ],
+        "required": ["csv", "ssv", "psv"],
         "properties": {
           "csv": {
             "type": "array",
@@ -1896,10 +1776,7 @@
       },
       "LabDeepFilterEcho": {
         "type": "object",
-        "required": [
-          "gte",
-          "lte"
-        ],
+        "required": ["gte", "lte"],
         "properties": {
           "gte": {
             "type": "number"
@@ -1914,9 +1791,7 @@
       },
       "LabPathEcho": {
         "type": "object",
-        "required": [
-          "score"
-        ],
+        "required": ["score"],
         "properties": {
           "score": {
             "type": "integer"
@@ -1925,9 +1800,7 @@
       },
       "LabDualStatusEcho": {
         "type": "object",
-        "required": [
-          "phase"
-        ],
+        "required": ["phase"],
         "properties": {
           "phase": {
             "type": "string"
@@ -1936,9 +1809,7 @@
       },
       "LabInt64": {
         "type": "object",
-        "required": [
-          "ledger"
-        ],
+        "required": ["ledger"],
         "properties": {
           "ledger": {
             "type": "integer",

@@ -155,8 +155,7 @@ describe('property-based tests — generateHooks invariants', () => {
         const { content } = generateHooks(spec, { staleTime: 0, gcTime: 0 })
         for (const pathItem of Object.values(spec.paths ?? {})) {
           const op = (pathItem as Record<string, unknown>)['get'] as
-            | { operationId?: string }
-            | undefined
+            { operationId?: string } | undefined
           if (!op?.operationId) continue
           const hookName = 'use' + op.operationId[0]!.toUpperCase() + op.operationId.slice(1)
           expect(content).toContain(`export function ${hookName}(`)
@@ -174,8 +173,7 @@ describe('property-based tests — generateHooks invariants', () => {
         for (const pathItem of Object.values(spec.paths ?? {})) {
           for (const method of ['post', 'put', 'patch', 'delete'] as const) {
             const op = (pathItem as Record<string, unknown>)[method] as
-              | { operationId?: string }
-              | undefined
+              { operationId?: string } | undefined
             if (!op?.operationId) continue
             const hookName = 'use' + op.operationId[0]!.toUpperCase() + op.operationId.slice(1)
             expect(content).toContain(`export function ${hookName}(`)
@@ -212,8 +210,7 @@ describe('property-based tests — generateHooks invariants', () => {
         const { content } = generateHooks(spec, { staleTime: 0, gcTime: 0 })
         for (const [_path, pathItem] of Object.entries(spec.paths ?? {})) {
           const op = (pathItem as Record<string, unknown>)['get'] as
-            | { operationId?: string; parameters?: Array<{ in: string }> }
-            | undefined
+            { operationId?: string; parameters?: Array<{ in: string }> } | undefined
           if (!op?.operationId) continue
           const params = (op.parameters ?? []).filter((p) => p.in === 'path')
           if (params.length < 2) continue
@@ -250,8 +247,7 @@ describe('property-based tests — generateHooks invariants', () => {
         for (const [path, pathItem] of Object.entries(spec.paths ?? {})) {
           for (const method of ['post', 'put', 'patch', 'delete'] as const) {
             const op = (pathItem as Record<string, unknown>)[method] as
-              | { operationId?: string }
-              | undefined
+              { operationId?: string } | undefined
             if (!op?.operationId) continue
 
             const stripped = path.replace(/^\/api\/v\d+\//, '').replace(/^\//, '')

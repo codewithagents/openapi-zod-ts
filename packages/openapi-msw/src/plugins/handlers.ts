@@ -42,10 +42,7 @@ function toMswPath(openApiPath: string): string {
 
 // ── Schema resolution ──────────────────────────────────────────────────────────
 
-function resolveRef(
-  ref: string,
-  schemas: Record<string, SchemaOrRef>
-): SchemaObject | undefined {
+function resolveRef(ref: string, schemas: Record<string, SchemaOrRef>): SchemaObject | undefined {
   const name = refName(ref)
   const resolved = schemas[name]
   if (resolved === undefined) return undefined
@@ -76,7 +73,7 @@ function fakerString(schema: SchemaObject): string {
   if (fmt === 'email') return 'faker.internet.email()'
   if (fmt === 'uuid') return 'faker.string.uuid()'
   if (fmt === 'date-time') return 'faker.date.recent().toISOString()'
-  if (fmt === 'date') return "faker.date.recent().toISOString().slice(0, 10)"
+  if (fmt === 'date') return 'faker.date.recent().toISOString().slice(0, 10)'
   if (fmt === 'uri' || fmt === 'url') return 'faker.internet.url()'
   return 'faker.lorem.word()'
 }
@@ -97,14 +94,18 @@ function fakerArray(
 ): string {
   const arraySchema = schema as OpenAPIV3_1.ArraySchemaObject
   // Pass depth unchanged: array nesting does not count toward $ref depth
-  const itemExpr = schemaToFaker(arraySchema.items ?? {}, schemas, visited, depth, maxItems, depthCap)
+  const itemExpr = schemaToFaker(
+    arraySchema.items ?? {},
+    schemas,
+    visited,
+    depth,
+    maxItems,
+    depthCap
+  )
   return `Array.from({ length: ${maxItems} }, () => (${itemExpr}))`
 }
 
-function mergeAllOf(
-  allOf: SchemaOrRef[],
-  schemas: Record<string, SchemaOrRef>
-): SchemaObject {
+function mergeAllOf(allOf: SchemaOrRef[], schemas: Record<string, SchemaOrRef>): SchemaObject {
   const merged: SchemaObject = { type: 'object', properties: {}, required: [] }
   for (const member of allOf) {
     const resolved = resolveSchema(member, schemas)
@@ -324,7 +325,14 @@ function buildHandlerLine(
     return `http.${method}('${mswPath}', () => HttpResponse.json(null, { status: ${status} }))`
   }
 
-  const bodyExpr = schemaToFaker(responseBody.schema, schemas, new Set(), 0, opts.maxArrayItems, opts.depthCap)
+  const bodyExpr = schemaToFaker(
+    responseBody.schema,
+    schemas,
+    new Set(),
+    0,
+    opts.maxArrayItems,
+    opts.depthCap
+  )
   const needsStatus = responseBody.statusCode !== 200
   if (needsStatus) {
     return `http.${method}('${mswPath}', () => HttpResponse.json(${bodyExpr}, { status: ${responseBody.statusCode} }))`
@@ -342,8 +350,7 @@ function buildPathHandlerLines(
   const lines: string[] = []
   for (const method of SUPPORTED_METHODS) {
     const operation = (pathItem as Record<string, unknown>)[method] as
-      | OpenAPIV3_1.OperationObject
-      | undefined
+      OpenAPIV3_1.OperationObject | undefined
     if (operation === undefined) continue
     const responses = operation.responses
     if (responses === undefined) continue

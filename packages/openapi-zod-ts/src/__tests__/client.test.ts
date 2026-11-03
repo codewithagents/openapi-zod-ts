@@ -2092,7 +2092,9 @@ describe('204 no-content guard (issue #272)', () => {
             responses: {
               '200': {
                 description: 'error info',
-                content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } },
+                content: {
+                  'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } },
+                },
               },
               '204': { description: 'no content' },
             },
@@ -2131,7 +2133,9 @@ describe('204 no-content guard (issue #272)', () => {
             responses: {
               '200': {
                 description: 'error info',
-                content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } },
+                content: {
+                  'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } },
+                },
               },
               '204': { description: 'no content' },
             },
@@ -2191,7 +2195,9 @@ describe('204 no-content guard (issue #272)', () => {
             responses: {
               '200': {
                 description: 'error info',
-                content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } },
+                content: {
+                  'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } },
+                },
               },
               '204': { description: 'no content' },
             },

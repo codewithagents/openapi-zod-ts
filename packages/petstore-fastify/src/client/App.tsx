@@ -80,7 +80,12 @@ function LoginView({ onSuccess }: { onSuccess: (t: string) => void }) {
     <main>
       <h1>Auth Lab: Login</h1>
       <form onSubmit={handleSubmit}>
-        <Field testid="login-username" placeholder="Username" value={username} onChange={setUsername} />
+        <Field
+          testid="login-username"
+          placeholder="Username"
+          value={username}
+          onChange={setUsername}
+        />
         <Field
           testid="login-password"
           type="password"
@@ -144,9 +149,26 @@ function ContactView() {
               <option value="phone">Phone</option>
             </select>
           </div>
-          <Field testid="contact-email" placeholder="Email" value={email} onChange={setEmail} error={fieldErrors.email} />
-          <Field testid="contact-phone" placeholder="Phone" value={phone} onChange={setPhone} error={fieldErrors.phone} />
-          <Field testid="contact-message" placeholder="Message" value={message} onChange={setMessage} />
+          <Field
+            testid="contact-email"
+            placeholder="Email"
+            value={email}
+            onChange={setEmail}
+            error={fieldErrors.email}
+          />
+          <Field
+            testid="contact-phone"
+            placeholder="Phone"
+            value={phone}
+            onChange={setPhone}
+            error={fieldErrors.phone}
+          />
+          <Field
+            testid="contact-message"
+            placeholder="Message"
+            value={message}
+            onChange={setMessage}
+          />
           <button data-testid="contact-submit" type="submit" disabled={contact.isPending}>
             {contact.isPending ? 'Sending...' : 'Send'}
           </button>

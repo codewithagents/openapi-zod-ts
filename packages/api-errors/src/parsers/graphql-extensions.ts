@@ -71,9 +71,7 @@ function extractField(item: Record<string, unknown>): string | null {
   // Fall back to extensions.path (array joined with `.`).
   const path = extensions['path']
   if (Array.isArray(path) && path.length > 0) {
-    const segments = path
-      .filter((s) => typeof s === 'string' || typeof s === 'number')
-      .map(String)
+    const segments = path.filter((s) => typeof s === 'string' || typeof s === 'number').map(String)
     if (segments.length > 0) return segments.join('.')
   }
 

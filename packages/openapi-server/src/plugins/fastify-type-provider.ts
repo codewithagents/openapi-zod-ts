@@ -115,8 +115,7 @@ function getResponseTypeName(
   schemaNames?: Set<string>
 ): { typeName: string; isArray: boolean } | undefined {
   const responses = operation.responses as
-    | Record<string, ResponseObject | ReferenceObject>
-    | undefined
+    Record<string, ResponseObject | ReferenceObject> | undefined
   if (responses === undefined) return undefined
 
   // Priority list mirrors the one in router.ts; both emitters scan the same response
@@ -135,8 +134,7 @@ function getResponseTypeName(
     if (response === undefined || isRef(response)) continue
     const resp = response as ResponseObject
     const content = resp.content as
-      | Record<string, { schema?: OpenAPIV3_1.SchemaObject | ReferenceObject }>
-      | undefined
+      Record<string, { schema?: OpenAPIV3_1.SchemaObject | ReferenceObject }> | undefined
     if (content === undefined) continue
     const jsonContent = content['application/json']
     if (jsonContent === undefined || jsonContent.schema === undefined) continue
@@ -645,8 +643,7 @@ function buildFastifyTypeProviderHandler(
     !op.responseStatus.isVoid
   ) {
     const responses = op.rawOperation.responses as
-      | Record<string, ResponseObject | ReferenceObject>
-      | undefined
+      Record<string, ResponseObject | ReferenceObject> | undefined
     if (responses !== undefined) {
       // The priority-ordered 2xx response scan mirrors the one in fastify-service.ts
       // getReturnInfo. Both emitters must independently walk the same responses object:
@@ -664,8 +661,7 @@ function buildFastifyTypeProviderHandler(
         const response = responses[code]
         if (response === undefined || isRef(response)) continue
         const content = (response as ResponseObject).content as
-          | Record<string, { schema?: OpenAPIV3_1.SchemaObject | ReferenceObject }>
-          | undefined
+          Record<string, { schema?: OpenAPIV3_1.SchemaObject | ReferenceObject }> | undefined
         if (content === undefined) continue
         const jsonContent = content['application/json']
         if (jsonContent?.schema === undefined) continue
@@ -917,8 +913,7 @@ function resolveRequestBody(
   const components = spec.components as OpenAPIV3_1.ComponentsObject | undefined
   const rb = (
     components?.requestBodies as
-      | Record<string, OpenAPIV3_1.RequestBodyObject | OpenAPIV3_1.ReferenceObject>
-      | undefined
+      Record<string, OpenAPIV3_1.RequestBodyObject | OpenAPIV3_1.ReferenceObject> | undefined
   )?.[name ?? '']
   if (rb === undefined || isRef(rb)) return undefined
   return rb as OpenAPIV3_1.RequestBodyObject
@@ -936,9 +931,7 @@ function operationHasBodyContentType(
   spec: OpenAPIV3_1.Document
 ): boolean {
   const raw = operation.requestBody as
-    | OpenAPIV3_1.RequestBodyObject
-    | OpenAPIV3_1.ReferenceObject
-    | undefined
+    OpenAPIV3_1.RequestBodyObject | OpenAPIV3_1.ReferenceObject | undefined
   const rb = resolveRequestBody(raw, spec)
   if (rb === undefined) return false
   const content = rb.content as Record<string, unknown> | undefined

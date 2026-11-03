@@ -258,7 +258,9 @@ describe('lab-routes inject() suite', () => {
     const app = buildApp(service)
     const res = await app.inject({ method: 'GET', url: '/pets/nonexistent' })
     expect(res.statusCode).toBe(404)
-    expect(res.json<{ statusCode: number; code: string; error: string; message: string }>()).toMatchObject({
+    expect(
+      res.json<{ statusCode: number; code: string; error: string; message: string }>()
+    ).toMatchObject({
       statusCode: 404,
       code: 'NOT_FOUND',
       error: 'pet not found',

@@ -88,8 +88,7 @@ function parseReactQueryConfig(
     gc_time: raw['gc_time'] as number | undefined,
     suspense: raw['suspense'] as boolean | undefined,
     overrides: raw['overrides'] as
-      | Record<string, { stale_time?: number; gc_time?: number }>
-      | undefined,
+      Record<string, { stale_time?: number; gc_time?: number }> | undefined,
     auto_invalidate: raw['auto_invalidate'] as boolean | undefined,
     infinite_query: raw['infinite_query'] as boolean | 'auto' | undefined,
   }
@@ -110,10 +109,7 @@ export async function loadConfig(cwd: string, configPath?: string): Promise<Reac
  * Single-spec config: returns a one-element array.
  * Multi-spec config with "projects" key: returns N-element array.
  */
-export async function loadConfigs(
-  cwd: string,
-  configPath?: string
-): Promise<ReactQueryConfig[]> {
+export async function loadConfigs(cwd: string, configPath?: string): Promise<ReactQueryConfig[]> {
   return loadConfigsFile<ReactQueryConfig>({
     cwd,
     configPath,

@@ -3,7 +3,13 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { loadConfig, loadConfigs, validateConfigPath, validateOutputPath, validateInputPath } from '../config.js'
+import {
+  loadConfig,
+  loadConfigs,
+  validateConfigPath,
+  validateOutputPath,
+  validateInputPath,
+} from '../config.js'
 
 describe('loadConfig', () => {
   let tmpDir: string
@@ -333,9 +339,7 @@ describe('loadConfigs: projects array support', () => {
 
   it('throws with project index when a project entry has invalid framework', async () => {
     writeConfig({
-      projects: [
-        { input_openapi: 'services/users.json', output: 'src/users', framework: 'koa' },
-      ],
+      projects: [{ input_openapi: 'services/users.json', output: 'src/users', framework: 'koa' }],
     })
     await expect(loadConfigs(tmpDir)).rejects.toThrow('projects[0]')
   })
