@@ -39,23 +39,23 @@ describe('generateHandlers: task-api.json fixture', () => {
   })
 
   it('generates http.get handler for listTasks', () => {
-    expect(content).toContain("http.get('/api/v1/tasks'")
+    expect(content).toContain('http.get("*/api/v1/tasks"')
   })
 
   it('generates http.post handler for createTask', () => {
-    expect(content).toContain("http.post('/api/v1/tasks'")
+    expect(content).toContain('http.post("*/api/v1/tasks"')
   })
 
   it('generates http.get handler for getTask with colon param', () => {
-    expect(content).toContain("http.get('/api/v1/tasks/:id'")
+    expect(content).toContain('http.get("*/api/v1/tasks/:id"')
   })
 
   it('generates http.put handler for updateTask', () => {
-    expect(content).toContain("http.put('/api/v1/tasks/:id'")
+    expect(content).toContain('http.put("*/api/v1/tasks/:id"')
   })
 
   it('generates http.delete handler for deleteTask', () => {
-    expect(content).toContain("http.delete('/api/v1/tasks/:id'")
+    expect(content).toContain('http.delete("*/api/v1/tasks/:id"')
   })
 
   it('generates null response body for 204 delete operation', () => {
@@ -263,7 +263,7 @@ describe('generateHandlers: operations without operationId', () => {
 
   it('generates a handler even without operationId', () => {
     const { content: c } = generateHandlers(noOpIdSpec, DEFAULT_OPTS)
-    expect(c).toContain("http.get('/widgets'")
+    expect(c).toContain('http.get("*/widgets"')
   })
 })
 
@@ -323,5 +323,33 @@ describe('generateHandlers: non-JSON content type responses', () => {
     const { content: c } = generateHandlers(binarySpec, DEFAULT_OPTS)
     expect(c).toContain('new HttpResponse(null,')
     expect(c).not.toContain('HttpResponse.json(null,')
+  })
+})
+
+describe('generateHandlers: handler URL origin', () => {
+  it('defaults to the * wildcard origin so handlers match absolute URLs in Node', () => {
+    const { content: c } = generateHandlers(spec, DEFAULT_OPTS)
+    expect(c).toContain('http.get("*/api/v1/tasks",')
+    expect(c).not.toMatch(/http\.\w+\('\/api/)
+  })
+
+  it('prefixes every handler path with baseUrl when set', () => {
+    const { content: c } = generateHandlers(spec, { ...DEFAULT_OPTS, baseUrl: 'https://api.test' })
+    expect(c).toContain('http.get("https://api.test/api/v1/tasks",')
+    expect(c).toContain('http.delete("https://api.test/api/v1/tasks/:id",')
+    expect(c).not.toContain("'*/")
+  })
+
+  it('strips trailing slashes from baseUrl and keeps a base path', () => {
+    const { content: c } = generateHandlers(spec, {
+      ...DEFAULT_OPTS,
+      baseUrl: 'https://api.test/v2//',
+    })
+    expect(c).toContain('http.get("https://api.test/v2/api/v1/tasks",')
+  })
+
+  it('escapes single quotes and backslashes in baseUrl', () => {
+    const { content: c } = generateHandlers(spec, { ...DEFAULT_OPTS, baseUrl: "https://a'b\\c" })
+    expect(c).toContain('http.get("https://a\'b\\\\c/api/v1/tasks",')
   })
 })

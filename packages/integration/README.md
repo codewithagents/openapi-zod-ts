@@ -57,7 +57,7 @@ spec/
 generated/                  Committed sample output, do not edit manually
   models.ts, client.ts, client-config.ts, server.ts, index.ts   openapi-zod-ts
   hooks.ts, test-utils.ts                                        openapi-react-query
-  handlers.ts                                                    openapi-msw (MSW v2 handlers)
+  handlers.ts, fixtures.ts                                       openapi-msw (MSW v2 handlers + fixture builders)
 
 src/
   __tests__/

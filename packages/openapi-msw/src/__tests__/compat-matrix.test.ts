@@ -3,6 +3,7 @@ import { describe, it } from 'vitest'
 import { readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { parseSpec } from 'openapi-zod-ts'
+import { generateFixtures } from '../plugins/fixtures.js'
 import { generateHandlers } from '../plugins/handlers.js'
 
 const configsDir = resolve(import.meta.dirname, '../../../../examples/configs')
@@ -25,6 +26,11 @@ describe.each(cases)(
     it('generates handlers without throwing', async () => {
       const spec = await parseSpec(specPath)
       generateHandlers(spec, DEFAULT_OPTS)
+    })
+
+    it('generates fixtures without throwing', async () => {
+      const spec = await parseSpec(specPath)
+      generateFixtures(spec, { ...DEFAULT_OPTS, modelsImport: './models.js' })
     })
   },
   120_000

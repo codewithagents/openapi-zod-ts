@@ -79,6 +79,8 @@ Or add to `package.json`:
 }
 ```
 
+Testing the hooks? The output directory also gets a generated `test-utils.ts` with `createTestQueryClient()` (no retries, `gcTime: 0`) and `createWrapper()` (a `QueryClientProvider` wrapper for `renderHook`), so you do not hand-write that setup. See [Testing](#testing).
+
 ## What gets generated
 
 Given a spec with a `/tasks` resource, `hooks.ts` contains:
