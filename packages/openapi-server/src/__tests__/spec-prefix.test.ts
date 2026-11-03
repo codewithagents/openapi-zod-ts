@@ -107,6 +107,18 @@ describe('resolvePrefixedSchemaNames', () => {
     }
   })
 
+  it('only strips at a word boundary: an unprefixed export sharing the prefix letters is kept', () => {
+    // spec_prefix "Admin" must not turn the unprefixed AdministratorSchema into istratorSchema.
+    const r = resolvePrefixedSchemaNames(
+      new Set(['AdministratorSchema', 'AdminUserSchema']),
+      'Admin'
+    )
+    expect([...r.schemaNames].sort()).toEqual(['AdministratorSchema', 'UserSchema'])
+    expect(r.importAliases.get('UserSchema')).toBe('AdminUserSchema')
+    expect(r.importAliases.has('istratorSchema')).toBe(false)
+    expect(r.importAliases.has('AdministratorSchema')).toBe(false)
+  })
+
   it('does not strip when nothing but "Schema" would remain', () => {
     const r = resolvePrefixedSchemaNames(new Set(['PublicApiSchema']), 'PublicApi')
     expect([...r.schemaNames]).toEqual(['PublicApiSchema'])

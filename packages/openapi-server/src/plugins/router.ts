@@ -911,14 +911,14 @@ function buildRouteHandler(
           return `    ${q.name}: ${honoArrayQueryExpr(q)}`
         }
         if (q.tsType === 'number') {
-          return `    ${q.name}: c.req.query('${q.name}') !== undefined ? Number(c.req.query('${q.name}')) : undefined`
+          return `    ${q.name}: c.req.query('${q.rawName}') !== undefined ? Number(c.req.query('${q.rawName}')) : undefined`
         }
         if (q.tsType === 'boolean') {
           // 'true'/'false' become booleans; anything else is passed through unchanged so the
           // z.boolean() validation below still rejects it with 422 (absent stays undefined).
           return `    ${q.name}: _toQueryBool(c.req.query('${q.rawName}'))`
         }
-        return `    ${q.name}: c.req.query('${q.name}') ?? undefined`
+        return `    ${q.name}: c.req.query('${q.rawName}') ?? undefined`
       })
       .join(',\n')
     lines.push(`${indent}  const params = {`)
@@ -1161,13 +1161,13 @@ function buildExpressRouteHandler(
         }
         if (q.tsType === 'number') {
           // Guard undefined so an absent optional param stays undefined instead of NaN (→ 422).
-          return `    ${q.name}: req.query['${q.name}'] !== undefined ? Number(req.query['${q.name}'] as string) : undefined`
+          return `    ${q.name}: req.query['${q.rawName}'] !== undefined ? Number(req.query['${q.rawName}'] as string) : undefined`
         }
         if (q.tsType === 'boolean') {
           // Absent stays undefined; values other than 'true'/'false' still fail z.boolean().
-          return `    ${q.name}: _toQueryBool(req.query['${q.name}'])`
+          return `    ${q.name}: _toQueryBool(req.query['${q.rawName}'])`
         }
-        return `    ${q.name}: req.query['${q.name}'] as string | undefined`
+        return `    ${q.name}: req.query['${q.rawName}'] as string | undefined`
       })
       .join(',\n')
     lines.push(`${indent}  const params = {`)

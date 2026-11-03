@@ -344,9 +344,12 @@ describe('generateRouter', () => {
     // Normalized names must be used as TypeScript property names in the params object
     expect(result.content).toContain('projectIds')
     expect(result.content).toContain('eventTypes')
-    // Raw names with [] must not appear in generated TypeScript
-    expect(result.content).not.toContain('project_ids[]')
-    expect(result.content).not.toContain('event_types[]')
+    // Raw names with [] must not be used as property names; they only appear as the quoted
+    // URL key the value is read from.
+    expect(result.content).toContain("projectIds: c.req.query('project_ids[]')")
+    expect(result.content).toContain("eventTypes: c.req.query('event_types[]')")
+    expect(result.content).not.toMatch(/['"]?project_ids\[\]['"]?\s*:/)
+    expect(result.content).not.toMatch(/['"]?event_types\[\]['"]?\s*:/)
   })
 
   it('path param with hyphens like {job-id}: c.req.param uses raw name from path', () => {

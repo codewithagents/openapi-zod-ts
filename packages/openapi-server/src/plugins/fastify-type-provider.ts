@@ -546,10 +546,13 @@ function buildParamsSchemaExpr(op: RouteOperation, spec: OpenAPIV3_1.Document): 
  * Returns undefined when no complex query params are present.
  */
 function buildPreValidationLines(queryParams: QueryParam[]): string[] | undefined {
-  const hasComplex = queryParams.some(
-    (q) => q.isDeepObject === true || q.delimiterStyle !== undefined
+  // A param whose URL key differs from its normalized identifier (e.g. `is-active` ->
+  // `isActive`) also needs the reshape: the querystring schema and the service type are keyed
+  // by the identifier, but Fastify parses req.query with the raw URL keys.
+  const needsReshape = queryParams.some(
+    (q) => q.isDeepObject === true || q.delimiterStyle !== undefined || q.name !== q.rawName
   )
-  if (!hasComplex) return undefined
+  if (!needsReshape) return undefined
 
   const lines: string[] = []
   lines.push(`      const _dq = req.query as unknown as Record<string, string | undefined>`)

@@ -40,8 +40,10 @@ export function resolvePrefixedSchemaNames(
   const schemaNames = new Set<string>()
   for (const name of exported) {
     const bare = name.startsWith(specPrefix) ? name.slice(specPrefix.length) : undefined
-    // Only strip when what remains is still a `${Type}Schema` identifier (Type non-empty).
-    if (bare !== undefined && bare.length > 'Schema'.length && /^[A-Za-z_$]/.test(bare)) {
+    // Only strip at a word boundary: generated type names are PascalCase, so what remains must
+    // start with an uppercase letter (`Admin` + `UserSchema`, not `Admin` + `istratorSchema`)
+    // and still be a `${Type}Schema` identifier (Type non-empty).
+    if (bare !== undefined && bare.length > 'Schema'.length && /^[A-Z]/.test(bare)) {
       schemaNames.add(bare)
       importAliases.set(bare, name)
     } else {
