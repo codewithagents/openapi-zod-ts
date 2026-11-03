@@ -319,7 +319,7 @@ describe('integer query param generates z.coerce.number() validation', () => {
 
 // ── Query param: boolean coercion (#314) ─────────────────────────────────────
 
-describe('boolean query param coerces via === "true" on Fastify (#314)', () => {
+describe('boolean query param coerces from the query string (#314)', () => {
   const boolQuerySpec = makeSpec({
     '/items': {
       get: {
@@ -333,29 +333,32 @@ describe('boolean query param coerces via === "true" on Fastify (#314)', () => {
     },
   })
 
-  it('Fastify: wires boolean params as z.boolean() in schema.querystring (no string coercion)', () => {
+  // Fastify's querystring parser never converts types, so z.boolean() rejected ?active=true
+  // with 400 (see query-scalar-coercion.test.ts for the runtime proof). The querystring
+  // schema now accepts exactly 'true'/'false' and transforms them to a boolean.
+  const boolExpr = "z.enum(['true', 'false']).transform((v) => v === 'true')"
+
+  it('Fastify: wires boolean params as a strict string->boolean transform (no z.coerce.boolean)', () => {
     const { content } = generateFastifyRouter(boolQuerySpec)
-    // New: boolean params declared as z.boolean() in querystring schema
-    expect(content).toContain('z.boolean()')
+    expect(content).toContain(boolExpr)
+    // z.coerce.boolean would turn any non-empty string (e.g. 'false') into true.
     expect(content).not.toContain('z.coerce.boolean')
-    // No manual string coercion - the type-provider handles booleans natively
-    expect(content).not.toContain("=== 'true'")
   })
 
-  it('Fastify: required boolean param appears in querystring schema as z.boolean()', () => {
+  it('Fastify: required boolean param appears in querystring schema without .optional()', () => {
     const { content } = generateFastifyRouter(boolQuerySpec)
-    expect(content).toContain('active: z.boolean()')
+    expect(content).toContain(`active: ${boolExpr},`)
   })
 
-  it('Fastify: optional boolean param appears in querystring schema as z.boolean().optional()', () => {
+  it('Fastify: optional boolean param appears in querystring schema with .optional()', () => {
     const { content } = generateFastifyRouter(boolQuerySpec)
-    expect(content).toContain('deleted: z.boolean().optional()')
+    expect(content).toContain(`deleted: ${boolExpr}.optional()`)
   })
 
-  it('Express: coerces boolean param via === "true" in extraction', () => {
+  it('Express: coerces boolean params via the _toQueryBool helper in extraction', () => {
     const { content } = generateExpressRouter(boolQuerySpec)
-    expect(content).toContain("active: req.query['active'] === 'true'")
-    expect(content).toContain("deleted: req.query['deleted'] === 'true'")
+    expect(content).toContain("active: _toQueryBool(req.query['active'])")
+    expect(content).toContain("deleted: _toQueryBool(req.query['deleted'])")
   })
 })
 

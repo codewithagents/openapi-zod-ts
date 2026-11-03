@@ -25,6 +25,7 @@ import {
   objectPathItemEntries,
 } from './shared.js'
 import { escapeJsDocString, deriveEffectiveSecurity } from './security-meta.js'
+import { formatSchemaImportSpecifiers } from './schema-prefix.js'
 
 // ── Simple header/cookie param descriptors (service-interface generation only) ─
 
@@ -437,7 +438,8 @@ export interface FastifyServiceOptions {
  */
 export function generateFastifyTypes(
   schemaNames: Set<string>,
-  schemaImportPath: string
+  schemaImportPath: string,
+  schemaImportAliases?: Map<string, string>
 ): GeneratedFile {
   // Collect aliases in sorted order for deterministic output.
   const aliases: Array<{ typeName: string; schemaName: string }> = []
@@ -462,8 +464,11 @@ export function generateFastifyTypes(
   lines.push("import { z } from 'zod'")
 
   if (aliases.length > 0) {
-    const sortedSchemaNames = aliases.map((a) => a.schemaName).join(', ')
-    lines.push(`import { ${sortedSchemaNames} } from '${schemaImportPath}'`)
+    const specifiers = formatSchemaImportSpecifiers(
+      aliases.map((a) => a.schemaName),
+      schemaImportAliases
+    )
+    lines.push(`import { ${specifiers} } from '${schemaImportPath}'`)
   }
 
   lines.push('')
