@@ -14,23 +14,23 @@
   "dependencies": {
     "@codewithagents/openapi-react-query": "workspace:*",
     "@codewithagents/openapi-server": "workspace:*",
-    "@hono/node-server": "^2.0.5",
+    "@hono/node-server": "^2.1.6",
     "@tanstack/react-query": "catalog:",
-    "hono": "^4.12.26",
+    "hono": "^4.13.16",
     "openapi-zod-ts": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "zod": "^4.4.3"
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "@playwright/test": "^1.61.0",
+    "@playwright/test": "^1.64.1",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@vitejs/plugin-react": "^6.0.2",
-    "concurrently": "^10.0.3",
-    "tsx": "^4.22.4",
+    "@vitejs/plugin-react": "^6.2.1",
+    "concurrently": "^10.0.6",
+    "tsx": "^4.23.15",
     "typescript": "catalog:",
-    "vite": "^8.0.16"
+    "vite": "^8.3.5"
   }
 }

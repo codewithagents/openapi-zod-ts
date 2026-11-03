@@ -25,12 +25,12 @@
     "dev": "tsc -p tsconfig.build.json --watch"
   },
   "dependencies": {
-    "openapi-zod-ts": "workspace:*",
     "openapi-types": "catalog:",
+    "openapi-zod-ts": "workspace:*",
     "prettier": "catalog:"
   },
   "peerDependencies": {
-    "@fastify/formbody": "^8",
+    "@fastify/formbody": "^8 || ^9",
     "@fastify/multipart": "^10",
     "fastify": "^5",
     "fastify-type-provider-zod": "^6 || ^7"
@@ -56,9 +56,9 @@
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "esbuild": "catalog:",
-    "express": "^5.2.1",
+    "express": "^5.3.0",
     "fast-check": "catalog:",
-    "hono": "^4.12.26",
+    "hono": "^4.13.16",
     "typescript": "catalog:",
     "vitest": "catalog:",
     "zod": "catalog:"

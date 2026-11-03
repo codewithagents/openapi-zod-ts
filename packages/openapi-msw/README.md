@@ -34,8 +34,8 @@ pnpm add msw @faker-js/faker
 
 | Peer dependency | Range |
 |---|---|
-| `msw` | `^2.0.0` |
-| `@faker-js/faker` | `^9.0.0` |
+| `msw` | `^2.0.0 \|\| ^3.0.0` |
+| `@faker-js/faker` | `^10.5.0` |
 
 This package depends on [`openapi-zod-ts`](../openapi-zod-ts) for spec parsing and shared config plumbing, but it does not require you to generate models or a client. Run it standalone or alongside the rest of the suite.
 

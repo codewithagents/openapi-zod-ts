@@ -16,11 +16,11 @@
   "dependencies": {
     "@codewithagents/openapi-react-query": "workspace:*",
     "@codewithagents/openapi-server": "workspace:*",
-    "@fastify/formbody": "^8.0.2",
-    "@fastify/multipart": "^10.0.0",
-    "@fastify/static": "^9.1.3",
+    "@fastify/formbody": "^9.0.1",
+    "@fastify/multipart": "^10.1.7",
+    "@fastify/static": "^10.1.8",
     "@tanstack/react-query": "catalog:",
-    "fastify": "^5.8.5",
+    "fastify": "^5.12.8",
     "fastify-type-provider-zod": "^7.0.0",
     "openapi-zod-ts": "workspace:*",
     "react": "catalog:",
@@ -28,15 +28,15 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@playwright/test": "^1.61.0",
+    "@playwright/test": "^1.64.1",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@vitejs/plugin-react": "^6.0.2",
-    "concurrently": "^10.0.3",
-    "tsx": "^4.22.4",
+    "@vitejs/plugin-react": "^6.2.1",
+    "concurrently": "^10.0.6",
+    "tsx": "^4.23.15",
     "typescript": "catalog:",
-    "vite": "^8.0.16",
+    "vite": "^8.3.5",
     "vitest": "catalog:"
   }
 }
