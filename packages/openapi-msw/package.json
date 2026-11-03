@@ -1,6 +1,6 @@
 {
   "name": "@codewithagents/openapi-msw",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Generate MSW v2 handlers with seeded Faker mock data from OpenAPI 3.1 specs",
   "type": "module",
   "engines": {
