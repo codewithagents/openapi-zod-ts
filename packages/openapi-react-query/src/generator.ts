@@ -50,6 +50,7 @@ async function generateOne(cwd: string, config: ReactQueryConfig, label?: string
       infiniteQuery: config.infinite_query,
       typedErrors: config.typed_errors,
       queries: config.queries,
+      optimisticUpdates: config.optimistic_updates,
     }),
     generateTestUtils(spec),
   ]

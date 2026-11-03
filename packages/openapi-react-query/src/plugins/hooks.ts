@@ -41,6 +41,12 @@ export interface HookGenOptions {
    * queryOptions factory for a dynamic number of parallel queries. Default: false.
    */
   queries?: boolean
+  /**
+   * When true, mutation hooks accept an `optimistic: { queryKey, updater }` option
+   * that applies an optimistic cache update with snapshot rollback on error and
+   * invalidation on settle, composed with the caller's callbacks. Default: false.
+   */
+  optimisticUpdates?: boolean
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -874,80 +880,195 @@ function buildMutationVars(
   }
 }
 
+/**
+ * Emits the auto-invalidation `onSuccess` for a mutation hook. `optionsRef` is
+ * the expression holding the caller's options (`options?`, or the optimistic
+ * wrapper's `mutationOptions`) whose `onSuccess` is composed inside.
+ */
+function buildAutoInvalidateOnSuccess(
+  op: OperationMeta,
+  invalidateInfo: MutationInvalidateInfo,
+  optionsRef: string
+): string[] {
+  const { pathParams, hasBody, hasQueryParams } = op
+  const { keyFactoryName, detailKeyName } = invalidateInfo
+  const canInvalidateDetail =
+    detailKeyName !== undefined &&
+    pathParams.length >= 1 &&
+    (op.method === 'put' || op.method === 'patch')
+
+  // How to reference the first path param from variables in onSuccess: a lone
+  // path param IS the variables value, otherwise it is a property.
+  const detailIdRef =
+    pathParams.length === 1 && !hasBody && !hasQueryParams
+      ? 'variables'
+      : `variables.${pathParams[0]}`
+
+  const lines: string[] = []
+  lines.push(`    onSuccess: (...args) => {`)
+  if (canInvalidateDetail) {
+    lines.push(`      const [, variables] = args`)
+  }
+  lines.push(`      queryClient.invalidateQueries({ queryKey: ${keyFactoryName}.all() })`)
+  if (canInvalidateDetail) {
+    lines.push(
+      `      queryClient.invalidateQueries({ queryKey: ${keyFactoryName}.${detailKeyName}(${detailIdRef}) })`
+    )
+  }
+  lines.push(`      ${optionsRef}.onSuccess?.(...args)`)
+  lines.push(`    },`)
+  return lines
+}
+
 function buildMutationHook(
   op: OperationMeta,
   autoInvalidate: boolean,
-  invalidateInfo: MutationInvalidateInfo | undefined
+  invalidateInfo: MutationInvalidateInfo | undefined,
+  optimistic = false
 ): string {
   const lines: string[] = []
-  const { funcName, hookName, pathParams, hasBody, hasQueryParams } = op
+  const { funcName, hookName, pathParams, hasBody } = op
 
   // Compute the index of the params argument in the client function signature
   const paramsArgIndex = pathParams.length + (hasBody ? 1 : 0)
 
   const { variablesType, mutationFnBody } = buildMutationVars(op, paramsArgIndex)
+  const dataType = `Awaited<ReturnType<typeof ${funcName}>>`
 
   // @deprecated JSDoc on deprecated operations
   if (op.deprecated) {
     lines.push(`/** @deprecated */`)
   }
-  lines.push(`export function ${hookName}(`)
-  lines.push(
-    `  options?: Omit<UseMutationOptions<Awaited<ReturnType<typeof ${funcName}>>, ${op.errorType}, ${variablesType}>, 'mutationFn'>,`
-  )
+  if (optimistic) {
+    // TContext types the caller's own onMutate result; TQueryData is inferred
+    // from the optimistic updater's `old` parameter annotation.
+    lines.push(`export function ${hookName}<TContext = unknown, TQueryData = unknown>(`)
+    lines.push(
+      `  options?: Omit<UseMutationOptions<${dataType}, ${op.errorType}, ${variablesType}, TContext>, 'mutationFn'> & { optimistic?: OptimisticUpdate<${variablesType}, TQueryData> },`
+    )
+  } else {
+    lines.push(`export function ${hookName}(`)
+    lines.push(
+      `  options?: Omit<UseMutationOptions<${dataType}, ${op.errorType}, ${variablesType}>, 'mutationFn'>,`
+    )
+  }
   lines.push(`) {`)
 
   const shouldInvalidate = autoInvalidate && invalidateInfo !== undefined
-  if (shouldInvalidate) {
+  if (shouldInvalidate || optimistic) {
     lines.push(`  const queryClient = useQueryClient()`)
   }
-
-  lines.push(
-    `  return useMutation<Awaited<ReturnType<typeof ${funcName}>>, ${op.errorType}, ${variablesType}>({`
-  )
+  if (optimistic) {
+    lines.push(`  const mutationOptions = _withOptimisticUpdate(queryClient, options)`)
+    lines.push(
+      `  return useMutation<${dataType}, ${op.errorType}, ${variablesType}, OptimisticContext<TContext>>({`
+    )
+  } else {
+    lines.push(`  return useMutation<${dataType}, ${op.errorType}, ${variablesType}>({`)
+  }
   lines.push(`    mutationFn: ${mutationFnBody},`)
   // Spread options first so caller can override mutationFn-unrelated options (e.g. retry, meta).
   // onSuccess must come AFTER the spread so the auto-invalidation logic always runs —
   // the caller's onSuccess is composed via options?.onSuccess?.(...args) inside.
-  lines.push(`    ...options,`)
+  lines.push(optimistic ? `    ...mutationOptions,` : `    ...options,`)
 
   if (shouldInvalidate) {
-    const { keyFactoryName, detailKeyName } = invalidateInfo
-    const canInvalidateDetail =
-      detailKeyName !== undefined &&
-      pathParams.length >= 1 &&
-      (op.method === 'put' || op.method === 'patch')
-
-    // Determine how to reference the first path param from variables in onSuccess
-    let detailIdRef: string
-    if (pathParams.length === 1 && !hasBody && !hasQueryParams) {
-      // variablesType is 'string' — variables IS the id directly
-      detailIdRef = 'variables'
-    } else if (pathParams.length >= 1) {
-      // variablesType is an object — access via property name
-      detailIdRef = `variables.${pathParams[0]}`
-    } else {
-      detailIdRef = 'variables'
-    }
-
-    lines.push(`    onSuccess: (...args) => {`)
-    if (canInvalidateDetail) {
-      lines.push(`      const [, variables] = args`)
-    }
-    lines.push(`      queryClient.invalidateQueries({ queryKey: ${keyFactoryName}.all() })`)
-    if (canInvalidateDetail) {
-      lines.push(
-        `      queryClient.invalidateQueries({ queryKey: ${keyFactoryName}.${detailKeyName}(${detailIdRef}) })`
+    lines.push(
+      ...buildAutoInvalidateOnSuccess(
+        op,
+        invalidateInfo,
+        optimistic ? 'mutationOptions' : 'options?'
       )
-    }
-    lines.push(`      options?.onSuccess?.(...args)`)
-    lines.push(`    },`)
+    )
   }
 
   lines.push(`  })`)
   lines.push(`}`)
 
   return lines.join('\n')
+}
+
+/**
+ * Shared optimistic-update helpers, emitted once when `optimisticUpdates` is on.
+ *
+ * Follows the TanStack Query v5 optimistic-update recipe: onMutate cancels
+ * in-flight queries for the key, snapshots the cached value and applies the
+ * updater; onError rolls back (or resets an entry that was not cached before);
+ * onSettled invalidates the key so the server state wins. The caller's own
+ * onMutate / onError / onSuccess / onSettled still run, receiving their own
+ * onMutate result as context. Extra callback arguments are forwarded with rest
+ * parameters so the helper works across @tanstack/react-query 5.x signatures.
+ */
+function buildOptimisticHelpers(): string {
+  return `/** Optimistic cache update for a generated mutation hook (the \`optimistic\` option). */
+export interface OptimisticUpdate<TVariables, TQueryData = unknown> {
+  /** Cache entry to update before the request runs; may be derived from the variables. */
+  queryKey: QueryKey | ((variables: TVariables) => QueryKey)
+  /** Next cache value, from the current one (undefined when not cached) and the variables. */
+  updater: (old: TQueryData | undefined, variables: TVariables) => TQueryData | undefined
+}
+
+/** Mutation context threaded from onMutate to onError / onSettled by optimistic hooks. */
+export interface OptimisticContext<TContext> {
+  /** The optimistically updated key, when an \`optimistic\` option was given. */
+  queryKey: QueryKey | undefined
+  /** Whether the key held data before the optimistic update. */
+  hadPrevious: boolean
+  /** Snapshot taken before the optimistic update, restored on error. */
+  previous: unknown
+  /** The caller's own onMutate result. */
+  context: TContext | undefined
+}
+
+function _withOptimisticUpdate<TData, TError, TVariables, TContext, TQueryData>(
+  queryClient: QueryClient,
+  options:
+    | (Omit<UseMutationOptions<TData, TError, TVariables, TContext>, 'mutationFn'> & {
+        optimistic?: OptimisticUpdate<TVariables, TQueryData>
+      })
+    | undefined,
+): Omit<UseMutationOptions<TData, TError, TVariables, OptimisticContext<TContext>>, 'mutationFn'> {
+  const { optimistic, onMutate, onError, onSuccess, onSettled, ...rest } = options ?? {}
+  return {
+    ...rest,
+    onMutate: async (variables, ...args) => {
+      let queryKey: QueryKey | undefined
+      let previous: unknown
+      let hadPrevious = false
+      if (optimistic !== undefined) {
+        const key =
+          typeof optimistic.queryKey === 'function'
+            ? optimistic.queryKey(variables)
+            : optimistic.queryKey
+        queryKey = key
+        await queryClient.cancelQueries({ queryKey: key })
+        previous = queryClient.getQueryData(key)
+        hadPrevious = previous !== undefined
+        queryClient.setQueryData<TQueryData>(key, (old) => optimistic.updater(old, variables))
+      }
+      const context = await onMutate?.(variables, ...args)
+      return { queryKey, hadPrevious, previous, context }
+    },
+    onError: (error, variables, result, ...args) => {
+      if (result?.queryKey !== undefined) {
+        if (result.hadPrevious) {
+          queryClient.setQueryData(result.queryKey, result.previous)
+        } else {
+          void queryClient.resetQueries({ queryKey: result.queryKey, exact: true })
+        }
+      }
+      return onError?.(error, variables, result?.context, ...args)
+    },
+    onSuccess: (data, variables, result, ...args) =>
+      onSuccess?.(data, variables, result.context as TContext, ...args),
+    onSettled: (data, error, variables, result, ...args) => {
+      if (result?.queryKey !== undefined) {
+        void queryClient.invalidateQueries({ queryKey: result.queryKey })
+      }
+      return onSettled?.(data, error, variables, result?.context, ...args)
+    },
+  }
+}`
 }
 
 // ── Main generator ─────────────────────────────────────────────────────────────
@@ -1058,6 +1179,7 @@ export function generateHooks(
     infiniteQuery = 'auto',
     typedErrors = false,
     queries = false,
+    optimisticUpdates = false,
   } = options
 
   // Collect all operations (metadata extraction separated from string emission)
@@ -1216,7 +1338,9 @@ export function generateHooks(
         invalidateInfo = { keyFactoryName, detailKeyName }
       }
     }
-    mutationHookBlocks.push(buildMutationHook(op, autoInvalidate, invalidateInfo))
+    mutationHookBlocks.push(
+      buildMutationHook(op, autoInvalidate, invalidateInfo, optimisticUpdates)
+    )
   }
 
   // Determine which react-query exports to import
@@ -1224,7 +1348,8 @@ export function generateHooks(
   const needsUseQuery = getOps.length > 0
   const needsUseMutation = mutationOps.length > 0
   const needsUseSuspenseQuery = suspense && getOps.length > 0
-  const needsUseQueryClient = autoInvalidate && needsUseMutation
+  const needsOptimistic = optimisticUpdates && needsUseMutation
+  const needsUseQueryClient = (autoInvalidate || optimisticUpdates) && needsUseMutation
   const rqImports: string[] = []
   if (needsQueryOptions) rqImports.push('queryOptions')
   if (needsUseQuery) rqImports.push('useQuery', 'type UseQueryOptions')
@@ -1239,6 +1364,10 @@ export function generateHooks(
     )
   if (needsUseMutation) rqImports.push('useMutation', 'type UseMutationOptions')
   if (needsUseQueryClient) rqImports.push('useQueryClient')
+  if (needsOptimistic) {
+    rqImports.push('type QueryClient')
+    if (!needsUseInfiniteQuery) rqImports.push('type QueryKey')
+  }
 
   // Collect all function names for client import
   const allFuncNames = operations.map((op) => op.funcName).sort()
@@ -1283,6 +1412,10 @@ export function generateHooks(
   if (mutationHookBlocks.length > 0) {
     lines.push('// ── Mutations ────────────────────────────────────────────────')
     lines.push('')
+    if (needsOptimistic) {
+      lines.push(buildOptimisticHelpers())
+      lines.push('')
+    }
     lines.push(mutationHookBlocks.join('\n\n'))
     lines.push('')
   }

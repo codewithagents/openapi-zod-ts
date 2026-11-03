@@ -29,6 +29,7 @@ Default: `openapi-react-query.config.json` in CWD. Fields:
 - `infinite_query?`: `boolean | 'auto'`, controls `useXxxInfinite` generation (default: `'auto'`)
 - `typed_errors?`: when true, hooks type TError as the client's per-operation alias (`GetPetError`, from `buildOperationErrorTypeNames`) instead of bare `ApiError` (default: false; opt-in because narrowing to documented statuses breaks `error.status === <undocumented>` comparisons)
 - `queries?`: when true, emits `useXxxQueries(paramsList, options?, combine?)` (a `useQueries` wrapper over the queryOptions factory) per GET op with parameters (default: false)
+- `optimistic_updates?`: when true, mutation hooks take `<TContext, TQueryData>` generics and an `optimistic?: { queryKey, updater }` option, routed through a once-emitted `_withOptimisticUpdate` helper (default: false)
 
 `--config <path>` resolves relative paths from config file's directory (same pattern as openapi-zod-ts).
 

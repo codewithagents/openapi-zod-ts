@@ -57,6 +57,7 @@ Create `openapi-react-query.config.json` in your project root:
 | `infinite_query` | No | `'auto'` | `boolean \| 'auto'`. Generates a `useXxxInfinite` hook for paginated list operations. `'auto'` detects paginated GETs; `true` forces generation, `false` disables it |
 | `typed_errors` | No | `false` | When `true`, hooks type their error as the client's per-operation error alias (e.g. `GetTaskError`), so `error.status` narrows `error.body` (see [Typed per-status errors](#typed-per-status-errors)) |
 | `queries` | No | `false` | When `true`, generates a `useXxxQueries(paramsList, options?, combine?)` hook per GET operation with parameters, for a dynamic number of parallel queries (see [Dynamic parallel queries](#dynamic-parallel-queries)) |
+| `optimistic_updates` | No | `false` | When `true`, mutation hooks accept an `optimistic: { queryKey, updater }` option that updates the cache before the request and rolls back on error (see [Optimistic updates](#optimistic-updates)) |
 | `overrides` | No | none | Per-resource cache timing (see [Per-resource cache timing](#per-resource-cache-timing)) |
 
 ## Generate
@@ -318,6 +319,29 @@ Invalidation scope:
 - `DELETE` → invalidates `resourceKeys.all()`
 
 Your `onSuccess` callback (if provided in `options`) is called after invalidation.
+
+## Optimistic updates
+
+When `optimistic_updates: true` in config, every mutation hook accepts an `optimistic` option implementing the TanStack Query v5 optimistic-update recipe:
+
+```ts
+const update = useUpdateTask({
+  optimistic: {
+    // static key, or derived from the mutation variables
+    queryKey: (vars) => taskKeys.detail(vars.id),
+    // annotate `old` to type the cache entry
+    updater: (old: Task | undefined, vars) => old && { ...old, ...vars.body },
+  },
+})
+update.mutate({ id: '123', body: { title: 'Renamed' } }) // the UI updates immediately
+```
+
+What the generated hook does:
+- **onMutate**: `cancelQueries` for the key (so an in-flight fetch cannot overwrite the optimistic value), snapshots `getQueryData`, then `setQueryData` with your `updater`.
+- **onError**: restores the snapshot (or resets the entry if it was not cached before).
+- **onSettled**: invalidates the key so the server state wins.
+
+Your own `onMutate` / `onError` / `onSuccess` / `onSettled` still run. `onMutate` runs after the optimistic write, and whatever it returns is passed to your other callbacks as their context, exactly as without the option. With `auto_invalidate: true` the resource invalidation runs on success as well. Without an `optimistic` option the hooks behave exactly like plain mutations. The hooks export `OptimisticUpdate<TVariables, TQueryData>` and `OptimisticContext<TContext>` types.
 
 ## Per-resource cache timing
 

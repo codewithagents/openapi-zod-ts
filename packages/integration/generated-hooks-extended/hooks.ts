@@ -13,6 +13,7 @@ import {
   useMutation,
   type UseMutationOptions,
   useQueryClient,
+  type QueryClient,
 } from '@tanstack/react-query'
 import {
   createTask,
@@ -174,104 +175,191 @@ export function useGetTaskQueries<
 
 // ── Mutations ────────────────────────────────────────────────
 
-export function useCreateTask(
+/** Optimistic cache update for a generated mutation hook (the `optimistic` option). */
+export interface OptimisticUpdate<TVariables, TQueryData = unknown> {
+  /** Cache entry to update before the request runs; may be derived from the variables. */
+  queryKey: QueryKey | ((variables: TVariables) => QueryKey)
+  /** Next cache value, from the current one (undefined when not cached) and the variables. */
+  updater: (old: TQueryData | undefined, variables: TVariables) => TQueryData | undefined
+}
+
+/** Mutation context threaded from onMutate to onError / onSettled by optimistic hooks. */
+export interface OptimisticContext<TContext> {
+  /** The optimistically updated key, when an `optimistic` option was given. */
+  queryKey: QueryKey | undefined
+  /** Whether the key held data before the optimistic update. */
+  hadPrevious: boolean
+  /** Snapshot taken before the optimistic update, restored on error. */
+  previous: unknown
+  /** The caller's own onMutate result. */
+  context: TContext | undefined
+}
+
+function _withOptimisticUpdate<TData, TError, TVariables, TContext, TQueryData>(
+  queryClient: QueryClient,
+  options:
+    | (Omit<UseMutationOptions<TData, TError, TVariables, TContext>, 'mutationFn'> & {
+        optimistic?: OptimisticUpdate<TVariables, TQueryData>
+      })
+    | undefined
+): Omit<UseMutationOptions<TData, TError, TVariables, OptimisticContext<TContext>>, 'mutationFn'> {
+  const { optimistic, onMutate, onError, onSuccess, onSettled, ...rest } = options ?? {}
+  return {
+    ...rest,
+    onMutate: async (variables, ...args) => {
+      let queryKey: QueryKey | undefined
+      let previous: unknown
+      let hadPrevious = false
+      if (optimistic !== undefined) {
+        const key =
+          typeof optimistic.queryKey === 'function'
+            ? optimistic.queryKey(variables)
+            : optimistic.queryKey
+        queryKey = key
+        await queryClient.cancelQueries({ queryKey: key })
+        previous = queryClient.getQueryData(key)
+        hadPrevious = previous !== undefined
+        queryClient.setQueryData<TQueryData>(key, (old) => optimistic.updater(old, variables))
+      }
+      const context = await onMutate?.(variables, ...args)
+      return { queryKey, hadPrevious, previous, context }
+    },
+    onError: (error, variables, result, ...args) => {
+      if (result?.queryKey !== undefined) {
+        if (result.hadPrevious) {
+          queryClient.setQueryData(result.queryKey, result.previous)
+        } else {
+          void queryClient.resetQueries({ queryKey: result.queryKey, exact: true })
+        }
+      }
+      return onError?.(error, variables, result?.context, ...args)
+    },
+    onSuccess: (data, variables, result, ...args) =>
+      onSuccess?.(data, variables, result.context as TContext, ...args),
+    onSettled: (data, error, variables, result, ...args) => {
+      if (result?.queryKey !== undefined) {
+        void queryClient.invalidateQueries({ queryKey: result.queryKey })
+      }
+      return onSettled?.(data, error, variables, result?.context, ...args)
+    },
+  }
+}
+
+export function useCreateTask<TContext = unknown, TQueryData = unknown>(
   options?: Omit<
     UseMutationOptions<
       Awaited<ReturnType<typeof createTask>>,
       CreateTaskError,
-      Parameters<typeof createTask>[0]
+      Parameters<typeof createTask>[0],
+      TContext
     >,
     'mutationFn'
-  >
+  > & { optimistic?: OptimisticUpdate<Parameters<typeof createTask>[0], TQueryData> }
 ) {
   const queryClient = useQueryClient()
+  const mutationOptions = _withOptimisticUpdate(queryClient, options)
   return useMutation<
     Awaited<ReturnType<typeof createTask>>,
     CreateTaskError,
-    Parameters<typeof createTask>[0]
+    Parameters<typeof createTask>[0],
+    OptimisticContext<TContext>
   >({
     mutationFn: (vars) => createTask(vars),
-    ...options,
+    ...mutationOptions,
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: taskKeys.all() })
-      options?.onSuccess?.(...args)
+      mutationOptions.onSuccess?.(...args)
     },
   })
 }
 
-export function useUploadTaskAttachment(
+export function useUploadTaskAttachment<TContext = unknown, TQueryData = unknown>(
   options?: Omit<
     UseMutationOptions<
       Awaited<ReturnType<typeof uploadTaskAttachment>>,
       ApiError,
-      Parameters<typeof uploadTaskAttachment>[0]
+      Parameters<typeof uploadTaskAttachment>[0],
+      TContext
     >,
     'mutationFn'
-  >
+  > & { optimistic?: OptimisticUpdate<Parameters<typeof uploadTaskAttachment>[0], TQueryData> }
 ) {
   const queryClient = useQueryClient()
+  const mutationOptions = _withOptimisticUpdate(queryClient, options)
   return useMutation<
     Awaited<ReturnType<typeof uploadTaskAttachment>>,
     ApiError,
-    Parameters<typeof uploadTaskAttachment>[0]
+    Parameters<typeof uploadTaskAttachment>[0],
+    OptimisticContext<TContext>
   >({
     mutationFn: (vars) => uploadTaskAttachment(vars),
-    ...options,
+    ...mutationOptions,
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: taskKeys.all() })
-      options?.onSuccess?.(...args)
+      mutationOptions.onSuccess?.(...args)
     },
   })
 }
 
-export function useUpdateTask(
+export function useUpdateTask<TContext = unknown, TQueryData = unknown>(
   options?: Omit<
     UseMutationOptions<
       Awaited<ReturnType<typeof updateTask>>,
       UpdateTaskError,
-      { id: Parameters<typeof updateTask>[0]; body: Parameters<typeof updateTask>[1] }
+      { id: Parameters<typeof updateTask>[0]; body: Parameters<typeof updateTask>[1] },
+      TContext
     >,
     'mutationFn'
-  >
+  > & {
+    optimistic?: OptimisticUpdate<
+      { id: Parameters<typeof updateTask>[0]; body: Parameters<typeof updateTask>[1] },
+      TQueryData
+    >
+  }
 ) {
   const queryClient = useQueryClient()
+  const mutationOptions = _withOptimisticUpdate(queryClient, options)
   return useMutation<
     Awaited<ReturnType<typeof updateTask>>,
     UpdateTaskError,
-    { id: Parameters<typeof updateTask>[0]; body: Parameters<typeof updateTask>[1] }
+    { id: Parameters<typeof updateTask>[0]; body: Parameters<typeof updateTask>[1] },
+    OptimisticContext<TContext>
   >({
     mutationFn: ({ id, body }) => updateTask(id, body),
-    ...options,
+    ...mutationOptions,
     onSuccess: (...args) => {
       const [, variables] = args
       queryClient.invalidateQueries({ queryKey: taskKeys.all() })
       queryClient.invalidateQueries({ queryKey: taskKeys.detail(variables.id) })
-      options?.onSuccess?.(...args)
+      mutationOptions.onSuccess?.(...args)
     },
   })
 }
 
-export function useDeleteTask(
+export function useDeleteTask<TContext = unknown, TQueryData = unknown>(
   options?: Omit<
     UseMutationOptions<
       Awaited<ReturnType<typeof deleteTask>>,
       DeleteTaskError,
-      Parameters<typeof deleteTask>[0]
+      Parameters<typeof deleteTask>[0],
+      TContext
     >,
     'mutationFn'
-  >
+  > & { optimistic?: OptimisticUpdate<Parameters<typeof deleteTask>[0], TQueryData> }
 ) {
   const queryClient = useQueryClient()
+  const mutationOptions = _withOptimisticUpdate(queryClient, options)
   return useMutation<
     Awaited<ReturnType<typeof deleteTask>>,
     DeleteTaskError,
-    Parameters<typeof deleteTask>[0]
+    Parameters<typeof deleteTask>[0],
+    OptimisticContext<TContext>
   >({
     mutationFn: (id) => deleteTask(id),
-    ...options,
+    ...mutationOptions,
     onSuccess: (...args) => {
       queryClient.invalidateQueries({ queryKey: taskKeys.all() })
-      options?.onSuccess?.(...args)
+      mutationOptions.onSuccess?.(...args)
     },
   })
 }

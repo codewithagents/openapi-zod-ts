@@ -2,13 +2,20 @@
 // (typed_errors, queries, optimistic_updates). Never called at runtime;
 // tsc --noEmit exercises these patterns on every `pnpm lint` run in CI.
 
-import type { ProblemDetail, Task, ValidationProblem } from '../generated/models.js'
+import type {
+  ProblemDetail,
+  Task,
+  UpdateTaskRequest,
+  ValidationProblem,
+} from '../generated/models.js'
 import type { ApiError } from '../generated/client.js'
 import {
+  taskKeys,
   useGetTask,
   useGetTaskQueries,
   useListTasks,
   useCreateTask,
+  useUpdateTask,
 } from '../generated-hooks-extended/hooks.js'
 
 type Equal<A, B> =
@@ -67,6 +74,37 @@ function _useGetTaskQueriesCombine(ids: readonly string[]) {
   return titles
 }
 
+// ── optimistic_updates (#195) ────────────────────────────────────────────────
+
+// Pattern O1: updater params are typed from the variables; the caller's onMutate
+// result flows to onSuccess / onError as their context.
+function _useUpdateTaskOptimistic() {
+  return useUpdateTask({
+    optimistic: {
+      queryKey: (vars) => taskKeys.detail(vars.id),
+      updater: (old: Task | undefined, vars) => {
+        assertType<Equal<typeof vars.body, UpdateTaskRequest>>()
+        return old && { ...old, ...vars.body, description: old.description }
+      },
+    },
+    onMutate: () => ({ startedAt: 0 }),
+    onSuccess: (_data, _vars, context) => {
+      assertType<Equal<typeof context, { startedAt: number }>>()
+    },
+    onError: (error, _vars, context) => {
+      assertType<Equal<typeof context, { startedAt: number } | undefined>>()
+      assertType<Equal<typeof error.status, 422>>()
+    },
+  })
+}
+
+// Pattern O2: existing (non-optimistic) call sites keep compiling unchanged.
+function _useUpdateTaskPlain() {
+  return useUpdateTask({ onSuccess: (data) => void data.id })
+}
+
+void _useUpdateTaskOptimistic
+void _useUpdateTaskPlain
 void _useGetTaskQueriesResults
 void _useGetTaskQueriesCombine
 void _useGetTaskTypedError

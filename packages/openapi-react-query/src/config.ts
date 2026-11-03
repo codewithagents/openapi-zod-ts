@@ -40,6 +40,11 @@ export interface ReactQueryConfig {
    * wrapper per parameterized GET operation (default: false).
    */
   queries?: boolean
+  /**
+   * When true, mutation hooks accept an `optimistic: { queryKey, updater }` option
+   * for optimistic cache updates with rollback on error (default: false).
+   */
+  optimistic_updates?: boolean
 }
 
 function validateTiming(resource: string, timing: unknown): void {
@@ -85,6 +90,7 @@ function validateReactQueryFields(raw: Record<string, unknown>): void {
   expectBoolean(raw, 'auto_invalidate', '"auto_invalidate" must be a boolean')
   expectBoolean(raw, 'typed_errors', '"typed_errors" must be a boolean')
   expectBoolean(raw, 'queries', '"queries" must be a boolean')
+  expectBoolean(raw, 'optimistic_updates', '"optimistic_updates" must be a boolean')
   validateInfiniteQuery(raw['infinite_query'])
   if (raw['overrides'] !== undefined) validateOverrides(raw['overrides'])
 }
@@ -105,6 +111,7 @@ function parseReactQueryConfig(
     infinite_query: raw['infinite_query'] as boolean | 'auto' | undefined,
     typed_errors: raw['typed_errors'] as boolean | undefined,
     queries: raw['queries'] as boolean | undefined,
+    optimistic_updates: raw['optimistic_updates'] as boolean | undefined,
   }
 }
 

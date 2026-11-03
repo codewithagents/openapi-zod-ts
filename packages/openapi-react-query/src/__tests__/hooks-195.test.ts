@@ -225,3 +225,107 @@ describe('#195 useXxxQueries: queries option', () => {
     )
   })
 })
+
+describe('#195 optimistic update scaffolding: optimisticUpdates option', () => {
+  it('is off by default: no helpers, mutation hooks unchanged', () => {
+    const { content } = generateHooks(spec, { staleTime: 0, gcTime: 0 })
+    expect(content).not.toContain('OptimisticUpdate')
+    expect(content).not.toContain('_withOptimisticUpdate')
+    expect(content).not.toContain('useQueryClient')
+  })
+
+  it('emits the helpers once and imports QueryClient / QueryKey / useQueryClient', () => {
+    const { content } = generateHooks(spec, { staleTime: 0, gcTime: 0, optimisticUpdates: true })
+    expect(content.match(/export interface OptimisticUpdate</g)).toHaveLength(1)
+    expect(content).toContain('export interface OptimisticContext<TContext>')
+    expect(content.match(/function _withOptimisticUpdate</g)).toHaveLength(1)
+    expect(content).toContain('useQueryClient, type QueryClient')
+    // QueryKey is already imported for the paginated list's infinite hook.
+    expect(content.match(/type QueryKey\b/g)).toHaveLength(1)
+  })
+
+  it('imports QueryKey for the helpers when no infinite hook needs it', () => {
+    const { content } = generateHooks(spec, {
+      staleTime: 0,
+      gcTime: 0,
+      optimisticUpdates: true,
+      infiniteQuery: false,
+    })
+    expect(content).toContain('useQueryClient, type QueryClient, type QueryKey }')
+  })
+
+  it('helper follows cancel → snapshot → set, rollback on error, invalidate on settle', () => {
+    const { content } = generateHooks(spec, { staleTime: 0, gcTime: 0, optimisticUpdates: true })
+    const helper = block(content, 'function _withOptimisticUpdate<')
+    const order = [
+      'await queryClient.cancelQueries({ queryKey: key })',
+      'previous = queryClient.getQueryData(key)',
+      'queryClient.setQueryData<TQueryData>(key, (old) => optimistic.updater(old, variables))',
+      'const context = await onMutate?.(variables, ...args)',
+    ].map((snippet) => helper.indexOf(snippet))
+    expect(order.every((i) => i > -1)).toBe(true)
+    expect([...order].sort((a, b) => a - b)).toEqual(order)
+    expect(helper).toContain('queryClient.setQueryData(result.queryKey, result.previous)')
+    expect(helper).toContain('queryClient.resetQueries({ queryKey: result.queryKey, exact: true })')
+    expect(helper).toContain('return onError?.(error, variables, result?.context, ...args)')
+    expect(helper).toContain('void queryClient.invalidateQueries({ queryKey: result.queryKey })')
+    expect(helper).toContain('return onSettled?.(data, error, variables, result?.context, ...args)')
+  })
+
+  it('mutation hooks take TContext / TQueryData and route options through the helper', () => {
+    const { content } = generateHooks(spec, { staleTime: 0, gcTime: 0, optimisticUpdates: true })
+    const hook = block(content, 'export function useUpdateTask<')
+    expect(hook).toContain(
+      'export function useUpdateTask<TContext = unknown, TQueryData = unknown>('
+    )
+    expect(hook).toContain(
+      'ApiError, { id: Parameters<typeof updateTask>[0]; body: Parameters<typeof updateTask>[1] }, TContext>'
+    )
+    expect(hook).toContain(
+      '& { optimistic?: OptimisticUpdate<{ id: Parameters<typeof updateTask>[0]; body: Parameters<typeof updateTask>[1] }, TQueryData> },'
+    )
+    expect(hook).toContain('const mutationOptions = _withOptimisticUpdate(queryClient, options)')
+    expect(hook).toContain('OptimisticContext<TContext>>({')
+    expect(hook).toContain('    ...mutationOptions,')
+    expect(hook).not.toContain('...options,')
+  })
+
+  it('composes with auto-invalidation: onSuccess calls the wrapped onSuccess', () => {
+    const { content } = generateHooks(spec, {
+      staleTime: 0,
+      gcTime: 0,
+      optimisticUpdates: true,
+      autoInvalidate: true,
+    })
+    const hook = block(content, 'export function useUpdateTask<')
+    expect(hook.match(/const queryClient = useQueryClient\(\)/g)).toHaveLength(1)
+    expect(hook).toContain(
+      'queryClient.invalidateQueries({ queryKey: taskKeys.detail(variables.id) })'
+    )
+    expect(hook).toContain('mutationOptions.onSuccess?.(...args)')
+  })
+
+  it('does not double-import QueryKey when infinite hooks already need it', () => {
+    const withMutation = structuredClone(paginatedSpec)
+    withMutation.paths!['/items']!.post = {
+      operationId: 'createItem',
+      responses: { '201': { description: 'ok' } },
+    }
+    const { content } = generateHooks(withMutation, {
+      staleTime: 0,
+      gcTime: 0,
+      optimisticUpdates: true,
+    })
+    expect(content.match(/type QueryKey\b/g)).toHaveLength(1)
+  })
+
+  it('no mutations: no helpers emitted', () => {
+    const { content } = generateHooks(paginatedSpec, {
+      staleTime: 0,
+      gcTime: 0,
+      optimisticUpdates: true,
+    })
+    expect(content).not.toContain('_withOptimisticUpdate')
+    expect(content).not.toContain('QueryClient')
+  })
+})
