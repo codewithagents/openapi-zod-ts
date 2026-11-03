@@ -26,6 +26,7 @@ import {
   collectSortedBodyTypes,
   collectUsedResponseSchemaNames,
 } from './operation-ir.js'
+import { formatSchemaImportSpecifiers } from './schema-prefix.js'
 // Fastify emitter: delegates to the dedicated type-provider module.
 export { generateFastifyRouter } from './fastify-type-provider.js'
 
@@ -648,6 +649,11 @@ interface RouterOptions {
   schemaNames?: Set<string>
   schemaImportPath?: string
   /**
+   * Bare schema name -> actual exported name, for spec_prefix (#334). Prefixed exports are
+   * imported under their bare name (`PublicApiGetUserSchema as GetUserSchema`).
+   */
+  schemaImportAliases?: Map<string, string>
+  /**
    * When set, matches the `contextType` from ServiceOptions. The generated router
    * handlers extract a context value from the framework's native channel and pass
    * it as the final argument to every service call.
@@ -1229,8 +1235,8 @@ export function generateExpressRouter(
     lines.push(`import { z } from 'zod'`)
   }
   if (usedSchemaNames.size > 0 && options?.schemaImportPath !== undefined) {
-    const sortedUsedSchemas = Array.from(usedSchemaNames).sort()
-    lines.push(`import { ${sortedUsedSchemas.join(', ')} } from '${options.schemaImportPath}'`)
+    const specifiers = formatSchemaImportSpecifiers(usedSchemaNames, options.schemaImportAliases)
+    lines.push(`import { ${specifiers} } from '${options.schemaImportPath}'`)
   }
   const expressErrorsPath = options?.errorsImportPath ?? './_shared/errors.js'
   lines.push('')
@@ -1298,8 +1304,8 @@ export function generateRouter(spec: OpenAPIV3_1.Document, options?: RouterOptio
     lines.push(`import { z } from 'zod'`)
   }
   if (usedSchemaNames.size > 0 && options?.schemaImportPath !== undefined) {
-    const sortedUsedSchemas = Array.from(usedSchemaNames).sort()
-    lines.push(`import { ${sortedUsedSchemas.join(', ')} } from '${options.schemaImportPath}'`)
+    const specifiers = formatSchemaImportSpecifiers(usedSchemaNames, options.schemaImportAliases)
+    lines.push(`import { ${specifiers} } from '${options.schemaImportPath}'`)
   }
   const honoErrorsPath = options?.errorsImportPath ?? './_shared/errors.js'
   lines.push('')

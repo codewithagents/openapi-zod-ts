@@ -46,6 +46,15 @@ export interface ServerConfig {
    * to consolidate the shared runtime at a specific location.
    */
   shared_output?: string
+  /**
+   * Namespace prefix for schema lookups in `input_schema`, for sharing ONE schemas file
+   * across several specs (#334). When set, the router looks up `${spec_prefix}${Type}Schema`
+   * (e.g. `PublicApiGetUserSchema`) instead of the bare `${Type}Schema`, and imports it
+   * under the bare name. Unprefixed exports remain available as a fallback for schemas that
+   * are genuinely shared between specs. Must be a valid identifier prefix (e.g. "PublicApi").
+   * Has no effect without `input_schema`. Default: unset (bare names).
+   */
+  spec_prefix?: string
 }
 
 /** Validate that an optional config field is a non-empty string when present. */
@@ -72,6 +81,15 @@ function parseServerConfig(
   assertOptionalString(raw, 'input_schema', 'path to your Zod schema file')
   assertOptionalString(raw, 'context_type', 'TypeScript type name')
   assertOptionalString(raw, 'shared_output', 'path to the shared output directory')
+  assertOptionalString(raw, 'spec_prefix', 'identifier prefix (e.g. "PublicApi")')
+  if (
+    raw['spec_prefix'] !== undefined &&
+    !/^[A-Za-z_$][\w$]*$/.test(raw['spec_prefix'] as string)
+  ) {
+    throw new Error(
+      '"spec_prefix" must be a valid TypeScript identifier prefix (letters, digits, _ or $; not starting with a digit)'
+    )
+  }
   if (
     raw['emit_response_validation'] !== undefined &&
     typeof raw['emit_response_validation'] !== 'boolean'
@@ -85,6 +103,7 @@ function parseServerConfig(
     context_type: raw['context_type'] as string | undefined,
     emit_response_validation: raw['emit_response_validation'] as boolean | undefined,
     shared_output: raw['shared_output'] as string | undefined,
+    spec_prefix: raw['spec_prefix'] as string | undefined,
   }
 }
 

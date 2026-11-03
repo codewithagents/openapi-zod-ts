@@ -298,6 +298,7 @@ serve({ fetch: app.fetch, port: 3001 })
 | `context_type` | No | none | TypeScript type name to thread through service methods as a final `ctx` argument. See below. |
 | `emit_response_validation` | No | `false` | Fastify only. Synthesize inline Zod response schemas for flat inline schemas. See below. |
 | `shared_output` | No | derived | Override directory for `_shared/errors.ts`. Default: derived from output paths (see below). |
+| `spec_prefix` | No | none | Namespace prefix for schema lookups when several specs share one `input_schema` file: looks up `${spec_prefix}${Type}Schema` instead of `${Type}Schema`. See [Sharing one schemas file across specs](#sharing-one-schemas-file-across-specs-spec_prefix). |
 
 Use `--config <path>` to point at a config file in a different location:
 
@@ -581,6 +582,65 @@ fastify.listen({ port: 3000 })
 ```
 
 Because `HttpError` is a single class imported from one shared file, the `instanceof` check on line `if (err instanceof HttpError)` works for errors thrown in either router. Without the shared module, each router's locally-defined class would be a distinct identity and the check would silently fail for errors from the other router.
+
+### Sharing one schemas file across specs (`spec_prefix`)
+
+By default every router looks up its Zod schemas by the bare convention name `${Type}Schema`. When two specs both declare a `GetUser` type and point `input_schema` at the **same** file, both would resolve to one `GetUserSchema`. Set `spec_prefix` per project to namespace the lookup:
+
+```json
+{
+  "projects": [
+    {
+      "input_openapi": "./specs/public.json",
+      "output": "./gen/public",
+      "framework": "fastify",
+      "input_schema": "./shared/schemas.ts",
+      "spec_prefix": "PublicApi"
+    },
+    {
+      "input_openapi": "./specs/admin.json",
+      "output": "./gen/admin",
+      "framework": "fastify",
+      "input_schema": "./shared/schemas.ts",
+      "spec_prefix": "AdminApi"
+    }
+  ]
+}
+```
+
+```ts
+// shared/schemas.ts: user-owned, names chosen by you
+export const PublicApiGetUserSchema = z.object({ id: z.string(), name: z.string() })
+export const AdminApiGetUserSchema = z.object({ id: z.string(), role: z.string() })
+export const ErrorSchema = z.object({ message: z.string() }) // unprefixed: shared by both
+```
+
+Each generated file imports the prefixed export under its bare name, so the rest of the output is identical to the unprefixed case:
+
+```ts
+// gen/public/router.ts
+import { PublicApiGetUserSchema as GetUserSchema } from '../../shared/schemas.js'
+```
+
+Rules:
+
+- Applies to every framework that looks schemas up by name: the Hono/Express `safeParse` blocks and the Fastify `schema.body` / `schema.response` slots plus `schema-types.ts`.
+- `${spec_prefix}${Type}Schema` wins. An **unprefixed** `${Type}Schema` export is still used as a fallback, so schemas genuinely shared by all specs can stay unprefixed.
+- Schemas must be declared as `export const NameSchema = ...` (the generator scans for that form; `export { A as B }` re-export lists are not detected).
+- `spec_prefix` must be a valid identifier prefix (letters, digits, `_`, `$`; not starting with a digit) and has no effect without `input_schema`.
+
+**Where the prefixed names come from.** `openapi-zod-ts` has no prefix option: its bootstrapped `input_schema` always uses bare `${Type}Schema` names, and its own `models.ts` / `client.ts` import those bare names. So the shared, prefixed file is one **you** maintain for the server side. A practical pattern is to keep each spec's bootstrapped `schemas.ts` for its client and build the shared server file from them:
+
+```ts
+// shared/schemas.ts
+import * as publicApi from '../gen/public-client/schemas.js'
+import * as adminApi from '../gen/admin-client/schemas.js'
+
+export const PublicApiGetUserSchema = publicApi.GetUserSchema
+export const AdminApiGetUserSchema = adminApi.GetUserSchema
+```
+
+If each spec has its own `schemas.ts` (the common setup), you do not need `spec_prefix` at all.
 
 ---
 

@@ -2,6 +2,9 @@ import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   test: {
+    // Several suites run the real TypeScript compiler over generated Fastify output, or
+    // execute generated routers; under parallel load these exceed vitest's 5s default.
+    testTimeout: 30_000,
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],

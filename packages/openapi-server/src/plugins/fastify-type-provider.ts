@@ -44,6 +44,7 @@ import {
   collectUsedSchemaNames,
   collectUsedResponseSchemaNames,
 } from './operation-ir.js'
+import { formatSchemaImportSpecifiers } from './schema-prefix.js'
 
 type OperationObject = OpenAPIV3_1.OperationObject
 type ReferenceObject = OpenAPIV3_1.ReferenceObject
@@ -78,6 +79,8 @@ interface RouteOperation {
 interface RouterOptions {
   schemaNames?: Set<string>
   schemaImportPath?: string
+  /** Bare schema name -> actual exported name, for spec_prefix (#334). See schema-prefix.ts. */
+  schemaImportAliases?: Map<string, string>
   /**
    * When true, emit the zero-cast router: body is passed as req.body (no cast),
    * response is sent without a cast, and model imports are skipped. The router
@@ -1014,8 +1017,8 @@ export function generateFastifyRouter(
   // z is always imported for schema.params/querystring/headers/response and cookie _ckv blocks.
   lines.push(`import { z } from 'zod'`)
   if (allUsedSchemaNames.size > 0 && options?.schemaImportPath !== undefined) {
-    const sortedUsedSchemas = Array.from(allUsedSchemaNames).sort()
-    lines.push(`import { ${sortedUsedSchemas.join(', ')} } from '${options.schemaImportPath}'`)
+    const specifiers = formatSchemaImportSpecifiers(allUsedSchemaNames, options.schemaImportAliases)
+    lines.push(`import { ${specifiers} } from '${options.schemaImportPath}'`)
   }
   lines.push('')
   // Augment FastifyContextConfig so that config: { operationId, security } on each route is type-safe.

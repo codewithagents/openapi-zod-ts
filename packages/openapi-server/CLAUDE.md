@@ -24,7 +24,7 @@ When `input_schema` is set in config:
 
 ## Config
 
-Default: `openapi-server.config.json` in CWD. Fields: `input_openapi`, `output`, `framework?` (`"hono"` | `"express"` | `"fastify"` | `"none"`, default: `"none"`), `input_schema?`, `shared_output?` (override for `_shared/errors.ts` location).
+Default: `openapi-server.config.json` in CWD. Fields: `input_openapi`, `output`, `framework?` (`"hono"` | `"express"` | `"fastify"` | `"none"`, default: `"none"`), `input_schema?`, `shared_output?` (override for `_shared/errors.ts` location), `spec_prefix?` (namespace for schema lookups when several specs share one `input_schema`: `${spec_prefix}${Type}Schema` is imported aliased to the bare `${Type}Schema`, see `src/plugins/schema-prefix.ts`).
 
 ## Fastify service interface shape
 
