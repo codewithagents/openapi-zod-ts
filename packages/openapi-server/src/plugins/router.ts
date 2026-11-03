@@ -327,6 +327,33 @@ function honoArrayQueryExpr(q: QueryParam): string {
  * (emitted once per file, see generateExpressRouter) normalizes all three cases to
  * string[] | undefined before item coercion, mirroring queryParamArrayZodBase's item expression.
  */
+/**
+ * Source of the `_toQueryBool` helper emitted once per Hono/Express router file when any
+ * operation declares a scalar boolean query param. Query values are strings on the wire:
+ * 'true'/'false' are coerced to booleans, every other value (including undefined) is
+ * returned unchanged so the z.boolean() validation rejects garbage with a 422 and an absent
+ * optional param stays undefined.
+ */
+const TO_QUERY_BOOL_HELPER = [
+  'function _toQueryBool(v: unknown): unknown {',
+  "  return v === 'true' ? true : v === 'false' ? false : v",
+  '}',
+  '',
+]
+
+/** True when any operation declares a scalar (non-array) boolean query param. */
+function needsQueryBoolHelper(operations: RouteOperation[]): boolean {
+  return operations.some((op) =>
+    op.queryParams.some(
+      (q) =>
+        q.tsType === 'boolean' &&
+        q.isArray !== true &&
+        q.delimiterStyle === undefined &&
+        q.isDeepObject !== true
+    )
+  )
+}
+
 function expressArrayQueryExpr(q: QueryParam): string {
   const base = `_toQueryArray(req.query['${q.rawName}'] as string | string[] | undefined)`
   if (q.itemsTsType === 'number') return `${base}?.map(Number)`
@@ -763,6 +790,11 @@ function buildRouteHandler(
         }
         if (q.tsType === 'number') {
           return `    ${q.name}: c.req.query('${q.name}') !== undefined ? Number(c.req.query('${q.name}')) : undefined`
+        }
+        if (q.tsType === 'boolean') {
+          // 'true'/'false' become booleans; anything else is passed through unchanged so the
+          // z.boolean() validation below still rejects it with 422 (absent stays undefined).
+          return `    ${q.name}: _toQueryBool(c.req.query('${q.rawName}'))`
         }
         return `    ${q.name}: c.req.query('${q.name}') ?? undefined`
       })
@@ -1271,6 +1303,7 @@ export function generateRouter(spec: OpenAPIV3_1.Document, options?: RouterOptio
   lines.push(`import { HttpError } from '${honoErrorsPath}'`)
   lines.push(`export { HttpError } from '${honoErrorsPath}'`)
   lines.push('')
+  if (needsQueryBoolHelper(operations)) lines.push(...TO_QUERY_BOOL_HELPER)
   lines.push(`export function createRouter(service: ${serviceRef}): Hono {`)
   lines.push('  const app = new Hono()')
   lines.push('')
