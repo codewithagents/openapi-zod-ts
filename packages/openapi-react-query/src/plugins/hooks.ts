@@ -35,6 +35,12 @@ export interface HookGenOptions {
    * without documented 4xx/5xx responses keep `ApiError`. Default: false.
    */
   typedErrors?: boolean
+  /**
+   * When true, emits a `useXxxQueries(paramsList, options?, combine?)` hook per
+   * GET operation with parameters: a `useQueries` wrapper over the operation's
+   * queryOptions factory for a dynamic number of parallel queries. Default: false.
+   */
+  queries?: boolean
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -628,6 +634,58 @@ function buildSuspenseQueryHook(
   return lines.join('\n')
 }
 
+// ── Dynamic parallel queries (useQueries) ─────────────────────────────────────
+
+/**
+ * Builds `useXxxQueries` for a GET operation: one query per entry of
+ * `paramsList`, each built by the operation's queryOptions factory so keys,
+ * timing and queryFn stay identical to the single-query hook.
+ *
+ * Entry shape: the bare argument when the factory takes exactly one (a path
+ * param, or the params object), otherwise a labeled tuple of the factory's
+ * positional arguments. Returns undefined for operations without parameters
+ * (there is nothing to vary between parallel queries).
+ */
+function buildQueriesHook(op: OperationMeta, hookName: string): string | undefined {
+  const { funcName, pathParams, hasQueryParams, hasRequiredQueryParams } = op
+  const argNames = hasQueryParams ? [...pathParams, 'params'] : [...pathParams]
+  if (argNames.length === 0) return undefined
+
+  const dataType = queryDataType(funcName)
+  const resultType = `UseQueryResult<${dataType}, ${op.errorType}>[]`
+  let entryType: string
+  let mapArg: string
+  if (argNames.length === 1) {
+    entryType = `Parameters<typeof ${funcName}>[0]`
+    mapArg = argNames[0]!
+  } else {
+    const labeled = argNames.map((name, i) => {
+      const optional = name === 'params' && !hasRequiredQueryParams ? '?' : ''
+      return `${name}${optional}: Parameters<typeof ${funcName}>[${i}]`
+    })
+    entryType = `readonly [${labeled.join(', ')}]`
+    mapArg = `[${argNames.join(', ')}]`
+  }
+
+  const lines: string[] = []
+  if (op.deprecated) lines.push(`/** @deprecated */`)
+  lines.push(`export function ${hookName}<TCombinedResult = ${resultType}>(`)
+  lines.push(`  paramsList: ReadonlyArray<${entryType}>,`)
+  lines.push(
+    `  options?: Omit<UseQueryOptions<${dataType}, ${op.errorType}>, 'queryKey' | 'queryFn'>,`
+  )
+  lines.push(`  combine?: (results: ${resultType}) => TCombinedResult,`)
+  lines.push(`): TCombinedResult {`)
+  lines.push(`  return useQueries({`)
+  lines.push(
+    `    queries: paramsList.map((${mapArg}) => ${queryOptionsFuncName(funcName)}(${argNames.join(', ')}, options)),`
+  )
+  lines.push(`    combine,`)
+  lines.push(`  })`)
+  lines.push(`}`)
+  return lines.join('\n')
+}
+
 // ── Infinite query hook generation ────────────────────────────────────────────
 
 /**
@@ -999,6 +1057,7 @@ export function generateHooks(
     autoInvalidate = false,
     infiniteQuery = 'auto',
     typedErrors = false,
+    queries = false,
   } = options
 
   // Collect all operations (metadata extraction separated from string emission)
@@ -1088,6 +1147,9 @@ export function generateHooks(
   const queryOptionsBlocks: string[] = []
   const queryHookBlocks: string[] = []
   let needsUseInfiniteQuery = false
+  let needsUseQueries = false
+  // useXxxQueries names must not collide with any operation's own hook name.
+  const usedHookNames = new Set(operations.map((op) => op.hookName))
   for (const op of getOps) {
     const info = opToKeyInfo.get(op.funcName)
     if (info === undefined) continue
@@ -1106,6 +1168,14 @@ export function generateHooks(
       queryHookBlocks.push(
         buildSuspenseQueryHook(op, factoryName, keyEntry, effectiveStaleTime, effectiveGcTime)
       )
+    }
+    if (queries) {
+      const queriesHookName = uniquifyName(`${op.hookName}Queries`, usedHookNames)
+      const queriesHook = buildQueriesHook(op, queriesHookName)
+      if (queriesHook !== undefined) {
+        needsUseQueries = true
+        queryHookBlocks.push(queriesHook)
+      }
     }
     if (op.isPaginated && op.pageParamName !== undefined) {
       needsUseInfiniteQuery = true
@@ -1158,6 +1228,7 @@ export function generateHooks(
   const rqImports: string[] = []
   if (needsQueryOptions) rqImports.push('queryOptions')
   if (needsUseQuery) rqImports.push('useQuery', 'type UseQueryOptions')
+  if (needsUseQueries) rqImports.push('useQueries', 'type UseQueryResult')
   if (needsUseSuspenseQuery) rqImports.push('useSuspenseQuery', 'type UseSuspenseQueryOptions')
   if (needsUseInfiniteQuery)
     rqImports.push(

@@ -35,6 +35,11 @@ export interface ReactQueryConfig {
    * (e.g. `GetPetError`) so `error.status` narrows `error.body` (default: false).
    */
   typed_errors?: boolean
+  /**
+   * When true, emits a `useXxxQueries(paramsList, options?, combine?)` useQueries
+   * wrapper per parameterized GET operation (default: false).
+   */
+  queries?: boolean
 }
 
 function validateTiming(resource: string, timing: unknown): void {
@@ -79,6 +84,7 @@ function validateReactQueryFields(raw: Record<string, unknown>): void {
   expectBoolean(raw, 'suspense', '"suspense" must be a boolean')
   expectBoolean(raw, 'auto_invalidate', '"auto_invalidate" must be a boolean')
   expectBoolean(raw, 'typed_errors', '"typed_errors" must be a boolean')
+  expectBoolean(raw, 'queries', '"queries" must be a boolean')
   validateInfiniteQuery(raw['infinite_query'])
   if (raw['overrides'] !== undefined) validateOverrides(raw['overrides'])
 }
@@ -98,6 +104,7 @@ function parseReactQueryConfig(
     auto_invalidate: raw['auto_invalidate'] as boolean | undefined,
     infinite_query: raw['infinite_query'] as boolean | 'auto' | undefined,
     typed_errors: raw['typed_errors'] as boolean | undefined,
+    queries: raw['queries'] as boolean | undefined,
   }
 }
 

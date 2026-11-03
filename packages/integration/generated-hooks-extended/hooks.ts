@@ -4,6 +4,8 @@ import {
   queryOptions,
   useQuery,
   type UseQueryOptions,
+  useQueries,
+  type UseQueryResult,
   useInfiniteQuery,
   type UseInfiniteQueryOptions,
   type InfiniteData,
@@ -86,6 +88,24 @@ export function useListTasks<TData = Awaited<ReturnType<typeof listTasks>>>(
   })
 }
 
+export function useListTasksQueries<
+  TCombinedResult = UseQueryResult<Awaited<ReturnType<typeof listTasks>>, ApiError>[],
+>(
+  paramsList: ReadonlyArray<Parameters<typeof listTasks>[0]>,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>,
+    'queryKey' | 'queryFn'
+  >,
+  combine?: (
+    results: UseQueryResult<Awaited<ReturnType<typeof listTasks>>, ApiError>[]
+  ) => TCombinedResult
+): TCombinedResult {
+  return useQueries({
+    queries: paramsList.map((params) => listTasksQueryOptions(params, options)),
+    combine,
+  })
+}
+
 export function useListTasksInfinite<TData = InfiniteData<Awaited<ReturnType<typeof listTasks>>>>(
   params?: Parameters<typeof listTasks>[0],
   options?: Omit<
@@ -131,6 +151,24 @@ export function useGetTask<TData = Awaited<ReturnType<typeof getTask>>>(
     gcTime: 300000,
     enabled: id != null && (options?.enabled ?? true),
     ...options,
+  })
+}
+
+export function useGetTaskQueries<
+  TCombinedResult = UseQueryResult<Awaited<ReturnType<typeof getTask>>, GetTaskError>[],
+>(
+  paramsList: ReadonlyArray<Parameters<typeof getTask>[0]>,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getTask>>, GetTaskError>,
+    'queryKey' | 'queryFn'
+  >,
+  combine?: (
+    results: UseQueryResult<Awaited<ReturnType<typeof getTask>>, GetTaskError>[]
+  ) => TCombinedResult
+): TCombinedResult {
+  return useQueries({
+    queries: paramsList.map((id) => getTaskQueryOptions(id, options)),
+    combine,
   })
 }
 

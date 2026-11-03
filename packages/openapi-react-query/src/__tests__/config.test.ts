@@ -124,6 +124,11 @@ describe('loadConfig', () => {
     await expect(loadConfig(tmpDir)).rejects.toThrow('"typed_errors" must be a boolean')
   })
 
+  it('throws when queries is not a boolean', async () => {
+    writeConfig({ input_openapi: 'openapi.json', output: 'src/hooks', queries: 1 })
+    await expect(loadConfig(tmpDir)).rejects.toThrow('"queries" must be a boolean')
+  })
+
   it('parses typed_errors: true', async () => {
     writeConfig({ input_openapi: 'openapi.json', output: 'src/hooks', typed_errors: true })
     expect((await loadConfig(tmpDir)).typed_errors).toBe(true)

@@ -2,9 +2,14 @@
 // (typed_errors, queries, optimistic_updates). Never called at runtime;
 // tsc --noEmit exercises these patterns on every `pnpm lint` run in CI.
 
-import type { ProblemDetail, ValidationProblem } from '../generated/models.js'
+import type { ProblemDetail, Task, ValidationProblem } from '../generated/models.js'
 import type { ApiError } from '../generated/client.js'
-import { useGetTask, useListTasks, useCreateTask } from '../generated-hooks-extended/hooks.js'
+import {
+  useGetTask,
+  useGetTaskQueries,
+  useListTasks,
+  useCreateTask,
+} from '../generated-hooks-extended/hooks.js'
 
 type Equal<A, B> =
   (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false
@@ -40,6 +45,30 @@ function _useListTasksPlainError() {
   assertType<Equal<typeof error, ApiError | null>>()
 }
 
+// ── queries (#195) ───────────────────────────────────────────────────────────
+
+// Pattern Q1: one result per id, typed with the operation's data + error types.
+function _useGetTaskQueriesResults(ids: string[]) {
+  const results = useGetTaskQueries(ids, { staleTime: 1000 })
+  const first = results[0]
+  if (first) {
+    assertType<Equal<typeof first.data, Task | undefined>>()
+    if (first.error) assertType<Equal<typeof first.error.status, 404>>()
+  }
+  return results
+}
+
+// Pattern Q2: combine determines the return type.
+function _useGetTaskQueriesCombine(ids: readonly string[]) {
+  const titles = useGetTaskQueries(ids, undefined, (results) =>
+    results.flatMap((r) => (r.data ? [r.data.title] : []))
+  )
+  assertType<Equal<typeof titles, string[]>>()
+  return titles
+}
+
+void _useGetTaskQueriesResults
+void _useGetTaskQueriesCombine
 void _useGetTaskTypedError
 void _useCreateTaskTypedError
 void _useListTasksPlainError

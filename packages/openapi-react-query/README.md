@@ -56,6 +56,7 @@ Create `openapi-react-query.config.json` in your project root:
 | `auto_invalidate` | No | `false` | When `true`, mutation hooks auto-invalidate related queries on success |
 | `infinite_query` | No | `'auto'` | `boolean \| 'auto'`. Generates a `useXxxInfinite` hook for paginated list operations. `'auto'` detects paginated GETs; `true` forces generation, `false` disables it |
 | `typed_errors` | No | `false` | When `true`, hooks type their error as the client's per-operation error alias (e.g. `GetTaskError`), so `error.status` narrows `error.body` (see [Typed per-status errors](#typed-per-status-errors)) |
+| `queries` | No | `false` | When `true`, generates a `useXxxQueries(paramsList, options?, combine?)` hook per GET operation with parameters, for a dynamic number of parallel queries (see [Dynamic parallel queries](#dynamic-parallel-queries)) |
 | `overrides` | No | none | Per-resource cache timing (see [Per-resource cache timing](#per-resource-cache-timing)) |
 
 ## Generate
@@ -197,6 +198,28 @@ useCreateTask({
 ```
 
 Operations without documented error statuses keep `ApiError`. This is opt-in because the alias only lists *documented* statuses: an existing comparison against an undocumented status (`error.status === 500`) stops compiling once the type is narrowed, and an undocumented status at runtime is still thrown as a plain `ApiError`.
+
+## Dynamic parallel queries
+
+When `queries: true` in config, every GET operation that takes parameters also gets a `useXxxQueries` hook: a `useQueries` wrapper that builds each query with the operation's `xxxQueryOptions` factory, so cache keys, timing and `queryFn` match the single-query hook exactly.
+
+```ts
+// One argument (a path param or the params object): pass the values directly
+const results = useGetTaskQueries(taskIds) // UseQueryResult<Task, ApiError>[]
+
+// Several arguments: pass one tuple per query, in client-function order
+const repos = useGetRepoQueries([
+  ['acme', 'web', { ref: 'main' }],
+  ['acme', 'api', { ref: 'main' }],
+])
+
+// Shared options apply to every query; `combine` reduces the results
+const titles = useGetTaskQueries(taskIds, { staleTime: 60_000 }, (results) =>
+  results.flatMap((r) => (r.data ? [r.data.title] : []))
+)
+```
+
+Operations without parameters get no `useXxxQueries` hook (there is nothing to vary). With `typed_errors: true` the results use the per-operation error alias.
 
 ## Next.js App Router SSR prefetch
 
