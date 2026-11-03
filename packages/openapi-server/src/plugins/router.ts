@@ -1020,10 +1020,12 @@ function buildExpressRouteHandler(
           return `    ${q.name}: ${expressArrayQueryExpr(q)}`
         }
         if (q.tsType === 'number') {
-          return `    ${q.name}: Number(req.query['${q.name}'] as string)`
+          // Guard undefined so an absent optional param stays undefined instead of NaN (→ 422).
+          return `    ${q.name}: req.query['${q.name}'] !== undefined ? Number(req.query['${q.name}'] as string) : undefined`
         }
         if (q.tsType === 'boolean') {
-          return `    ${q.name}: req.query['${q.name}'] === 'true'`
+          // Absent stays undefined; values other than 'true'/'false' still fail z.boolean().
+          return `    ${q.name}: _toQueryBool(req.query['${q.name}'])`
         }
         return `    ${q.name}: req.query['${q.name}'] as string | undefined`
       })
@@ -1249,6 +1251,7 @@ export function generateExpressRouter(
     lines.push('')
   }
 
+  if (needsQueryBoolHelper(operations)) lines.push(...TO_QUERY_BOOL_HELPER)
   lines.push(`export function createRouter(service: ${serviceRef}): Router {`)
   lines.push('  const router = Router()')
   lines.push('')

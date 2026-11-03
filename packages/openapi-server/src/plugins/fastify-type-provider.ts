@@ -402,6 +402,8 @@ function synthesizeResponseSchemaExpr(
   return synthesizePropExpr(s)
 }
 
+const SCALAR_QUERY_BOOL_EXPR = "z.enum(['true', 'false']).transform((v) => v === 'true')"
+
 function queryParamItemExpr(itemsTsType: string | undefined): string {
   if (itemsTsType === 'number') return 'z.coerce.number()'
   if (itemsTsType === 'boolean') return 'z.boolean()'
@@ -422,7 +424,10 @@ function queryParamBaseExpr(param: QueryParam): string {
   // querystring schema matches the service T[] signature. Item coercion mirrors the scalar path.
   if (param.isArray === true) return `z.array(${queryParamItemExpr(param.itemsTsType)})`
   if (param.tsType === 'number') return `z.coerce.number()${numberConstraintSuffix(param)}`
-  if (param.tsType === 'boolean') return 'z.boolean()'
+  // Fastify's querystring parser never converts types, so a scalar boolean arrives as the
+  // string 'true'/'false'. Accept exactly those two and transform to a boolean; anything
+  // else is rejected with 400 by the validatorCompiler.
+  if (param.tsType === 'boolean') return SCALAR_QUERY_BOOL_EXPR
   return enumOrStringExpr(param)
 }
 

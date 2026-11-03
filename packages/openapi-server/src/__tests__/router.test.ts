@@ -832,7 +832,7 @@ describe('generateExpressRouter', () => {
     expect(result.content).toContain("Number(req.query['limit'] as string)")
   })
 
-  it('boolean query param uses === true comparison', () => {
+  it('boolean query param is coerced via _toQueryBool', () => {
     const spec = makeSpec({
       '/pets': {
         get: {
@@ -845,7 +845,7 @@ describe('generateExpressRouter', () => {
       },
     })
     const result = generateExpressRouter(spec)
-    expect(result.content).toContain("req.query['active'] === 'true'")
+    expect(result.content).toContain("active: _toQueryBool(req.query['active'])")
   })
 
   it('POST extracts body from req.body with type cast', () => {
