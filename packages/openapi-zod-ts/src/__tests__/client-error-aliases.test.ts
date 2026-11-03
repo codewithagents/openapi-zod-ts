@@ -139,5 +139,90 @@ describe('per-operation error type aliases (#195)', () => {
       'usage.ts': usage,
     })
     assertNoTsDiagnostics(diagnostics, 'error alias usage')
+  }, 30_000)
+})
+
+describe('error-body models whose names collide with client.ts declarations', () => {
+  // Fictional spec with component schemas named like the client's own ApiError
+  // class and ClientConfig import, used as error bodies (directly and nested).
+  const collisionSpec: OpenAPIV3_1.Document = {
+    openapi: '3.1.0',
+    info: { title: 'Collisions', version: '1.0.0' },
+    paths: {
+      '/widgets/{id}': {
+        get: {
+          operationId: 'getWidget',
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
+          responses: {
+            '200': { description: 'ok', ...json('#/components/schemas/Widget') },
+            '400': { description: 'bad', ...json('#/components/schemas/ApiError') },
+            '409': {
+              description: 'conflict',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      ApiError: { type: 'string' },
+                      errors: { type: 'array', items: { $ref: '#/components/schemas/ApiError' } },
+                      config: { $ref: '#/components/schemas/ClientConfig' },
+                    },
+                    required: ['errors'],
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    components: {
+      schemas: {
+        Widget: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'] },
+        ApiError: {
+          type: 'object',
+          properties: { code: { type: 'integer' }, message: { type: 'string' } },
+          required: ['code'],
+        },
+        ClientConfig: { type: 'object', properties: { region: { type: 'string' } } },
+      },
+    },
+  }
+  const { content } = generateClient(collisionSpec)
+
+  it('imports colliding models under a Model alias', () => {
+    expect(content).toMatch(
+      /import type \{[^}]*ApiError as ApiErrorModel[^}]*ClientConfig as ClientConfigModel[^}]*\} from '\.\/models\.js'/
+    )
+    expect(content).not.toMatch(/import type \{[^}]*\bApiError,/)
   })
+
+  it('references the alias in the union, leaving property keys and ApiError<> alone', () => {
+    expect(content).toContain(
+      'export type GetWidgetError = ApiError<400, ApiErrorModel> | ApiError<409, { ApiError?: string; errors: ApiErrorModel[]; config?: ClientConfigModel }>'
+    )
+  })
+
+  it('compiles under tsc --strict and narrows to the model body', () => {
+    const usage = `
+      import type { GetWidgetError } from './client.js'
+      import type { ApiError as ApiErrorBody } from './models.js'
+      export function code(error: GetWidgetError): number {
+        if (error.status === 400) {
+          const body: ApiErrorBody = error.body
+          return body.code
+        }
+        return error.body.errors.length
+      }
+    `
+    const diagnostics = compileFiles({
+      'models.ts': generateTypes(collisionSpec).content,
+      'client-config.ts': generateClientConfig().content,
+      // No barrel: models named ApiError / ClientConfig already make index.ts's
+      // \`export *\` ambiguous, independent of the error aliases.
+      'client.ts': content,
+      'usage.ts': usage,
+    })
+    assertNoTsDiagnostics(diagnostics, 'colliding error-body models')
+  }, 30_000)
 })

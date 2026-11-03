@@ -891,13 +891,65 @@ function getThrowsTags(operation: OperationObject): string[] {
 }
 
 /**
+ * Model imports needed by the per-operation error aliases. A model whose name
+ * collides with a declaration local to client.ts (the ApiError class, the
+ * ClientConfig import, ...) cannot be imported under its own name, so it is
+ * imported as `Name as NameModel` and referenced by that alias in the union.
+ */
+interface ErrorBodyImports {
+  /** Model names imported as-is (shared with the client's other model imports). */
+  plain: Set<string>
+  /** Colliding model name -> local alias. */
+  aliased: Map<string, string>
+  /** Names declared or imported locally in client.ts. */
+  localNames: ReadonlySet<string>
+  /** Every name models.ts exports (aliases must avoid them too). */
+  modelNames: ReadonlySet<string>
+}
+
+/**
+ * Rename type identifiers in a rendered TS type string, skipping quoted
+ * property keys and identifier property keys (`Name:` / `Name?:`).
+ */
+function renameTypeIdentifiers(typeStr: string, renames: ReadonlyMap<string, string>): string {
+  if (renames.size === 0) return typeStr
+  return typeStr.replace(
+    /"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|[A-Za-z_$][\w$]*(?!\??:)(?![\w$])/g,
+    (token) => renames.get(token) ?? token
+  )
+}
+
+/** Record the models an error body references, aliasing the ones that collide. */
+function trackErrorBodyImports(names: Set<string>, imports: ErrorBodyImports): Map<string, string> {
+  const renames = new Map<string, string>()
+  for (const name of names) {
+    if (!imports.localNames.has(name)) {
+      imports.plain.add(name)
+      continue
+    }
+    let alias = imports.aliased.get(name)
+    if (alias === undefined) {
+      const taken = new Set([
+        ...imports.localNames,
+        ...imports.modelNames,
+        ...imports.aliased.values(),
+      ])
+      alias = uniquifyName(`${name}Model`, taken)
+      imports.aliased.set(name, alias)
+    }
+    renames.set(name, alias)
+  }
+  return renames
+}
+
+/**
  * Render the body type of one documented error response. Responses without a
  * JSON schema use `fallback` (the configured error_body_type, else `unknown`).
  */
 function errorResponseBodyType(
   response: ResponseObject | ReferenceObject,
   spec: OpenAPIV3_1.Document,
-  importsOut: Set<string>,
+  imports: ErrorBodyImports | undefined,
   fallback: string
 ): string {
   const resolved = isRef(response)
@@ -910,8 +962,11 @@ function errorResponseBodyType(
   if (picked === null || picked.kind !== 'json' || picked.entry.schema === undefined) {
     return fallback
   }
-  collectComponentRefNames(picked.entry.schema, spec, importsOut)
-  return inlineSchemaToTs(picked.entry.schema, spec)
+  const rendered = inlineSchemaToTs(picked.entry.schema, spec)
+  if (imports === undefined) return rendered
+  const referenced = new Set<string>()
+  collectComponentRefNames(picked.entry.schema, spec, referenced)
+  return renameTypeIdentifiers(rendered, trackErrorBodyImports(referenced, imports))
 }
 
 /**
@@ -922,7 +977,7 @@ function errorResponseBodyType(
 function operationErrorUnion(
   operation: OperationObject,
   spec: OpenAPIV3_1.Document,
-  importsOut: Set<string>,
+  imports?: ErrorBodyImports,
   fallbackBodyType = 'unknown'
 ): string | undefined {
   const responses = operation.responses as
@@ -934,7 +989,7 @@ function operationErrorUnion(
   if (codes.length === 0) return undefined
   return codes
     .map((code) => {
-      const body = errorResponseBodyType(responses[code]!, spec, importsOut, fallbackBodyType)
+      const body = errorResponseBodyType(responses[code]!, spec, imports, fallbackBodyType)
       return `ApiError<${code}, ${body}>`
     })
     .join(' | ')
@@ -961,30 +1016,34 @@ const ERROR_ALIAS_RESERVED_NAMES = [
  *
  * Exported so `@codewithagents/openapi-react-query` resolves the same names.
  */
-export function buildOperationErrorTypeNames(spec: OpenAPIV3_1.Document): Map<string, string> {
+export function buildOperationErrorTypeNames(
+  spec: OpenAPIV3_1.Document,
+  modelNames: ReadonlySet<string> = modelExportNames(spec)
+): Map<string, string> {
   const names = new Map<string, string>()
   const paths = spec.paths as Record<string, Record<string, OperationObject>> | undefined
   if (paths === undefined) return names
-  const modelNames = generateTypes(spec).content.matchAll(
-    /^export (?:type|interface|const|enum) ([A-Za-z_$][\w$]*)/gm
-  )
-  const usedAliasNames = new Set<string>([
-    ...ERROR_ALIAS_RESERVED_NAMES,
-    ...Array.from(modelNames, (m) => m[1]!),
-  ])
+  const usedAliasNames = new Set<string>([...ERROR_ALIAS_RESERVED_NAMES, ...modelNames])
   const usedFuncNames = new Set<string>(CLIENT_INTERNAL_NAMES)
-  const scratch = new Set<string>()
   for (const [path, pathItem] of Object.entries(paths)) {
     for (const method of SUPPORTED_METHODS) {
       const operation = pathItem[method] as OperationObject | undefined
       if (operation === undefined) continue
       const funcName = uniquifyName(operationFuncName(operation, method, path), usedFuncNames)
-      if (operationErrorUnion(operation, spec, scratch) === undefined) continue
+      if (operationErrorUnion(operation, spec) === undefined) continue
       const base = `${funcName.charAt(0).toUpperCase()}${funcName.slice(1)}Error`
       names.set(funcName, uniquifyName(base, usedAliasNames))
     }
   }
   return names
+}
+
+/** Every name models.ts exports for this spec. */
+function modelExportNames(spec: OpenAPIV3_1.Document): Set<string> {
+  const matches = generateTypes(spec).content.matchAll(
+    /^export (?:type|interface|const|enum) ([A-Za-z_$][\w$]*)/gm
+  )
+  return new Set(Array.from(matches, (m) => m[1]!))
 }
 
 function operationFuncName(operation: OperationObject, method: string, path: string): string {
@@ -1820,7 +1879,23 @@ export function generateClient(
   // The CLIENT_INTERNAL_NAMES set is defined at module level and exported so that
   // the hooks generator can reuse the same set (single source of truth).
   const usedFuncNames = new Set<string>(CLIENT_INTERNAL_NAMES)
-  const errorTypeNames = buildOperationErrorTypeNames(spec)
+  const modelNames = modelExportNames(spec)
+  const errorTypeNames = buildOperationErrorTypeNames(spec, modelNames)
+  const customErrorBodyType =
+    options?.errorBodyType !== undefined && options.errorBodyType !== 'laravel'
+      ? [options.errorBodyType]
+      : []
+  const errorBodyImports: ErrorBodyImports = {
+    plain: collectedTypeNames,
+    aliased: new Map(),
+    localNames: new Set([
+      ...CLIENT_INTERNAL_NAMES,
+      'LaravelValidationError',
+      ...customErrorBodyType,
+      ...errorTypeNames.values(),
+    ]),
+    modelNames,
+  }
 
   if (paths !== undefined) {
     for (const [path, pathItem] of Object.entries(paths)) {
@@ -1916,7 +1991,7 @@ export function generateClient(
             options?.errorBodyType === 'laravel'
               ? 'LaravelValidationError'
               : (options?.errorBodyType ?? 'unknown')
-          const union = operationErrorUnion(operation, spec, collectedTypeNames, fallbackBodyType)!
+          const union = operationErrorUnion(operation, spec, errorBodyImports, fallbackBodyType)!
           functionBlocks.push(
             `/** Documented error responses of \`${funcName}\`, for narrowing on \`error.status\`. */\nexport type ${errorTypeName} = ${union}`
           )
@@ -1930,8 +2005,12 @@ export function generateClient(
   lines.push('// This file is auto-generated by openapi-zod-ts — do not edit')
   lines.push('')
 
-  if (collectedTypeNames.size > 0) {
-    const sortedTypes = Array.from(collectedTypeNames).sort()
+  const aliasedModelImports = Array.from(
+    errorBodyImports.aliased,
+    ([name, alias]) => `${name} as ${alias}`
+  )
+  if (collectedTypeNames.size > 0 || aliasedModelImports.length > 0) {
+    const sortedTypes = [...Array.from(collectedTypeNames), ...aliasedModelImports].sort()
     lines.push(`import type { ${sortedTypes.join(', ')} } from './models.js'`)
   }
   lines.push(`import { getConfig, type ClientConfig } from './client-config.js'`)
