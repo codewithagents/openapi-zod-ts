@@ -82,6 +82,26 @@ function assertOptionalString(raw: Record<string, unknown>, key: string, label: 
   }
 }
 
+/** spec_prefix: optional non-empty string that is a valid identifier prefix. */
+function assertSpecPrefix(raw: Record<string, unknown>): void {
+  assertOptionalString(raw, 'spec_prefix', 'identifier prefix (e.g. "PublicApi")')
+  const value = raw['spec_prefix']
+  if (value !== undefined && !/^[A-Za-z_$][\w$]*$/.test(value as string)) {
+    throw new Error(
+      '"spec_prefix" must be a valid TypeScript identifier prefix (letters, digits, _ or $; not starting with a digit)'
+    )
+  }
+}
+
+/** error_format: optional 'default' | 'problem+json'. */
+function parseErrorFormat(raw: Record<string, unknown>): ServerConfig['error_format'] {
+  const value = raw['error_format']
+  if (value !== undefined && value !== 'default' && value !== 'problem+json') {
+    throw new Error('"error_format" must be one of: "default" or "problem+json"')
+  }
+  return value
+}
+
 function parseServerConfig(
   raw: Record<string, unknown>,
   base: import('openapi-zod-ts/config-core').BaseConfig
@@ -99,19 +119,8 @@ function parseServerConfig(
   assertOptionalString(raw, 'input_schema', 'path to your Zod schema file')
   assertOptionalString(raw, 'context_type', 'TypeScript type name')
   assertOptionalString(raw, 'shared_output', 'path to the shared output directory')
-  assertOptionalString(raw, 'spec_prefix', 'identifier prefix (e.g. "PublicApi")')
-  if (
-    raw['spec_prefix'] !== undefined &&
-    !/^[A-Za-z_$][\w$]*$/.test(raw['spec_prefix'] as string)
-  ) {
-    throw new Error(
-      '"spec_prefix" must be a valid TypeScript identifier prefix (letters, digits, _ or $; not starting with a digit)'
-    )
-  }
-  const errorFormat = raw['error_format']
-  if (errorFormat !== undefined && errorFormat !== 'default' && errorFormat !== 'problem+json') {
-    throw new Error('"error_format" must be one of: "default" or "problem+json"')
-  }
+  assertSpecPrefix(raw)
+  const errorFormat = parseErrorFormat(raw)
   if (
     raw['emit_response_validation'] !== undefined &&
     typeof raw['emit_response_validation'] !== 'boolean'
@@ -126,7 +135,7 @@ function parseServerConfig(
     emit_response_validation: raw['emit_response_validation'] as boolean | undefined,
     shared_output: raw['shared_output'] as string | undefined,
     spec_prefix: raw['spec_prefix'] as string | undefined,
-    error_format: errorFormat as 'default' | 'problem+json' | undefined,
+    error_format: errorFormat,
   }
 }
 

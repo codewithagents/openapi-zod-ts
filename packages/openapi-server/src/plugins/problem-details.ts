@@ -96,7 +96,7 @@ export function fastifyProblemHelperLines(): string[] {
 
 const HONO_INSTANCE = 'c.req.path'
 const EXPRESS_INSTANCE = 'req.baseUrl + req.path'
-export const FASTIFY_INSTANCE = "req.url.split('?')[0]!"
+const FASTIFY_INSTANCE = "req.url.split('?')[0]!"
 
 /**
  * Hono `return ...` statement for a router-produced error with a literal message.

@@ -141,6 +141,17 @@ async function generateSchemaEnhancedRouter(
   // Compute the relative path from this router's outputDir to the shared errors module.
   const errorsImportPath = sharedErrorsImportPath(outputDir, sharedDir)
 
+  // Router options shared by the Fastify zero-cast and the Hono/Express second pass.
+  const enhancedRouterOptions: FastifyRouterOptions = {
+    schemaNames,
+    schemaImportAliases: importAliases,
+    schemaImportPath: schemaImportPathJs,
+    contextType: config.context_type,
+    emitResponseValidation: config.emit_response_validation === true,
+    errorsImportPath,
+    errorFormat: config.error_format,
+  }
+
   // For Fastify: emit schema-types.ts (z.infer aliases) and re-emit service.ts using those
   // aliases. This enables the zero-cast router path where req.body and service params align.
   if (framework === 'fastify') {
@@ -167,14 +178,8 @@ async function generateSchemaEnhancedRouter(
     console.log(`${prefix}  ✓ service.ts (Fastify-typed, imports from schema-types.js)`)
 
     const routerFile = buildRouterFile(spec, framework, {
-      schemaNames,
-      schemaImportAliases: importAliases,
-      schemaImportPath: schemaImportPathJs,
+      ...enhancedRouterOptions,
       zeroCast: true,
-      contextType: config.context_type,
-      emitResponseValidation: config.emit_response_validation === true,
-      errorsImportPath,
-      errorFormat: config.error_format,
     })
     const routerPath = join(outputDir, routerFile.filename)
     await writeFile(routerPath, await formatTs(routerFile.content, routerPath), 'utf-8')
@@ -182,15 +187,7 @@ async function generateSchemaEnhancedRouter(
     return
   }
 
-  const routerFile = buildRouterFile(spec, framework, {
-    schemaNames,
-    schemaImportAliases: importAliases,
-    schemaImportPath: schemaImportPathJs,
-    contextType: config.context_type,
-    emitResponseValidation: config.emit_response_validation === true,
-    errorsImportPath,
-    errorFormat: config.error_format,
-  })
+  const routerFile = buildRouterFile(spec, framework, enhancedRouterOptions)
   const routerPath = join(outputDir, routerFile.filename)
   await writeFile(routerPath, await formatTs(routerFile.content, routerPath), 'utf-8')
   console.log(`${prefix}  ✓ router.ts (with Zod validation for ${schemaNames.size} schema(s))`)

@@ -681,15 +681,7 @@ function responseValidationExpr(
   schemaNames: Set<string> | undefined,
   emitResponseValidation: boolean | undefined
 ): string | undefined {
-  if (emitResponseValidation !== true) return undefined
-  const rs = op.responseStatus
-  if (rs.isVoid || rs.isMultiStatus === true) return undefined
-  if (
-    rs.responseContentType === 'text/plain' ||
-    rs.responseContentType === 'application/octet-stream'
-  ) {
-    return undefined
-  }
+  if (emitResponseValidation !== true || !isPlainJsonResponse(op.responseStatus)) return undefined
   if (op.responseTypeName !== undefined && schemaNames?.has(`${op.responseTypeName}Schema`)) {
     const name = `${op.responseTypeName}Schema`
     return op.responseIsArray === true ? `z.array(${name})` : name
@@ -697,6 +689,30 @@ function responseValidationExpr(
   if (op.primaryResponseSchema === undefined || isRef(op.primaryResponseSchema)) return undefined
   const expr = synthesizeResponseSchemaExpr(op.primaryResponseSchema)
   return expr === 'z.unknown()' ? undefined : expr
+}
+
+/** True for a single-status JSON response body (not void, multi-status, text or binary). */
+function isPlainJsonResponse(rs: ResponseStatus): boolean {
+  if (rs.isVoid || rs.isMultiStatus === true) return false
+  return (
+    rs.responseContentType !== 'text/plain' && rs.responseContentType !== 'application/octet-stream'
+  )
+}
+
+/** Push the `z` import and the input_schema import (aliased for spec_prefix) when needed. */
+function pushZodAndSchemaImports(
+  lines: string[],
+  needsZod: boolean,
+  importSchemaNames: Set<string>,
+  options: RouterOptions | undefined
+): void {
+  if (needsZod) {
+    lines.push(`import { z } from 'zod'`)
+  }
+  if (importSchemaNames.size > 0 && options?.schemaImportPath !== undefined) {
+    const specifiers = formatSchemaImportSpecifiers(importSchemaNames, options.schemaImportAliases)
+    lines.push(`import { ${specifiers} } from '${options.schemaImportPath}'`)
+  }
 }
 
 /** Response schema names actually referenced by the response-validation blocks. */
@@ -1366,13 +1382,7 @@ export function generateExpressRouter(
   const ctx = options?.contextType
   const serviceRef = ctx !== undefined ? `${serviceName}<${ctx}>` : serviceName
   lines.push(`import type { ${serviceName} } from './service.js'`)
-  if (needsZod) {
-    lines.push(`import { z } from 'zod'`)
-  }
-  if (importSchemaNames.size > 0 && options?.schemaImportPath !== undefined) {
-    const specifiers = formatSchemaImportSpecifiers(importSchemaNames, options.schemaImportAliases)
-    lines.push(`import { ${specifiers} } from '${options.schemaImportPath}'`)
-  }
+  pushZodAndSchemaImports(lines, needsZod, importSchemaNames, options)
   const expressErrorsPath = options?.errorsImportPath ?? './_shared/errors.js'
   lines.push('')
   lines.push(`import { HttpError } from '${expressErrorsPath}'`)
@@ -1448,13 +1458,7 @@ export function generateRouter(spec: OpenAPIV3_1.Document, options?: RouterOptio
     lines.push(`import type { ${sortedBodyTypes.join(', ')} } from './models.js'`)
   }
   lines.push(`import type { ${serviceName} } from './service.js'`)
-  if (needsZod) {
-    lines.push(`import { z } from 'zod'`)
-  }
-  if (importSchemaNames.size > 0 && options?.schemaImportPath !== undefined) {
-    const specifiers = formatSchemaImportSpecifiers(importSchemaNames, options.schemaImportAliases)
-    lines.push(`import { ${specifiers} } from '${options.schemaImportPath}'`)
-  }
+  pushZodAndSchemaImports(lines, needsZod, importSchemaNames, options)
   const honoErrorsPath = options?.errorsImportPath ?? './_shared/errors.js'
   lines.push('')
   lines.push(`import { HttpError } from '${honoErrorsPath}'`)
