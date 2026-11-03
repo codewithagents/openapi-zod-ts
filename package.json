@@ -23,9 +23,9 @@
     "@typescript-eslint/eslint-plugin": "catalog:",
     "@typescript-eslint/parser": "catalog:",
     "eslint": "catalog:",
-    "fallow": "^3.0.0",
+    "fallow": "^3.38.1",
     "prettier": "catalog:",
-    "typescript": "^6.0.3"
+    "typescript": "catalog:"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

@@ -2,7 +2,12 @@
 // tsc --noEmit exercises all these patterns on every `pnpm lint` run in CI.
 
 import type { Task, CreateTaskRequest } from '../generated/models.js'
-import { useListTasks, useListTasksInfinite, useGetTask, useCreateTask } from '../generated/hooks.js'
+import {
+  useListTasks,
+  useListTasksInfinite,
+  useGetTask,
+  useCreateTask,
+} from '../generated/hooks.js'
 import { createServerClient } from '../generated/server.js'
 
 // Pattern 1: useQuery with no params (list hook)

@@ -25,7 +25,10 @@ function makeArrayQuerySpec(
     name: paramName,
     in: 'query',
     required: opts.required ?? false,
-    schema: { type: 'array', items: { type: itemType as 'string' | 'integer' | 'number' | 'boolean' } },
+    schema: {
+      type: 'array',
+      items: { type: itemType as 'string' | 'integer' | 'number' | 'boolean' },
+    },
     ...(opts.style !== undefined ? { style: opts.style } : {}),
     ...(opts.explode !== undefined ? { explode: opts.explode } : {}),
   }

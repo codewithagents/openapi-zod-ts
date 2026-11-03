@@ -24,9 +24,7 @@
       "post": {
         "operationId": "batchCreateAlbums",
         "summary": "Batch create — body + required $ref param",
-        "parameters": [
-          { "$ref": "#/components/parameters/RequiredFormat" }
-        ],
+        "parameters": [{ "$ref": "#/components/parameters/RequiredFormat" }],
         "requestBody": {
           "required": true,
           "content": {
@@ -71,9 +69,7 @@
       "get": {
         "operationId": "getMultipleArtists",
         "summary": "Get multiple artists — all-required $ref params",
-        "parameters": [
-          { "$ref": "#/components/parameters/RequiredIds" }
-        ],
+        "parameters": [{ "$ref": "#/components/parameters/RequiredIds" }],
         "responses": {
           "200": {
             "description": "Artists",

@@ -6,7 +6,11 @@ import { loadConfigs, type ServerConfig } from './config.js'
 import { generateService, type ServiceOptions } from './plugins/service.js'
 import { generateFastifyTypes, generateFastifyTypedService } from './plugins/fastify-service.js'
 import { generateRouter, generateExpressRouter, generateFastifyRouter } from './plugins/router.js'
-import { emitSharedErrorsFile, deriveSharedDir, sharedErrorsImportPath } from './plugins/errors-emitter.js'
+import {
+  emitSharedErrorsFile,
+  deriveSharedDir,
+  sharedErrorsImportPath,
+} from './plugins/errors-emitter.js'
 
 async function formatTs(content: string, filePath: string): Promise<string> {
   const { format, resolveConfig } = await import('prettier')
@@ -129,8 +133,14 @@ async function generateSchemaEnhancedRouter(
   if (framework === 'fastify') {
     const schemaTypesFile = generateFastifyTypes(exportedSchemas, schemaImportPathJs)
     const schemaTypesPath = join(outputDir, schemaTypesFile.filename)
-    await writeFile(schemaTypesPath, await formatTs(schemaTypesFile.content, schemaTypesPath), 'utf-8')
-    console.log(`${prefix}  ✓ schema-types.ts (z.infer aliases for ${exportedSchemas.size} schema(s))`)
+    await writeFile(
+      schemaTypesPath,
+      await formatTs(schemaTypesFile.content, schemaTypesPath),
+      'utf-8'
+    )
+    console.log(
+      `${prefix}  ✓ schema-types.ts (z.infer aliases for ${exportedSchemas.size} schema(s))`
+    )
 
     const fastifyServiceFile = generateFastifyTypedService(spec, {
       schemaNames: exportedSchemas,
@@ -138,7 +148,11 @@ async function generateSchemaEnhancedRouter(
       contextType: config.context_type,
     })
     const fastifyServicePath = join(outputDir, fastifyServiceFile.filename)
-    await writeFile(fastifyServicePath, await formatTs(fastifyServiceFile.content, fastifyServicePath), 'utf-8')
+    await writeFile(
+      fastifyServicePath,
+      await formatTs(fastifyServiceFile.content, fastifyServicePath),
+      'utf-8'
+    )
     console.log(`${prefix}  ✓ service.ts (Fastify-typed, imports from schema-types.js)`)
 
     const routerFile = buildRouterFile(spec, framework, {

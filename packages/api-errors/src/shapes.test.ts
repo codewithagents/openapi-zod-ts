@@ -885,7 +885,10 @@ describe('graphql-extensions shape', () => {
 
   it('skips items without a message', () => {
     const result = extractErrors({
-      errors: [{ extensions: { field: 'email' } }, { message: 'valid', extensions: { field: 'name' } }],
+      errors: [
+        { extensions: { field: 'email' } },
+        { message: 'valid', extensions: { field: 'name' } },
+      ],
     })
     expect(result.fieldErrors).toEqual([{ field: 'name', message: 'valid' }])
   })

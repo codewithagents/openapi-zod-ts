@@ -20,9 +20,7 @@ import type { OpenAPIV3_1 } from 'openapi-types'
  * Use this to keep per-test spec literals focused on the delta rather than
  * repeating the same boilerplate skeleton in every file.
  */
-export function makeSpec(
-  overrides: Partial<OpenAPIV3_1.Document> = {}
-): OpenAPIV3_1.Document {
+export function makeSpec(overrides: Partial<OpenAPIV3_1.Document> = {}): OpenAPIV3_1.Document {
   const base: OpenAPIV3_1.Document = {
     openapi: '3.1.0',
     info: { title: 'Test API', version: '1' },
@@ -174,9 +172,7 @@ export function compileSingleFile(
   }
 
   const program = ts.createProgram([filename], options, customHost)
-  return ts
-    .getPreEmitDiagnostics(program, sourceFile)
-    .filter((d) => d.file?.fileName === filename)
+  return ts.getPreEmitDiagnostics(program, sourceFile).filter((d) => d.file?.fileName === filename)
 }
 
 // ---------------------------------------------------------------------------

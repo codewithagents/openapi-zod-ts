@@ -1,11 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import type { PetstoreService } from '../../generated/service.js'
 import { HttpError } from '../../generated/router.js'
-import type {
-  Pet,
-  LabDelimitedEcho,
-  LabDeepFilterEcho,
-} from '../../generated/models.js'
+import type { Pet, LabDelimitedEcho, LabDeepFilterEcho } from '../../generated/models.js'
 
 const pets = new Map<string, Pet>()
 

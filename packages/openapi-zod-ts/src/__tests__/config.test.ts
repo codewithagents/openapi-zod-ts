@@ -153,12 +153,12 @@ describe('loadConfig', () => {
 
   it('throws when drift is an invalid value', async () => {
     writeConfig({ input_openapi: 'openapi.json', output: 'src/api', drift: 'throw' })
-    await expect(loadConfig(tmpDir)).rejects.toThrow('"drift" must be \'error\' or \'warn\'')
+    await expect(loadConfig(tmpDir)).rejects.toThrow("\"drift\" must be 'error' or 'warn'")
   })
 
   it('throws when drift is a boolean', async () => {
     writeConfig({ input_openapi: 'openapi.json', output: 'src/api', drift: true })
-    await expect(loadConfig(tmpDir)).rejects.toThrow('"drift" must be \'error\' or \'warn\'')
+    await expect(loadConfig(tmpDir)).rejects.toThrow("\"drift\" must be 'error' or 'warn'")
   })
 
   it('ignores unknown config fields', async () => {
@@ -499,9 +499,7 @@ describe('loadConfigs: projects array support', () => {
 
   it('throws when a project entry has an invalid drift value', async () => {
     writeConfig({
-      projects: [
-        { input_openapi: 'services/users.json', output: 'src/users', drift: 'throw' },
-      ],
+      projects: [{ input_openapi: 'services/users.json', output: 'src/users', drift: 'throw' }],
     })
     await expect(loadConfigs(tmpDir)).rejects.toThrow('projects[0]')
   })

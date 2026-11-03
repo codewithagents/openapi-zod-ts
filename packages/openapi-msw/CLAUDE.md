@@ -1,6 +1,6 @@
 # @codewithagents/openapi-msw (v0.2.0). CLI: `openapi-msw`
 
-Generates MSW v2 HTTP handlers with seeded Faker mock data from an OpenAPI 3.x spec (3.1 primary target, 3.0.x best-effort). Depends on `openapi-zod-ts` (`parseSpec`, config-core, cli-core); peer deps `msw` ^2 and `@faker-js/faker` ^9.
+Generates MSW v2 HTTP handlers with seeded Faker mock data from an OpenAPI 3.x spec (3.1 primary target, 3.0.x best-effort). Depends on `openapi-zod-ts` (`parseSpec`, config-core, cli-core); peer deps `msw` ^2 || ^3 and `@faker-js/faker` ^10.
 
 ## What it generates
 
@@ -27,7 +27,7 @@ Multi-spec generation via a top-level `projects` array (inherited from openapi-z
 
 ## Peer dependencies
 
-`msw` ^2 and `@faker-js/faker` ^9 are peer dependencies, not bundled. Install them yourself:
+`msw` ^2 || ^3 and `@faker-js/faker` ^10 are peer dependencies, not bundled. Install them yourself:
 
 ```
 pnpm add msw @faker-js/faker

@@ -1,11 +1,6 @@
 // Shared operation IR helpers consumed by the framework router emitters (router.ts, fastify-type-provider.ts). Framework-divergent logic stays in each emitter.
 import type { OpenAPIV3_1 } from 'openapi-types'
-import {
-  type SupportedMethod,
-  isRef,
-  resolveParam,
-  type BodyInfo,
-} from './shared.js'
+import { type SupportedMethod, isRef, resolveParam, type BodyInfo } from './shared.js'
 
 type OperationObject = OpenAPIV3_1.OperationObject
 type ReferenceObject = OpenAPIV3_1.ReferenceObject
@@ -168,8 +163,7 @@ export function getResponseStatus(
   httpMethod: SupportedMethod
 ): ResponseStatus {
   const responses = operation.responses as
-    | Record<string, ResponseObject | ReferenceObject>
-    | undefined
+    Record<string, ResponseObject | ReferenceObject> | undefined
 
   if (responses === undefined) {
     return httpMethod === 'delete'
@@ -222,14 +216,13 @@ export function getResponseStatus(
   if (twoxxKeys.length === 1) {
     const code = parseInt(twoxxKeys[0], 10)
     const resp = responses[twoxxKeys[0]]
-    const isVoid =
-      isRef(resp)
-        ? false
-        : (() => {
-            const r = resp as ResponseObject
-            const content = r.content as Record<string, unknown> | undefined
-            return content === undefined || Object.keys(content).length === 0
-          })()
+    const isVoid = isRef(resp)
+      ? false
+      : (() => {
+          const r = resp as ResponseObject
+          const content = r.content as Record<string, unknown> | undefined
+          return content === undefined || Object.keys(content).length === 0
+        })()
     return { status: code, isVoid, responseContentType: detectResponseContentType(resp) }
   }
 

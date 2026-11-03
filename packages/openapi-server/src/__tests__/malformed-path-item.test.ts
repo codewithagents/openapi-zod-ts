@@ -29,7 +29,9 @@ function generateAndCollectMalformedWarnings(spec: OpenAPIV3_1.Document): {
     const { content } = generateService(spec)
     const warnings = warnSpy.mock.calls
       .map((call) => call[0])
-      .filter((m): m is string => typeof m === 'string' && m.includes('not a valid Path Item Object'))
+      .filter(
+        (m): m is string => typeof m === 'string' && m.includes('not a valid Path Item Object')
+      )
     return { content, warnings }
   } finally {
     warnSpy.mockRestore()

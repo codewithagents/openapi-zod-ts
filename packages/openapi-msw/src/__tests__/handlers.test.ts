@@ -77,7 +77,7 @@ describe('generateHandlers: task-api.json fixture', () => {
   })
 
   it('uses faker.date.recent().toISOString().slice(0, 10) for date fields', () => {
-    expect(content).toContain("faker.date.recent().toISOString().slice(0, 10)")
+    expect(content).toContain('faker.date.recent().toISOString().slice(0, 10)')
   })
 
   it('uses faker.internet.url() for uri format fields', () => {
@@ -164,7 +164,11 @@ describe('generateHandlers: depth cap on circular schemas', () => {
   }
 
   it('terminates circular reference with null comment', () => {
-    const { content: c } = generateHandlers(circularSpec, { seed: 42, maxArrayItems: 3, depthCap: 2 })
+    const { content: c } = generateHandlers(circularSpec, {
+      seed: 42,
+      maxArrayItems: 3,
+      depthCap: 2,
+    })
     expect(c).toContain('null /* circular ref: depth cap reached */')
   })
 })
@@ -218,10 +222,7 @@ describe('generateHandlers: anyOf/oneOf picks first member', () => {
               content: {
                 'application/json': {
                   schema: {
-                    anyOf: [
-                      { type: 'string' },
-                      { type: 'integer' },
-                    ],
+                    anyOf: [{ type: 'string' }, { type: 'integer' }],
                   },
                 },
               },

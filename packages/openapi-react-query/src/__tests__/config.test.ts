@@ -3,7 +3,13 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { loadConfig, loadConfigs, validateConfigPath, validateOutputPath, validateInputPath } from '../config.js'
+import {
+  loadConfig,
+  loadConfigs,
+  validateConfigPath,
+  validateOutputPath,
+  validateInputPath,
+} from '../config.js'
 
 describe('loadConfig', () => {
   let tmpDir: string

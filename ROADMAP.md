@@ -91,7 +91,7 @@ Generates MSW v2 HTTP handlers with seeded Faker mock data from an OpenAPI 3.1 s
 
 - One `http.<method>(path, resolver)` handler per operation
 - Faker-seeded responses derived from response schemas
-- Peer dependencies: `msw` (`^2`) and `@faker-js/faker` (`^9`)
+- Peer dependencies: `msw` (`^2 || ^3`) and `@faker-js/faker` (`^10`)
 
 ---
 

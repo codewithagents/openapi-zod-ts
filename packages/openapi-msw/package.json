@@ -3,6 +3,9 @@
   "version": "0.2.1",
   "description": "Generate MSW v2 handlers with seeded Faker mock data from OpenAPI 3.1 specs",
   "type": "module",
+  "engines": {
+    "node": ">=22.19.0"
+  },
   "bin": {
     "openapi-msw": "dist/cli.cjs"
   },
@@ -27,14 +30,14 @@
   },
   "peerDependencies": {
     "@faker-js/faker": "^10.5.0",
-    "msw": "^2.0.0"
+    "msw": "^2.0.0 || ^3.0.0"
   },
   "devDependencies": {
-    "@faker-js/faker": "^10.5.0",
+    "@faker-js/faker": "^10.6.0",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "esbuild": "catalog:",
-    "msw": "^2.14.6",
+    "msw": "^3.0.3",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },

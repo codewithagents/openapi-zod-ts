@@ -15,7 +15,9 @@ afterEach(async () => {
   }
 })
 
-async function writeConfig(obj: Record<string, unknown>): Promise<{ cwd: string; configPath: string }> {
+async function writeConfig(
+  obj: Record<string, unknown>
+): Promise<{ cwd: string; configPath: string }> {
   tmpDir = await mkdtemp(join(tmpdir(), 'openapi-msw-config-test-'))
   const configPath = join(tmpDir, 'openapi-msw.config.json')
   await writeFile(configPath, JSON.stringify(obj), 'utf-8')
@@ -85,7 +87,9 @@ describe('loadConfig: invalid field values', () => {
       output: 'generated',
       max_array_items: 2.5,
     })
-    await expect(loadConfig(cwd, configPath)).rejects.toThrow('"max_array_items" must be an integer')
+    await expect(loadConfig(cwd, configPath)).rejects.toThrow(
+      '"max_array_items" must be an integer'
+    )
   })
 
   it('rejects zero depth_cap', async () => {

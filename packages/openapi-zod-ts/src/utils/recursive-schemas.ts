@@ -71,8 +71,7 @@ function reachableFromSelf(start: string, edges: Map<string, Set<string>>): bool
  */
 export function findRecursiveSchemaNames(spec: OpenAPIV3_1.Document): Set<string> {
   const schemas = spec.components?.schemas as
-    | Record<string, SchemaObject | ReferenceObject>
-    | undefined
+    Record<string, SchemaObject | ReferenceObject> | undefined
   if (schemas === undefined) return new Set()
 
   const edges = new Map<string, Set<string>>()

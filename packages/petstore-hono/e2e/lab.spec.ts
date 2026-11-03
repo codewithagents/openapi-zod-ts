@@ -23,7 +23,7 @@ const LAB_OK = 200
 async function labPost(
   request: import('@playwright/test').APIRequestContext,
   endpoint: string,
-  payload: unknown,
+  payload: unknown
 ): Promise<{ status: number; body: unknown }> {
   const res = await request.post(`${LAB_BASE}/${endpoint}`, {
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
@@ -42,7 +42,7 @@ async function labPost(
 async function labGet(
   request: import('@playwright/test').APIRequestContext,
   pathAndQuery: string,
-  extraHeaders: Record<string, string> = {},
+  extraHeaders: Record<string, string> = {}
 ): Promise<{ status: number; body: unknown }> {
   const res = await request.get(`${LAB_BASE}/${pathAndQuery}`, {
     headers: { Accept: 'application/json', ...extraHeaders },
@@ -68,13 +68,23 @@ test('lab/numeric: bounds, exclusive bounds, and multipleOf round-trip and rejec
   expect(ok.body).toEqual({ bounded: 15, exclusive: 0.5, multiple: 25 })
 
   // minimum / maximum
-  expect((await labPost(request, 'numeric', { bounded: 9, exclusive: 0.5, multiple: 25 })).status).toBe(422)
-  expect((await labPost(request, 'numeric', { bounded: 21, exclusive: 0.5, multiple: 25 })).status).toBe(422)
+  expect(
+    (await labPost(request, 'numeric', { bounded: 9, exclusive: 0.5, multiple: 25 })).status
+  ).toBe(422)
+  expect(
+    (await labPost(request, 'numeric', { bounded: 21, exclusive: 0.5, multiple: 25 })).status
+  ).toBe(422)
   // exclusiveMinimum / exclusiveMaximum — boundary values are rejected
-  expect((await labPost(request, 'numeric', { bounded: 15, exclusive: 0, multiple: 25 })).status).toBe(422)
-  expect((await labPost(request, 'numeric', { bounded: 15, exclusive: 1, multiple: 25 })).status).toBe(422)
+  expect(
+    (await labPost(request, 'numeric', { bounded: 15, exclusive: 0, multiple: 25 })).status
+  ).toBe(422)
+  expect(
+    (await labPost(request, 'numeric', { bounded: 15, exclusive: 1, multiple: 25 })).status
+  ).toBe(422)
   // multipleOf
-  expect((await labPost(request, 'numeric', { bounded: 15, exclusive: 0.5, multiple: 23 })).status).toBe(422)
+  expect(
+    (await labPost(request, 'numeric', { bounded: 15, exclusive: 0.5, multiple: 23 })).status
+  ).toBe(422)
 })
 
 test('lab/string: minLength, maxLength, and pattern round-trip and reject', async ({ request }) => {
@@ -83,18 +93,26 @@ test('lab/string: minLength, maxLength, and pattern round-trip and reject', asyn
   expect(ok.body).toEqual({ sized: 'hello', coded: 'AB-1234' })
 
   expect((await labPost(request, 'string', { sized: 'ab', coded: 'AB-1234' })).status).toBe(422) // min:3
-  expect((await labPost(request, 'string', { sized: 'toolongvalue', coded: 'AB-1234' })).status).toBe(422) // max:8
+  expect(
+    (await labPost(request, 'string', { sized: 'toolongvalue', coded: 'AB-1234' })).status
+  ).toBe(422) // max:8
   expect((await labPost(request, 'string', { sized: 'hello', coded: 'bad-code' })).status).toBe(422) // pattern
 })
 
-test('lab/array: minItems, maxItems, and uniqueItems round-trip and reject', async ({ request }) => {
+test('lab/array: minItems, maxItems, and uniqueItems round-trip and reject', async ({
+  request,
+}) => {
   const ok = await labPost(request, 'array', { bag: ['a', 'b'], distinct: [1, 2, 3] })
   expect(ok.status).toBe(LAB_OK)
   expect(ok.body).toEqual({ bag: ['a', 'b'], distinct: [1, 2, 3] })
 
   expect((await labPost(request, 'array', { bag: ['a'], distinct: [1] })).status).toBe(422) // minItems
-  expect((await labPost(request, 'array', { bag: ['a', 'b', 'c', 'd', 'e'], distinct: [1] })).status).toBe(422) // maxItems
-  expect((await labPost(request, 'array', { bag: ['a', 'b'], distinct: [1, 1, 2] })).status).toBe(422) // uniqueItems
+  expect(
+    (await labPost(request, 'array', { bag: ['a', 'b', 'c', 'd', 'e'], distinct: [1] })).status
+  ).toBe(422) // maxItems
+  expect((await labPost(request, 'array', { bag: ['a', 'b'], distinct: [1, 1, 2] })).status).toBe(
+    422
+  ) // uniqueItems
 })
 
 test('lab/enum-const: enum membership and const round-trip and reject', async ({ request }) => {
@@ -102,7 +120,9 @@ test('lab/enum-const: enum membership and const round-trip and reject', async ({
   expect(ok.status).toBe(LAB_OK)
   expect(ok.body).toEqual({ color: 'green', version: 'v2' })
 
-  expect((await labPost(request, 'enum-const', { color: 'purple', version: 'v2' })).status).toBe(422) // enum
+  expect((await labPost(request, 'enum-const', { color: 'purple', version: 'v2' })).status).toBe(
+    422
+  ) // enum
   expect((await labPost(request, 'enum-const', { color: 'green', version: 'v1' })).status).toBe(422) // const
 })
 
@@ -130,12 +150,18 @@ test('lab/presence: required, nullable, optional, and default behave per contrac
   expect((await labPost(request, 'presence', { nullableField: 'x' })).status).toBe(422)
 
   // Explicit null on nullable field is accepted and stays null
-  const explicitNull = await labPost(request, 'presence', { mandatory: 'here', nullableField: null })
+  const explicitNull = await labPost(request, 'presence', {
+    mandatory: 'here',
+    nullableField: null,
+  })
   expect(explicitNull.status).toBe(LAB_OK)
   expect((explicitNull.body as Record<string, unknown>).nullableField).toBeNull()
 
   // Overriding the default is honored
-  const overridden = await labPost(request, 'presence', { mandatory: 'here', withDefault: 'custom' })
+  const overridden = await labPost(request, 'presence', {
+    mandatory: 'here',
+    withDefault: 'custom',
+  })
   expect((overridden.body as Record<string, unknown>).withDefault).toBe('custom')
 })
 
@@ -184,7 +210,9 @@ test('lab/empty-map: GET returns LabMap with counts:{} on the wire (response-sid
 // C. SCALAR UNIONS
 // ===========================================================================
 
-test('lab/union: oneOf scalar union hydrates BOTH variants without coercion', async ({ request }) => {
+test('lab/union: oneOf scalar union hydrates BOTH variants without coercion', async ({
+  request,
+}) => {
   const asString = await labPost(request, 'union', { value: 'hello' })
   expect(asString.status).toBe(LAB_OK)
   expect((asString.body as Record<string, unknown>).value).toBe('hello')
@@ -287,9 +315,13 @@ test('lab/inherit-shape: allOf-inheritance discriminated union hydrates each var
   expect(boatBody.wheels).toBeUndefined()
 
   // variant-specific rule: car.wheels min:3
-  expect((await labPost(request, 'inherit-shape', { vehicleType: 'car', wheels: 2 })).status).toBe(422)
+  expect((await labPost(request, 'inherit-shape', { vehicleType: 'car', wheels: 2 })).status).toBe(
+    422
+  )
   // unknown discriminator value is a clean 422
-  expect((await labPost(request, 'inherit-shape', { vehicleType: 'plane', wheels: 4 })).status).toBe(422)
+  expect(
+    (await labPost(request, 'inherit-shape', { vehicleType: 'plane', wheels: 4 })).status
+  ).toBe(422)
 })
 
 test('lab/inherit-shape: missing discriminator field is rejected with 422', async ({ request }) => {
@@ -329,7 +361,9 @@ test('lab/backed-enum: a named string enum component round-trips and rejects out
   expect((await labPost(request, 'backed-enum', { priority: 'urgent' })).status).toBe(422)
 })
 
-test('lab/tuple: prefixItems validate per position and the value round-trips', async ({ request }) => {
+test('lab/tuple: prefixItems validate per position and the value round-trips', async ({
+  request,
+}) => {
   const ok = await labPost(request, 'tuple', { pair: ['hi', 5] })
   expect(ok.status).toBe(LAB_OK)
   expect((ok.body as Record<string, unknown>).pair).toEqual(['hi', 5])
@@ -462,15 +496,12 @@ test('lab/query: required query params missing → 422; valid params → 200 ech
   expect((await labGet(request, 'query?tier=gold&count=50')).status).toBe(422)
 })
 
-test(
-  'lab/query: enum+min/max+pattern query param violations → 422',
-  async ({ request }) => {
-    expect((await labGet(request, 'query?tier=platinum&count=50&code=ABC')).status).toBe(422) // enum
-    expect((await labGet(request, 'query?tier=gold&count=0&code=ABC')).status).toBe(422) // min:1
-    expect((await labGet(request, 'query?tier=gold&count=999&code=ABC')).status).toBe(422) // max:100
-    expect((await labGet(request, 'query?tier=gold&count=50&code=abcd')).status).toBe(422) // pattern
-  },
-)
+test('lab/query: enum+min/max+pattern query param violations → 422', async ({ request }) => {
+  expect((await labGet(request, 'query?tier=platinum&count=50&code=ABC')).status).toBe(422) // enum
+  expect((await labGet(request, 'query?tier=gold&count=0&code=ABC')).status).toBe(422) // min:1
+  expect((await labGet(request, 'query?tier=gold&count=999&code=ABC')).status).toBe(422) // max:100
+  expect((await labGet(request, 'query?tier=gold&count=50&code=abcd')).status).toBe(422) // pattern
+})
 
 // ===========================================================================
 // I. HEADER PARAMS — presence legs only (Phase 1)
@@ -487,13 +518,10 @@ test('lab/header: required header present → 200; missing header → 422', asyn
   expect(missing.status).toBe(422)
 })
 
-test(
-  'lab/header: pattern-violating header value → 422',
-  async ({ request }) => {
-    const bad = await labGet(request, 'header', { 'X-Lab-Token': 'garbage' })
-    expect(bad.status).toBe(422)
-  },
-)
+test('lab/header: pattern-violating header value → 422', async ({ request }) => {
+  const bad = await labGet(request, 'header', { 'X-Lab-Token': 'garbage' })
+  expect(bad.status).toBe(422)
+})
 
 // ===========================================================================
 // J. FORMATS — email/uuid/date/datetime PASS; time/duration/hostname via custom regex
@@ -514,11 +542,15 @@ test('lab/formats: date, datetime, email, uuid round-trip and reject', async ({ 
   expect(ok.body).toEqual(valid)
 
   expect((await labPost(request, 'formats', { ...valid, day: '15-01-2026' })).status).toBe(422)
-  expect((await labPost(request, 'formats', { ...valid, moment: 'not-a-datetime' })).status).toBe(422)
+  expect((await labPost(request, 'formats', { ...valid, moment: 'not-a-datetime' })).status).toBe(
+    422
+  )
   expect((await labPost(request, 'formats', { ...valid, clock: '99:99:99' })).status).toBe(422)
   expect((await labPost(request, 'formats', { ...valid, span: '2 hours' })).status).toBe(422)
   expect((await labPost(request, 'formats', { ...valid, mail: 'notanemail' })).status).toBe(422)
-  expect((await labPost(request, 'formats', { ...valid, identifier: 'not-a-uuid' })).status).toBe(422)
+  expect((await labPost(request, 'formats', { ...valid, identifier: 'not-a-uuid' })).status).toBe(
+    422
+  )
   expect((await labPost(request, 'formats', { ...valid, host: 'not a host!' })).status).toBe(422)
 })
 
@@ -540,25 +572,20 @@ test('K3: JSON array where an object is expected is a clean 422', async ({ reque
 // L. INLINE BODY (Step 0 verification + Phase 2 fixme)
 // ===========================================================================
 
-test('lab/inline-body: valid inline body is accepted and echoed', async ({
-  request,
-}) => {
+test('lab/inline-body: valid inline body is accepted and echoed', async ({ request }) => {
   // Bug #1 fixed: LabInlineBodySchema.safeParse is now wired. Valid input passes and is echoed.
   const ok = await labPost(request, 'inline-body', { title: 'hello', rank: 3 })
   expect(ok.status).toBe(LAB_OK)
   expect(ok.body).toEqual({ title: 'hello', rank: 3 })
 })
 
-test(
-  'lab/inline-body: constraint violations on inline body → 422',
-  async ({ request }) => {
-    // Bug #1 fixed: getBodyInfo() now synthesizes LabInlineBody from the operationId for
-    // inline JSON schemas. The router wires LabInlineBodySchema.safeParse → 422 on violation.
-    expect((await labPost(request, 'inline-body', { title: 'x', rank: 3 })).status).toBe(422) // minLength:2
-    expect((await labPost(request, 'inline-body', { title: 'hello', rank: 9 })).status).toBe(422) // max:5
-    expect((await labPost(request, 'inline-body', { title: 'hello' })).status).toBe(422) // required rank
-  },
-)
+test('lab/inline-body: constraint violations on inline body → 422', async ({ request }) => {
+  // Bug #1 fixed: getBodyInfo() now synthesizes LabInlineBody from the operationId for
+  // inline JSON schemas. The router wires LabInlineBodySchema.safeParse → 422 on violation.
+  expect((await labPost(request, 'inline-body', { title: 'x', rank: 3 })).status).toBe(422) // minLength:2
+  expect((await labPost(request, 'inline-body', { title: 'hello', rank: 9 })).status).toBe(422) // max:5
+  expect((await labPost(request, 'inline-body', { title: 'hello' })).status).toBe(422) // required rank
+})
 
 // ===========================================================================
 // PHASE 2 — Bug-hunt seams
@@ -574,19 +601,18 @@ test(
 // P2: /lab/delimited-query — style/explode not deserialized
 // ---------------------------------------------------------------------------
 
-test(
-  'lab/delimited-query: csv/ssv/psv query arrays are split by delimiter',
-  async ({ request }) => {
-    // Generator now emits .split(','), .split(' '), .split('|') for style:form/spaceDelimited/
-    // pipeDelimited with explode:false. params.csv etc. arrive as string[] before Zod.
-    const res = await labGet(request, 'delimited-query?csv=a,b,c&ssv=x%20y%20z&psv=p|q|r')
-    expect(res.status).toBe(200)
-    const body = res.body as Record<string, unknown>
-    expect(body.csv).toEqual(['a', 'b', 'c'])
-    expect(body.ssv).toEqual(['x', 'y', 'z'])
-    expect(body.psv).toEqual(['p', 'q', 'r'])
-  },
-)
+test('lab/delimited-query: csv/ssv/psv query arrays are split by delimiter', async ({
+  request,
+}) => {
+  // Generator now emits .split(','), .split(' '), .split('|') for style:form/spaceDelimited/
+  // pipeDelimited with explode:false. params.csv etc. arrive as string[] before Zod.
+  const res = await labGet(request, 'delimited-query?csv=a,b,c&ssv=x%20y%20z&psv=p|q|r')
+  expect(res.status).toBe(200)
+  const body = res.body as Record<string, unknown>
+  expect(body.csv).toEqual(['a', 'b', 'c'])
+  expect(body.ssv).toEqual(['x', 'y', 'z'])
+  expect(body.psv).toEqual(['p', 'q', 'r'])
+})
 
 test('lab/delimited-query: missing required array params → 422', async ({ request }) => {
   // Required params absent → z.string() check fires → 422. This leg is active.
@@ -598,19 +624,18 @@ test('lab/delimited-query: missing required array params → 422', async ({ requ
 // P3: /lab/deep-filter — deepObject not assembled
 // ---------------------------------------------------------------------------
 
-test(
-  'lab/deep-filter: filter[gte] and filter[lte] are assembled into a nested object',
-  async ({ request }) => {
-    // Generator now emits c.req.queries() + bracket-key filtering to assemble deepObject
-    // params. filter[gte]=10 → filter = { gte: '10', ... }. Service coerces to numbers.
-    const res = await labGet(request, 'deep-filter?filter[gte]=10&filter[lte]=100&filter[color]=blue')
-    expect(res.status).toBe(200)
-    const body = res.body as Record<string, unknown>
-    expect(body.gte).toBe(10)
-    expect(body.lte).toBe(100)
-    expect(body.color).toBe('blue')
-  },
-)
+test('lab/deep-filter: filter[gte] and filter[lte] are assembled into a nested object', async ({
+  request,
+}) => {
+  // Generator now emits c.req.queries() + bracket-key filtering to assemble deepObject
+  // params. filter[gte]=10 → filter = { gte: '10', ... }. Service coerces to numbers.
+  const res = await labGet(request, 'deep-filter?filter[gte]=10&filter[lte]=100&filter[color]=blue')
+  expect(res.status).toBe(200)
+  const body = res.body as Record<string, unknown>
+  expect(body.gte).toBe(10)
+  expect(body.lte).toBe(100)
+  expect(body.color).toBe('blue')
+})
 
 // ---------------------------------------------------------------------------
 // P4: /lab/path/{score} — in-range active, out-of-range has no validation
@@ -626,102 +651,89 @@ test('lab/path/{score}: in-range integer path param round-trips as number', asyn
   expect(typeof body.score).toBe('number')
 })
 
-test(
-  'lab/path/{score}: out-of-range integer path param → 422',
-  async ({ request }) => {
-    expect((await labGet(request, 'path/5')).status).toBe(422)  // below minimum:10
-    expect((await labGet(request, 'path/25')).status).toBe(422) // above maximum:20
-  },
-)
+test('lab/path/{score}: out-of-range integer path param → 422', async ({ request }) => {
+  expect((await labGet(request, 'path/5')).status).toBe(422) // below minimum:10
+  expect((await labGet(request, 'path/25')).status).toBe(422) // above maximum:20
+})
 
 // ---------------------------------------------------------------------------
 // P6: /lab/form-body — application/x-www-form-urlencoded not decoded
 // ---------------------------------------------------------------------------
 
-test(
-  'lab/form-body: form-urlencoded body is decoded and echoed',
-  async ({ request }) => {
-    // Bug #7 fixed: getBodyInfo() now recognises application/x-www-form-urlencoded.
-    // Router checks CT, decodes via c.req.parseBody(), runs LabFormBodySchema.safeParse
-    // (z.coerce.number() converts string quantity to integer). Returns 200 echo.
-    const res = await request.post(`${LAB_BASE}/form-body`, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      data: 'label=hello&quantity=5',
-    })
-    expect(res.status()).toBe(200)
-    const body = await res.json()
-    expect(body).toEqual({ label: 'hello', quantity: 5 })
-  },
-)
+test('lab/form-body: form-urlencoded body is decoded and echoed', async ({ request }) => {
+  // Bug #7 fixed: getBodyInfo() now recognises application/x-www-form-urlencoded.
+  // Router checks CT, decodes via c.req.parseBody(), runs LabFormBodySchema.safeParse
+  // (z.coerce.number() converts string quantity to integer). Returns 200 echo.
+  const res = await request.post(`${LAB_BASE}/form-body`, {
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    data: 'label=hello&quantity=5',
+  })
+  expect(res.status()).toBe(200)
+  const body = await res.json()
+  expect(body).toEqual({ label: 'hello', quantity: 5 })
+})
 
 // ---------------------------------------------------------------------------
 // P7: /lab/gallery — multipart/form-data not decoded
 // ---------------------------------------------------------------------------
 
-test(
-  'lab/gallery: multipart photo upload returns count of uploaded files',
-  async ({ request }) => {
-    // Bug #8 fixed: getBodyInfo() now recognises multipart/form-data.
-    // Router emits parseBody({ all: true }) so file fields arrive as File objects.
-    // Service counts the photos and returns { count }.
-    const res = await request.post(`${LAB_BASE}/gallery`, {
-      multipart: {
-        photos: {
-          name: 'photo.jpg',
-          mimeType: 'image/jpeg',
-          buffer: Buffer.from('fake-jpeg-bytes'),
-        },
+test('lab/gallery: multipart photo upload returns count of uploaded files', async ({ request }) => {
+  // Bug #8 fixed: getBodyInfo() now recognises multipart/form-data.
+  // Router emits parseBody({ all: true }) so file fields arrive as File objects.
+  // Service counts the photos and returns { count }.
+  const res = await request.post(`${LAB_BASE}/gallery`, {
+    multipart: {
+      photos: {
+        name: 'photo.jpg',
+        mimeType: 'image/jpeg',
+        buffer: Buffer.from('fake-jpeg-bytes'),
       },
-    })
-    expect(res.status()).toBe(200)
-    const body = await res.json()
-    expect((body as Record<string, unknown>).count).toBe(1)
-  },
-)
+    },
+  })
+  expect(res.status()).toBe(200)
+  const body = await res.json()
+  expect((body as Record<string, unknown>).count).toBe(1)
+})
 
 // ---------------------------------------------------------------------------
 // P8: /lab/accepted — 202-only response; generator defaults to 200
 // ---------------------------------------------------------------------------
 
-test(
-  'lab/accepted: POST with only 202 declared → server returns 202 (#9)',
-  async ({ request }) => {
-    // Bug #9 fixed: getResponseStatus() now detects a single non-200/201/204 2xx and
-    // honors it. getReturnInfo() also reads 202 content for the service return type.
-    const res = await request.post(`${LAB_BASE}/accepted`, {
-      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-      data: { baseField: 'b', extraField: 7 },
-    })
-    expect(res.status()).toBe(202)
-    const body = await res.json() as Record<string, unknown>
-    expect(body.baseField).toBe('b')
-    expect(body.extraField).toBe(7)
-  },
-)
+test('lab/accepted: POST with only 202 declared → server returns 202 (#9)', async ({ request }) => {
+  // Bug #9 fixed: getResponseStatus() now detects a single non-200/201/204 2xx and
+  // honors it. getReturnInfo() also reads 202 content for the service return type.
+  const res = await request.post(`${LAB_BASE}/accepted`, {
+    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+    data: { baseField: 'b', extraField: 7 },
+  })
+  expect(res.status()).toBe(202)
+  const body = (await res.json()) as Record<string, unknown>
+  expect(body.baseField).toBe('b')
+  expect(body.extraField).toBe(7)
+})
 
 // ---------------------------------------------------------------------------
 // P9: /lab/dual-status — handler selects 200 vs 202 via envelope (bug #10 fixed)
 // ---------------------------------------------------------------------------
 
-test(
-  'lab/dual-status: service returns 200 (done) or 202 (running) via status+body envelope',
-  async ({ request }) => {
-    // Bug #10 fixed: generator now emits envelope dispatch for multi-status ops.
-    // Service returns { status: number; body: T } and the router calls
-    // c.json(_envelope.body, _envelope.status) so the handler can select the status at runtime.
+test('lab/dual-status: service returns 200 (done) or 202 (running) via status+body envelope', async ({
+  request,
+}) => {
+  // Bug #10 fixed: generator now emits envelope dispatch for multi-status ops.
+  // Service returns { status: number; body: T } and the router calls
+  // c.json(_envelope.body, _envelope.status) so the handler can select the status at runtime.
 
-    // Case 1: prefer=async -> 202 still running
-    const res202 = await request.get(`${LAB_BASE}/dual-status?prefer=async`)
-    expect(res202.status()).toBe(202)
-    const body202 = await res202.json() as Record<string, unknown>
-    expect(body202.phase).toBe('running')
+  // Case 1: prefer=async -> 202 still running
+  const res202 = await request.get(`${LAB_BASE}/dual-status?prefer=async`)
+  expect(res202.status()).toBe(202)
+  const body202 = (await res202.json()) as Record<string, unknown>
+  expect(body202.phase).toBe('running')
 
-    // Case 2: no prefer param -> 200 done
-    const res200 = await labGet(request, 'dual-status')
-    expect(res200.status).toBe(200)
-    expect((res200.body as Record<string, unknown>).phase).toBe('done')
-  },
-)
+  // Case 2: no prefer param -> 200 done
+  const res200 = await labGet(request, 'dual-status')
+  expect(res200.status).toBe(200)
+  expect((res200.body as Record<string, unknown>).phase).toBe('done')
+})
 
 // ---------------------------------------------------------------------------
 // P10: /lab/plain-text and /lab/download — non-JSON responses (bug #11 fixed)
@@ -770,31 +782,30 @@ test('lab/int64: valid int64 (small) round-trips and negative value is rejected'
   expect((await labPost(request, 'int64', { ledger: -1 })).status).toBe(422)
 })
 
-test.fixme(
-  'lab/int64: int64 value > MAX_SAFE_INTEGER is accepted and echoed (KNOWN LIMITATION: JS precision + Zod implicit int range)',
-  async ({ request }) => {
-    // KNOWN, INTENTIONAL LIMITATION. Do NOT attempt to fix. File as an open issue when the branch is pushed.
-    //
-    // Two compounding root causes prevent representing int64 values > Number.MAX_SAFE_INTEGER (2^53 - 1):
-    //   (a) JavaScript/JSON cannot represent integers > 2^53 - 1. The constant 9007199254740993
-    //       equals 9007199254740992 at runtime (IEEE 754 silent precision loss). Playwright
-    //       therefore sends 9007199254740992 in the JSON body.
-    //   (b) Zod v4 z.number().int() implicitly constrains integers to [-MAX_SAFE, MAX_SAFE]
-    //       (i.e. maximum = 9007199254740991). The received value 9007199254740992 exceeds
-    //       this implicit bound, so Zod rejects with 422 ("Too big: expected int to be <=9007199254740991").
-    //
-    // Fixing this would require BigInt transport (JSON-string encoding for large int64 values)
-    // at both the schema layer (Zod z.bigint()) and the wire layer (custom JSON serializer).
-    // That is a significant breaking change to the generated types and is out of scope for this
-    // branch. Leave this as a permanent test.fixme and open a tracking issue when the branch is pushed.
-    const MAX_SAFE_PLUS_ONE = 9007199254740993 // === 9007199254740992 at runtime in JS
-    const res = await labPost(request, 'int64', { ledger: MAX_SAFE_PLUS_ONE })
-    // Promised: 200 with precise echo. Actual: 422 (Zod implicit int range + JS precision loss).
-    expect(res.status).toBe(LAB_OK)
-    const body = res.body as Record<string, unknown>
-    expect(body.ledger).toBe(MAX_SAFE_PLUS_ONE)
-  },
-)
+test.fixme('lab/int64: int64 value > MAX_SAFE_INTEGER is accepted and echoed (KNOWN LIMITATION: JS precision + Zod implicit int range)', async ({
+  request,
+}) => {
+  // KNOWN, INTENTIONAL LIMITATION. Do NOT attempt to fix. File as an open issue when the branch is pushed.
+  //
+  // Two compounding root causes prevent representing int64 values > Number.MAX_SAFE_INTEGER (2^53 - 1):
+  //   (a) JavaScript/JSON cannot represent integers > 2^53 - 1. The constant 9007199254740993
+  //       equals 9007199254740992 at runtime (IEEE 754 silent precision loss). Playwright
+  //       therefore sends 9007199254740992 in the JSON body.
+  //   (b) Zod v4 z.number().int() implicitly constrains integers to [-MAX_SAFE, MAX_SAFE]
+  //       (i.e. maximum = 9007199254740991). The received value 9007199254740992 exceeds
+  //       this implicit bound, so Zod rejects with 422 ("Too big: expected int to be <=9007199254740991").
+  //
+  // Fixing this would require BigInt transport (JSON-string encoding for large int64 values)
+  // at both the schema layer (Zod z.bigint()) and the wire layer (custom JSON serializer).
+  // That is a significant breaking change to the generated types and is out of scope for this
+  // branch. Leave this as a permanent test.fixme and open a tracking issue when the branch is pushed.
+  const MAX_SAFE_PLUS_ONE = 9007199254740993 // === 9007199254740992 at runtime in JS
+  const res = await labPost(request, 'int64', { ledger: MAX_SAFE_PLUS_ONE })
+  // Promised: 200 with precise echo. Actual: 422 (Zod implicit int range + JS precision loss).
+  expect(res.status).toBe(LAB_OK)
+  const body = res.body as Record<string, unknown>
+  expect(body.ledger).toBe(MAX_SAFE_PLUS_ONE)
+})
 
 // ---------------------------------------------------------------------------
 // P12: DELETE /pets/{id} → 404 for nonexistent pet (service throws → Hono 500)

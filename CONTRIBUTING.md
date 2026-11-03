@@ -6,7 +6,7 @@ Thank you for your interest in contributing! This is a pnpm workspace monorepo. 
 
 ## Prerequisites
 
-- **Node.js 22**, the version CI builds and tests against. There is no `engines` floor pinned, so match CI and use Node 22.
+- **Node.js 22 (>= 22.19)**, the version CI builds and tests against. The published generators declare `engines.node >=22.19.0` (required by `@apidevtools/swagger-parser` 13).
 - **pnpm 10.30.3** is pinned via the `packageManager` field. Run `corepack enable` so the pinned pnpm is used automatically, or install it with `npm install -g pnpm@10.30.3`. Never use npm or yarn at the root.
 - **TypeScript 6**, installed automatically as a dev dependency.
 

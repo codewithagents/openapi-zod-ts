@@ -149,8 +149,7 @@ function resolveParamRef(
   if (match !== null) {
     const name = match[1]!
     const params = spec.components?.parameters as
-      | Record<string, ParameterObject | ReferenceObject>
-      | undefined
+      Record<string, ParameterObject | ReferenceObject> | undefined
     const resolved = params?.[name]
     if (resolved === undefined) return null
     return resolveParamRef(resolved, spec, visitedSet)
@@ -179,9 +178,7 @@ function getResolvedQueryParamNames(
   for (const p of resolved) {
     seen.set(`${p.name}::${p.in}`, p)
   }
-  return [...seen.values()]
-    .filter((p) => p.in === 'query')
-    .map((p) => p.name)
+  return [...seen.values()].filter((p) => p.in === 'query').map((p) => p.name)
 }
 
 const PAGINATED_FALSE = { isPaginated: false, pageParamName: undefined } as const
@@ -267,16 +264,13 @@ function getBodyInfo(
   bodyTypeName: string | undefined
 } {
   const requestBody = operation.requestBody as
-    | OpenAPIV3_1.RequestBodyObject
-    | ReferenceObject
-    | undefined
+    OpenAPIV3_1.RequestBodyObject | ReferenceObject | undefined
   if (requestBody === undefined) return { hasBody: false, bodyTypeName: undefined }
   if (isRef(requestBody)) return { hasBody: true, bodyTypeName: undefined }
 
   const rb = requestBody as OpenAPIV3_1.RequestBodyObject
   const content = rb.content as
-    | Record<string, { schema?: OpenAPIV3_1.SchemaObject | ReferenceObject }>
-    | undefined
+    Record<string, { schema?: OpenAPIV3_1.SchemaObject | ReferenceObject }> | undefined
   if (content === undefined) return { hasBody: true, bodyTypeName: undefined }
 
   // Check multipart first
@@ -768,9 +762,7 @@ function buildMutationVars(
 
   // Multiple path params. Each path param type is derived from its positional
   // index in the client function so integer params stay number (#300).
-  const fields = pathParams
-    .map((p, i) => `${p}: Parameters<typeof ${funcName}>[${i}]`)
-    .join('; ')
+  const fields = pathParams.map((p, i) => `${p}: Parameters<typeof ${funcName}>[${i}]`).join('; ')
   if (!hasBody && !hasQueryParams) {
     const destructured = pathParams.join(', ')
     return {
@@ -976,8 +968,13 @@ export function generateHooks(
   spec: OpenAPIV3_1.Document,
   options: HookGenOptions
 ): { filename: string; content: string } {
-  const { staleTime, gcTime, suspense = false, autoInvalidate = false, infiniteQuery = 'auto' } =
-    options
+  const {
+    staleTime,
+    gcTime,
+    suspense = false,
+    autoInvalidate = false,
+    infiniteQuery = 'auto',
+  } = options
 
   // Collect all operations (metadata extraction separated from string emission)
   const operations = collectOperations(spec, infiniteQuery)

@@ -208,8 +208,7 @@ function compositeToZod(schema: SchemaObject): string {
     const parts = (schema.allOf as (SchemaObject | ReferenceObject)[]).map(schemaToZod)
     // Sibling properties outside the allOf array must be merged in as an extra intersection member
     const siblingProps = schema.properties as
-      | Record<string, SchemaObject | ReferenceObject>
-      | undefined
+      Record<string, SchemaObject | ReferenceObject> | undefined
     if (siblingProps !== undefined && Object.keys(siblingProps).length > 0) {
       parts.push(inlineObjectZod(schema))
     }
@@ -536,8 +535,7 @@ function collectContentfulTwoxxResponses(
     if (isRef(resp)) continue
     const r = resp as OpenAPIV3_1.ResponseObject
     const content = r.content as
-      | Record<string, { schema?: SchemaObject | ReferenceObject }>
-      | undefined
+      Record<string, { schema?: SchemaObject | ReferenceObject }> | undefined
     if (content === undefined) continue
     const json = content['application/json']
     if (json === undefined || json.schema === undefined) continue
@@ -573,8 +571,7 @@ function synthesizeInlineResponseSchemas(spec: OpenAPIV3_1.Document): InlineResp
   // never shadow a component schema (which would produce a duplicate const declaration).
   const taken = new Set<string>()
   const rawSchemas = spec.components?.schemas as
-    | Record<string, SchemaObject | ReferenceObject>
-    | undefined
+    Record<string, SchemaObject | ReferenceObject> | undefined
   if (rawSchemas !== undefined) {
     for (const name of Object.keys(rawSchemas)) {
       taken.add(toTypeName(name))
@@ -590,8 +587,7 @@ function synthesizeInlineResponseSchemas(spec: OpenAPIV3_1.Document): InlineResp
       if (operationId === undefined || operationId.length === 0) continue
 
       const responses = operation.responses as
-        | Record<string, OpenAPIV3_1.ResponseObject | ReferenceObject>
-        | undefined
+        Record<string, OpenAPIV3_1.ResponseObject | ReferenceObject> | undefined
       if (responses === undefined) continue
 
       const inlineResps = collectContentfulTwoxxResponses(responses)
@@ -714,8 +710,7 @@ function emitSynthesizedResponseSchemas(spec: OpenAPIV3_1.Document): string[] {
 
 export function generateZodSchemas(spec: OpenAPIV3_1.Document): GeneratedFile {
   const schemas = spec.components?.schemas as
-    | Record<string, SchemaObject | ReferenceObject>
-    | undefined
+    Record<string, SchemaObject | ReferenceObject> | undefined
 
   // Recursive (cyclic or self-referential) schemas are cast with `as z.ZodType<ModelType>`
   // so that z.infer resolves concretely. Their model type lives in models.ts, imported type-only.

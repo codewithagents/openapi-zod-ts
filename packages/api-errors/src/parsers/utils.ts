@@ -26,7 +26,11 @@ function parseKeyedItem(
  * Items whose field value is absent or empty are treated as global (form-level) errors.
  * Items without a message value are silently skipped.
  */
-export function parseKeyedArray(items: unknown[], fieldKey: string, messageKey: string): ParsedErrors {
+export function parseKeyedArray(
+  items: unknown[],
+  fieldKey: string,
+  messageKey: string
+): ParsedErrors {
   const fieldErrors: FieldError[] = []
   const formErrors: string[] = []
 

@@ -453,8 +453,7 @@ export function getBodyInfo(
 
   const rb = requestBody as RequestBodyObject
   const content = rb.content as
-    | Record<string, { schema?: OpenAPIV3_1.SchemaObject | ReferenceObject }>
-    | undefined
+    Record<string, { schema?: OpenAPIV3_1.SchemaObject | ReferenceObject }> | undefined
   if (content === undefined) {
     return {
       typeName: undefined,

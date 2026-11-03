@@ -1,1 +1,6 @@
-{ "input_openapi": "spec/auth-lab.json", "output": "generated-auth/", "stale_time": 0, "gc_time": 300000 }
+{
+  "input_openapi": "spec/auth-lab.json",
+  "output": "generated-auth/",
+  "stale_time": 0,
+  "gc_time": 300000
+}

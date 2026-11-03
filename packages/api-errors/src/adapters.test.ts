@@ -181,9 +181,13 @@ describe('mapApiErrorsTanstack', () => {
 
   it('respects transformField option', () => {
     const setFieldMeta = vi.fn()
-    mapApiErrorsTanstack({ errors: { emailAddress: ['invalid'] } }, { setFieldMeta }, {
-      transformField: (f) => f.replace(/([A-Z])/g, '.$1').toLowerCase(),
-    })
+    mapApiErrorsTanstack(
+      { errors: { emailAddress: ['invalid'] } },
+      { setFieldMeta },
+      {
+        transformField: (f) => f.replace(/([A-Z])/g, '.$1').toLowerCase(),
+      }
+    )
     expect(setFieldMeta).toHaveBeenCalledWith('email.address', expect.any(Function))
   })
 

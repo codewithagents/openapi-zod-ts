@@ -1,7 +1,9 @@
 **/dist/**
 **/generated/**
+**/generated-*/**
 **/node_modules/**
 **/test-results/**
 examples/specs/**
 **/*.md
+**/*.mdx
 pnpm-lock.yaml
