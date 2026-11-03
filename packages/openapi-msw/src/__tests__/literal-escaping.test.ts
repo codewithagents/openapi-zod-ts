@@ -61,9 +61,7 @@ const spec = {
       Hostile: {
         type: 'object',
         required: HOSTILE,
-        properties: Object.fromEntries(
-          HOSTILE.map((k) => [k, { type: 'string', enum: HOSTILE }])
-        ),
+        properties: Object.fromEntries(HOSTILE.map((k) => [k, { type: 'string', enum: HOSTILE }])),
       },
     },
   },
