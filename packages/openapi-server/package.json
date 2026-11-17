@@ -61,7 +61,7 @@
     "esbuild": "catalog:",
     "express": "^5.3.0",
     "fast-check": "catalog:",
-    "hono": "^4.13.16",
+    "hono": "^4.13.19",
     "typescript": "catalog:",
     "vitest": "catalog:",
     "zod": "catalog:"

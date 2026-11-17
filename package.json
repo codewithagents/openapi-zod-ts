@@ -23,7 +23,7 @@
     "@typescript-eslint/eslint-plugin": "catalog:",
     "@typescript-eslint/parser": "catalog:",
     "eslint": "catalog:",
-    "fallow": "^3.38.1",
+    "fallow": "^3.43.2",
     "prettier": "catalog:",
     "typescript": "catalog:"
   },

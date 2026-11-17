@@ -37,7 +37,7 @@
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "esbuild": "catalog:",
-    "msw": "^3.0.3",
+    "msw": "^3.0.6",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },
