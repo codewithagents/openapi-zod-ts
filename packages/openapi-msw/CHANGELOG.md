@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/codewithagents/openapi-zod-ts/compare/openapi-msw-v0.3.0...openapi-msw-v0.3.1) (2026-11-17)
+
+
+### Bug Fixes
+
+* **deps:** update dependencies to latest ([#454](https://github.com/codewithagents/openapi-zod-ts/issues/454)) ([3b12607](https://github.com/codewithagents/openapi-zod-ts/commit/3b126070349d8ba75e2c6e465b7893093cee4f28))
+
 ## [0.3.0](https://github.com/codewithagents/openapi-zod-ts/compare/openapi-msw-v0.2.2...openapi-msw-v0.3.0) (2026-11-03)
 
 

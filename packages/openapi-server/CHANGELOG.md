@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.0.0](https://github.com/codewithagents/openapi-zod-ts/compare/openapi-server-v2.3.0...openapi-server-v3.0.0) (2026-11-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* **openapi-server:** the generated Fastify code changes for specs that declare these parameters, and Hono and Express change in one case. (1) A query parameter whose default fits its schema is required in the generated Fastify service type (`limit: number`, was `limit?: number`), so code that calls the service directly without it no longer compiles. (2) At runtime a Fastify handler now receives the declared default for such a parameter when the request omits it, where it received undefined. (3) Fastify validates more strictly: a query value that is no uuid for `format: uuid`, or that is outside the string enum of an array item, now gets a 400 where it was accepted. (4) Fastify now validates path params declared on the path item and path params whose schema is a `$ref` to a component with a format (uuid, email, uri or url, date-time), where any string was accepted. (5) A query value outside a string enum reached through a `$ref` now gets a 400 on Fastify and a 422 on Hono and Express, where any string was accepted.
+
+### Features
+
+* **openapi-server:** resolve $ref param schemas, carry query defaults ([#459](https://github.com/codewithagents/openapi-zod-ts/issues/459)) ([94d389c](https://github.com/codewithagents/openapi-zod-ts/commit/94d389c3acfc34bc038480acffa66480c06627c3))
+
+
+### Bug Fixes
+
+* **deps:** update dependencies to latest ([#454](https://github.com/codewithagents/openapi-zod-ts/issues/454)) ([3b12607](https://github.com/codewithagents/openapi-zod-ts/commit/3b126070349d8ba75e2c6e465b7893093cee4f28))
+
 ## [2.3.0](https://github.com/codewithagents/openapi-zod-ts/compare/openapi-server-v2.2.2...openapi-server-v2.3.0) (2026-11-03)
 
 
