@@ -31,9 +31,9 @@ catalog:
   '@stryker-mutator/vitest-runner': ^10.1.1
 
   # ESLint (integration lint)
-  eslint: ^10.14.0
-  '@typescript-eslint/eslint-plugin': ^8.72.1
-  '@typescript-eslint/parser': ^8.72.1
+  eslint: ^10.15.0
+  '@typescript-eslint/eslint-plugin': ^8.73.0
+  '@typescript-eslint/parser': ^8.73.0
 
   # Zod (examples)
   zod: ^4.6.7
@@ -43,4 +43,4 @@ catalog:
   react-dom: ^19.3.1
   '@types/react': ^19.3.0
   '@types/react-dom': ^19.3.0
-  '@tanstack/react-query': ^5.105.3
+  '@tanstack/react-query': ^5.107.1

@@ -19,7 +19,7 @@
     "@types/express": "^5.0.6",
     "@types/node": "catalog:",
     "@types/supertest": "^7.2.1",
-    "supertest": "^7.3.1",
+    "supertest": "^7.3.2",
     "tsx": "^4.23.15",
     "typescript": "catalog:",
     "vitest": "catalog:"
