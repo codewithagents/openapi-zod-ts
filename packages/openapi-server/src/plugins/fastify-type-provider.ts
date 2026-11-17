@@ -24,6 +24,7 @@ import {
   refToName,
   extractPathParamsFromPath,
   resolveParam,
+  resolveSchemaRef,
   deriveServiceName,
   deriveMethodName,
   type QueryParam,
@@ -75,6 +76,11 @@ interface RouteOperation {
   responseIsArray?: boolean
   /** Raw OpenAPI operation object for schema.params resolution. */
   rawOperation: OperationObject
+  /**
+   * `parameters` declared on the path item itself, shared by every operation on the path. The
+   * raw operation carries only its own list, so path param resolution reads both.
+   */
+  pathItemParameters: Array<ParameterObject | ReferenceObject>
   /**
    * Effective security requirements for this operation, derived from
    * operation.security if present, otherwise from the global spec.security.
@@ -260,6 +266,9 @@ function collectOperations(
         responseTypeName: responseTypeInfo?.typeName,
         responseIsArray: responseTypeInfo?.isArray,
         rawOperation: operation,
+        pathItemParameters: Array.isArray(pathItem.parameters)
+          ? (pathItem.parameters as Array<ParameterObject | ReferenceObject>)
+          : [],
         effectiveSecurity,
       })
     }
@@ -304,17 +313,18 @@ function numberConstraintSuffix(p: {
   return s
 }
 
-/** z.enum([...]) when an enum is present, else z.string(), plus string constraints. */
+/** z.enum([...]) for an enum, z.uuid() for format uuid, else z.string(), plus string constraints. */
 function enumOrStringExpr(p: {
   enum?: string[]
+  format?: string
   minLength?: number
   maxLength?: number
   pattern?: string
 }): string {
-  const base =
-    p.enum !== undefined && p.enum.length > 0
-      ? `z.enum([${p.enum.map((v) => JSON.stringify(v)).join(', ')}])`
-      : 'z.string()'
+  if (p.enum !== undefined && p.enum.length > 0) {
+    return `z.enum([${p.enum.map((v) => JSON.stringify(v)).join(', ')}])${stringConstraintSuffix(p)}`
+  }
+  const base = p.format === 'uuid' ? 'z.uuid()' : 'z.string()'
   return base + stringConstraintSuffix(p)
 }
 
@@ -414,7 +424,7 @@ export function synthesizeResponseSchemaExpr(
   return synthesizePropExpr(s)
 }
 
-const SCALAR_QUERY_BOOL_EXPR = "z.enum(['true', 'false']).transform((v) => v === 'true')"
+const QUERY_BOOL_EXPR = "z.enum(['true', 'false']).transform((v) => v === 'true')"
 
 /**
  * Return the JSON schema of the operation's primary 2xx response: the first of 200, 201, then
@@ -449,9 +459,16 @@ export function findPrimaryJsonResponseSchema(
   return undefined
 }
 
-function queryParamItemExpr(itemsTsType: string | undefined): string {
+function queryParamItemExpr(
+  itemsTsType: string | undefined,
+  itemsEnum: string[] | undefined
+): string {
+  if (itemsEnum !== undefined && itemsEnum.length > 0) {
+    return `z.enum([${itemsEnum.map((v) => JSON.stringify(v)).join(', ')}])`
+  }
   if (itemsTsType === 'number') return 'z.coerce.number()'
-  if (itemsTsType === 'boolean') return 'z.boolean()'
+  // Items arrive as the strings 'true' / 'false', exactly like a scalar boolean.
+  if (itemsTsType === 'boolean') return QUERY_BOOL_EXPR
   return 'z.string()'
 }
 
@@ -467,17 +484,25 @@ function queryParamBaseExpr(param: QueryParam): string {
   }
   // Plain repeated-key array (type:array, explode:true). Emit z.array(<itemExpr>) so the
   // querystring schema matches the service T[] signature. Item coercion mirrors the scalar path.
-  if (param.isArray === true) return `z.array(${queryParamItemExpr(param.itemsTsType)})`
+  if (param.isArray === true) {
+    return `z.array(${queryParamItemExpr(param.itemsTsType, param.itemsEnum)})`
+  }
   if (param.tsType === 'number') return `z.coerce.number()${numberConstraintSuffix(param)}`
   // Fastify's querystring parser never converts types, so a scalar boolean arrives as the
   // string 'true'/'false'. Accept exactly those two and transform to a boolean; anything
   // else is rejected with 400 by the validatorCompiler.
-  if (param.tsType === 'boolean') return SCALAR_QUERY_BOOL_EXPR
+  if (param.tsType === 'boolean') return QUERY_BOOL_EXPR
   return enumOrStringExpr(param)
 }
 
 function queryParamZodExpr(param: QueryParam): string {
-  return withOptional(queryParamBaseExpr(param), param.required)
+  const base = queryParamBaseExpr(param)
+  // .default() rather than .optional(): the declared value reaches the handler when the param is
+  // omitted, so the service interface can type the param as always present.
+  if (!param.required && param.default !== undefined) {
+    return `${base}.default(${JSON.stringify(param.default)})`
+  }
+  return withOptional(base, param.required)
 }
 
 function headerParamZodExpr(param: HeaderParam): string {
@@ -491,8 +516,8 @@ function cookieParamZodExpr(param: CookieParam): string {
 // ── Path param schema builder ─────────────────────────────────────────────────
 
 // fallow-ignore-next-line complexity
-function pathParamSchemaExpr(resolved: ParameterObject): string {
-  const schema = resolved.schema as OpenAPIV3_1.SchemaObject | undefined
+function pathParamSchemaExpr(resolved: ParameterObject, spec: OpenAPIV3_1.Document): string {
+  const schema = resolveSchemaRef(resolved.schema, spec)
   if (schema === undefined || isRef(schema)) return 'z.string()'
   const s = schema as OpenAPIV3_1.SchemaObject & {
     exclusiveMinimum?: number
@@ -515,21 +540,22 @@ function pathParamSchemaExpr(resolved: ParameterObject): string {
 function buildParamsSchemaExpr(op: RouteOperation, spec: OpenAPIV3_1.Document): string | undefined {
   if (op.pathParams.length === 0) return undefined
 
+  // Path-item-level parameters first, then operation-level: an operation-level param with the same
+  // name overrides the path-item-level one, per the OpenAPI override rule (Map.set replaces).
   const paramByName = new Map<string, ParameterObject>()
-  const parameters = op.rawOperation.parameters as (ParameterObject | ReferenceObject)[] | undefined
-  if (parameters !== undefined) {
-    for (const p of parameters) {
-      const resolved = resolveParam(p, spec)
-      if (resolved !== undefined && resolved.in === 'path') {
-        paramByName.set(resolved.name, resolved)
-      }
+  const operationParameters = op.rawOperation.parameters as
+    (ParameterObject | ReferenceObject)[] | undefined
+  for (const p of [...op.pathItemParameters, ...(operationParameters ?? [])]) {
+    const resolved = resolveParam(p, spec)
+    if (resolved !== undefined && resolved.in === 'path') {
+      paramByName.set(resolved.name, resolved)
     }
   }
 
   const fields = op.pathParams
     .map((rawName) => {
       const resolved = paramByName.get(rawName)
-      const zodExpr = resolved !== undefined ? pathParamSchemaExpr(resolved) : 'z.string()'
+      const zodExpr = resolved !== undefined ? pathParamSchemaExpr(resolved, spec) : 'z.string()'
       const key = /[^a-zA-Z0-9_$]/.test(rawName) ? JSON.stringify(rawName) : rawName
       return `${key}: ${zodExpr}`
     })

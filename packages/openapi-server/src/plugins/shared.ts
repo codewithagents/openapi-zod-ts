@@ -14,6 +14,11 @@ export function isRef(obj: unknown): obj is ReferenceObject {
   return typeof obj === 'object' && obj !== null && '$ref' in obj
 }
 
+/** True for a non-null, non-array object: the only shape a schema, parameter or path item takes. */
+function isObjectNode(value: unknown): boolean {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+}
+
 export function refToName(ref: string): string {
   const parts = ref.split('/')
   return toTypeName(parts[parts.length - 1]!)
@@ -40,6 +45,8 @@ export function resolveParam(
   p: ParameterObject | ReferenceObject,
   spec: OpenAPIV3_1.Document
 ): ParameterObject | undefined {
+  // An empty `-` item in a YAML `parameters:` list parses to null: not a Parameter Object.
+  if (!isObjectNode(p)) return undefined
   if (!isRef(p)) return p as ParameterObject
   const refStr = (p as ReferenceObject).$ref
   const name = refToName(refStr)
@@ -50,6 +57,73 @@ export function resolveParam(
   ]
   if (resolved === undefined || isRef(resolved)) return undefined
   return resolved as ParameterObject
+}
+
+const COMPONENT_SCHEMA_REF_PREFIX = '#/components/schemas/'
+
+/**
+ * OpenAPI 3.1 and later allow keywords next to a `$ref`; 3.0.x says they SHALL be ignored. A
+ * document whose `openapi` field is missing or not a version number gets the 3.0 reading, which
+ * carries the fewest constraints.
+ */
+function allowsRefSiblings(spec: OpenAPIV3_1.Document): boolean {
+  const version = /^(\d+)\.(\d+)/.exec(spec.openapi)
+  if (version === null) return false
+  const [major, minor] = [Number(version[1]), Number(version[2])]
+  return major > 3 || (major === 3 && minor >= 1)
+}
+
+/** Keywords written next to a `$ref`: everything but `$ref` itself. */
+function siblingKeywords(ref: ReferenceObject): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(ref).filter(([key]) => key !== '$ref'))
+}
+
+/**
+ * The schema a `#/components/schemas/<Name>` ref points to, or undefined when the ref points
+ * elsewhere (another section, an external file) or the component is not an object schema. Only the
+ * spec's own components count: `#/components/schemas/toString` is no member of Object.prototype.
+ */
+function componentSchema(
+  spec: OpenAPIV3_1.Document,
+  refStr: string
+): OpenAPIV3_1.SchemaObject | ReferenceObject | undefined {
+  if (!refStr.startsWith(COMPONENT_SCHEMA_REF_PREFIX)) return undefined
+  const schemas = spec.components?.schemas
+  const name = refStr.slice(COMPONENT_SCHEMA_REF_PREFIX.length)
+  if (schemas === undefined || !Object.hasOwn(schemas, name)) return undefined
+  const target = schemas[name]
+  return isObjectNode(target) ? target : undefined
+}
+
+/**
+ * Resolve a schema that is a `$ref` to `#/components/schemas/<Name>` to that component schema,
+ * following `$ref` to `$ref` chains. In OpenAPI 3.1 and later, keywords written next to a `$ref`
+ * override the target's, the outermost ref winning, and the result is a new merged object; in 3.0.x
+ * they are ignored. Without keywords to merge the result is the component schema itself.
+ *
+ * Anything that does not resolve is returned unchanged, as the original `$ref`: an inline schema,
+ * a ref to another section or an external file, a component that does not exist, and a chain that
+ * loops back on itself. Callers check isRef on the result to tell whether resolution happened.
+ */
+export function resolveSchemaRef(
+  schema: OpenAPIV3_1.SchemaObject | ReferenceObject | undefined,
+  spec: OpenAPIV3_1.Document
+): OpenAPIV3_1.SchemaObject | ReferenceObject | undefined {
+  if (schema === undefined || !isRef(schema)) return schema
+  const keepSiblings = allowsRefSiblings(spec)
+  const visited = new Set<string>()
+  let overrides: Record<string, unknown> = {}
+  let current: OpenAPIV3_1.SchemaObject | ReferenceObject = schema
+  while (isRef(current)) {
+    const refStr: string = current.$ref
+    if (visited.has(refStr)) return schema
+    visited.add(refStr)
+    const target = componentSchema(spec, refStr)
+    if (target === undefined) return schema
+    if (keepSiblings) overrides = { ...siblingKeywords(current), ...overrides }
+    current = target
+  }
+  return Object.keys(overrides).length === 0 ? current : { ...current, ...overrides }
 }
 
 // ── Service name ──────────────────────────────────────────────────────────────
@@ -229,6 +303,22 @@ export interface QueryParam {
    * coercion (e.g. z.coerce.number() for integer/number items) inside z.array().
    */
   itemsTsType?: string
+  /**
+   * String format from the param schema (e.g. 'uuid'). Read through a component $ref, unlike the
+   * constraints above, which come from an inline schema only.
+   */
+  format?: string
+  /**
+   * Allowed values of each item of a plain array param (isArray) whose items are a string enum,
+   * inline or through a component $ref. Used to emit z.array(z.enum([...])).
+   */
+  itemsEnum?: string[]
+  /**
+   * Declared schema default, read through a component $ref. Only set when its type is one the
+   * emitted Zod schema carries, so the router can emit `.default(value)` and the service type can
+   * make the param non-optional.
+   */
+  default?: unknown
 }
 
 /** Apply deepObject classification to a query param, mutating it in place. */
@@ -327,6 +417,105 @@ function applyScalarConstraints(
   if (typeof s.pattern === 'string') param.pattern = s.pattern
 }
 
+function isStringEnum(value: unknown): value is string[] {
+  return Array.isArray(value) && value.length > 0 && value.every((v) => typeof v === 'string')
+}
+
+/** `type: 'string'`, or the 3.1 nullable form `['string', 'null']` (3.0 `nullable` normalizes to it). */
+function isStringType(type: unknown): boolean {
+  if (type === 'string') return true
+  return (
+    Array.isArray(type) &&
+    type.includes('string') &&
+    type.every((t) => t === 'string' || t === 'null')
+  )
+}
+
+/** Copy a string `format` onto the param. */
+function applyFormatConstraint(param: QueryParam, schema: OpenAPIV3_1.SchemaObject): void {
+  if (isStringType(schema.type) && typeof schema.format === 'string') param.format = schema.format
+}
+
+/**
+ * Copy a string `enum` of the resolved schema, and the string enum of array items, onto the
+ * param. z.enum accepts string members only, so an enum read through a `$ref` with any other
+ * member is left out. An inline enum was already copied by applyScalarConstraints, whatever its
+ * members.
+ */
+function applyEnumConstraint(
+  param: QueryParam,
+  schema: OpenAPIV3_1.SchemaObject,
+  spec: OpenAPIV3_1.Document
+): void {
+  if (isStringEnum(schema.enum)) param.enum = schema.enum
+  if (param.isArray !== true) return
+  const items = resolveSchemaRef((schema as OpenAPIV3_1.ArraySchemaObject).items, spec)
+  if (items !== undefined && !isRef(items) && isStringEnum(items.enum)) param.itemsEnum = items.enum
+}
+
+/** True when `value` has the JS type a scalar of this tsType validates to. */
+function fitsScalarTsType(tsType: string | undefined, value: unknown): boolean {
+  // Finite only: JSON.stringify writes Infinity and NaN as null (a YAML `.inf` parses to Infinity).
+  if (tsType === 'number') return typeof value === 'number' && Number.isFinite(value)
+  if (tsType === 'boolean') return typeof value === 'boolean'
+  return typeof value === 'string'
+}
+
+/** True when no enum applies, or `value` is one of its members. */
+function isEnumMember(members: readonly unknown[] | undefined, value: unknown): boolean {
+  return members === undefined || members.length === 0 || members.includes(value)
+}
+
+/**
+ * True when `value` is a default the param's emitted Zod schema can carry: `.default(value)` on
+ * a mismatched type, or on a z.enum without that member, does not typecheck, and a spec whose
+ * default disagrees with its own schema must keep generating compilable output. The emitted type
+ * comes from the UNRESOLVED schema, so a $ref'd integer schema is still a z.string() and its
+ * numeric default does not fit. A deepObject param emitted as an object (an inline object schema
+ * with `properties`) takes no default; one whose schema is a $ref, or has no `properties`, is
+ * emitted as a z.string(), so a string default fits it like any other string param.
+ */
+function defaultFitsParam(param: QueryParam, value: unknown): boolean {
+  if (param.isDeepObject === true) return false
+  if (param.isArray === true) {
+    return (
+      Array.isArray(value) &&
+      value.every((v) => fitsScalarTsType(param.itemsTsType, v) && isEnumMember(param.itemsEnum, v))
+    )
+  }
+  if (param.delimiterStyle !== undefined) {
+    return Array.isArray(value) && value.every((v) => typeof v === 'string')
+  }
+  return fitsScalarTsType(param.tsType, value) && isEnumMember(param.enum, value)
+}
+
+/** Copy a declared `default` onto the param when its emitted Zod schema can carry it. */
+function applyDefault(param: QueryParam, schema: OpenAPIV3_1.SchemaObject): void {
+  const value = schema.default
+  if (value !== undefined && defaultFitsParam(param, value)) param.default = value
+}
+
+/**
+ * Apply the constraints that are read through a component `$ref`: format, string enums and the
+ * default. The schema is resolved once here for all three.
+ *
+ * A separate pass from applyScalarConstraints on purpose: that one reads the inline schema only
+ * and also carries minLength, maxLength and pattern, so resolving refs there would start emitting
+ * length and .regex() checks on every $ref'd string param.
+ */
+function applyResolvedConstraints(
+  param: QueryParam,
+  schema: OpenAPIV3_1.SchemaObject | undefined,
+  spec: OpenAPIV3_1.Document
+): void {
+  const resolved = resolveSchemaRef(schema, spec)
+  if (resolved === undefined || isRef(resolved)) return
+  const target = resolved as OpenAPIV3_1.SchemaObject
+  applyFormatConstraint(param, target)
+  applyEnumConstraint(param, target, spec)
+  applyDefault(param, target)
+}
+
 export function getQueryParams(
   operation: OpenAPIV3_1.OperationObject,
   spec: OpenAPIV3_1.Document
@@ -352,6 +541,7 @@ export function getQueryParams(
     applyDeepObjectStyle(param, schema, resolvedStyle)
     applyArrayStyle(param, schema, resolvedStyle, resolvedExplode)
     applyScalarConstraints(param, schema)
+    applyResolvedConstraints(param, schema, spec)
 
     result.push(param)
   }
@@ -368,7 +558,7 @@ export function getQueryParams(
  * here (it is simply unsupported by the collectors, out of scope), as is an operation-less {}.
  */
 function isPathItemObject(pathItem: unknown): boolean {
-  return pathItem !== null && typeof pathItem === 'object' && !Array.isArray(pathItem)
+  return isObjectNode(pathItem)
 }
 
 /**

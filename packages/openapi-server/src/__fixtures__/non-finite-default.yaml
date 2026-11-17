@@ -1,0 +1,43 @@
+openapi: 3.1.0
+info:
+  title: Pet Registry
+  version: 1.0.0
+paths:
+  /pets:
+    get:
+      operationId: listPets
+      parameters:
+        - name: maxWeight
+          in: query
+          schema:
+            type: number
+            default: .inf
+        - name: minWeight
+          in: query
+          schema:
+            type: number
+            default: -.inf
+        - name: ratio
+          in: query
+          schema:
+            type: number
+            default: .nan
+        - name: weights
+          in: query
+          schema:
+            type: array
+            items:
+              type: number
+            default: [1, .inf]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object

@@ -44,7 +44,7 @@ interface PetstoreService<Ctx = never> {
 Rules:
 - Facet keys (`params`, `body`, `query`, `headers`, `cookies`) are present only when the operation has them.
 - Each PRESENT facet key is REQUIRED on the outer `input` object (no `?`).
-- Per-field optionality lives INSIDE each facet (e.g. `query: { q?: string }`).
+- Per-field optionality lives INSIDE each facet (e.g. `query: { q?: string }`). The exception is a query param whose `default` fits its emitted Zod schema (finite number, matching type, enum member, not a deepObject emitted as an object, not required): the router emits `.default(value)`, so it is non-optional. A default the schema cannot carry is left out and the param stays optional.
 - Zero facets: `input` is omitted entirely; the method signature is `(ctx: Ctx)` or `()`.
 - `ctx` is always a SEPARATE trailing arg after `input`; it is never inside `input`.
 

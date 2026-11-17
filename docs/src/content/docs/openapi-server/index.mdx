@@ -466,7 +466,16 @@ Invalid requests receive a structured `422` response:
   native `400` (`FST_ERR_VALIDATION`), not the `422 { error, issues }` envelope that Hono and
   Express emit. Cookie params (`in: cookie`) are the exception: Fastify has no native cookie
   schema, so those keep a `_ckv` safeParse block and still return `422 { error: 'Invalid request
-  cookies', issues }`.
+  cookies', issues }`. Path and query params whose `schema` is a `$ref` to
+  `#/components/schemas/...` are read through the reference (chains are followed; in OpenAPI 3.1
+  and later, keywords next to the `$ref` win over the target's, while 3.0.x ignores them): a query
+  param carries its string `enum` and `format: uuid`, a path param its `uuid`, `email`, `uri` or
+  `date-time` format, and a path param with an enum stays `z.string()`. A `$ref` that does not
+  resolve (a cycle, a missing component) leaves the param a plain string. Path-item-level
+  `parameters` validate path params. A query param whose `default`
+  fits the emitted schema (a finite number, a boolean, a string or enum member, or an array of
+  those) is filled in when omitted and is non-optional in the service interface; any other default
+  is left out and the param stays optional.
 </Aside>
 
 The generator runs in two passes: first it writes `router.ts` without any Zod imports, then it rewrites `router.ts` with validation for every route whose body type has a matching schema in `input_schema`. For Hono and Express this means `safeParse` calls; for Fastify it means schemas threaded through `fastify-type-provider-zod`. If the schema file does not exist yet at generation time, the second pass is skipped and validation is added on the next run.
