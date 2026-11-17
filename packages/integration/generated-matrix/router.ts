@@ -136,7 +136,7 @@ export function createRouter(
           querystring: z.object({
             strParam: z.string().optional(),
             emailParam: z.string().optional(),
-            uuidParam: z.string().optional(),
+            uuidParam: z.uuid().optional(),
             dateParam: z.string().optional(),
             intParam: z.coerce.number().optional(),
             int32Param: z.coerce.number().optional(),
@@ -173,7 +173,10 @@ export function createRouter(
       '/matrix/enums',
       {
         schema: {
-          querystring: z.object({ strEnum: z.string().optional(), intEnum: z.string().optional() }),
+          querystring: z.object({
+            strEnum: z.enum(['alpha', 'beta', 'gamma']).optional(),
+            intEnum: z.string().optional(),
+          }),
           response: { 200: MxEnumConstContainerSchema },
         },
         config: { operationId: 'getEnumEcho' },

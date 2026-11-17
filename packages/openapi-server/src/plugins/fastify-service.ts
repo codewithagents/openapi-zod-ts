@@ -370,9 +370,11 @@ function buildMethodSignature(
   }
 
   // query facet: preserve per-field optionality; the outer facet key is always required.
+  // A param with a declared default is present on the handler's type: the router's
+  // .default(value) fills it in when the caller omits it.
   if (op.queryParams.length > 0) {
     const fields = op.queryParams
-      .map((q) => `${q.name}${q.required ? '' : '?'}: ${q.tsType}`)
+      .map((q) => `${q.name}${q.required || q.default !== undefined ? '' : '?'}: ${q.tsType}`)
       .join('; ')
     facets.push(`query: { ${fields} }`)
   }

@@ -1,0 +1,29 @@
+openapi: 3.1.0
+info:
+  title: Pet Registry
+  version: 1.0.0
+paths:
+  /pets/{petId}:
+    parameters:
+      -
+      - name: petId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      operationId: getPet
+      parameters:
+        - name: verbose
+          in: query
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
