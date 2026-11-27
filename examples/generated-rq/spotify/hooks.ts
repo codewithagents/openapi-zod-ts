@@ -4,8 +4,10 @@ import {
   queryOptions,
   useQuery,
   type UseQueryOptions,
+  type UseQueryResult,
   useInfiniteQuery,
   type UseInfiniteQueryOptions,
+  type UseInfiniteQueryResult,
   type InfiniteData,
   type QueryKey,
   useMutation,
@@ -317,7 +319,7 @@ export const marketKeys = {
 
 // ── Query options factories ──────────────────────────────────
 
-export function getAnAlbumQueryOptions<TData = Awaited<ReturnType<typeof getAnAlbum>>>(
+function _getAnAlbumQueryOptions<TData = Awaited<ReturnType<typeof getAnAlbum>>>(
   id: Parameters<typeof getAnAlbum>[0],
   params?: Parameters<typeof getAnAlbum>[1],
   options?: Omit<
@@ -334,10 +336,10 @@ export function getAnAlbumQueryOptions<TData = Awaited<ReturnType<typeof getAnAl
   })
 }
 
-/** @deprecated */
-export function getMultipleAlbumsQueryOptions<
-  TData = Awaited<ReturnType<typeof getMultipleAlbums>>,
->(
+export const getAnAlbumQueryOptions: typeof _getAnAlbumQueryOptions &
+  typeof _getAnAlbumQueryOptions<Awaited<ReturnType<typeof getAnAlbum>>> = _getAnAlbumQueryOptions
+
+function _getMultipleAlbumsQueryOptions<TData = Awaited<ReturnType<typeof getMultipleAlbums>>>(
   params: Parameters<typeof getMultipleAlbums>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getMultipleAlbums>>, ApiError, TData>,
@@ -353,9 +355,12 @@ export function getMultipleAlbumsQueryOptions<
   })
 }
 
-export function getAnAlbumsTracksQueryOptions<
-  TData = Awaited<ReturnType<typeof getAnAlbumsTracks>>,
->(
+/** @deprecated */
+export const getMultipleAlbumsQueryOptions: typeof _getMultipleAlbumsQueryOptions &
+  typeof _getMultipleAlbumsQueryOptions<Awaited<ReturnType<typeof getMultipleAlbums>>> =
+  _getMultipleAlbumsQueryOptions
+
+function _getAnAlbumsTracksQueryOptions<TData = Awaited<ReturnType<typeof getAnAlbumsTracks>>>(
   id: Parameters<typeof getAnAlbumsTracks>[0],
   params?: Parameters<typeof getAnAlbumsTracks>[1],
   options?: Omit<
@@ -372,7 +377,11 @@ export function getAnAlbumsTracksQueryOptions<
   })
 }
 
-export function getAnArtistQueryOptions<TData = Awaited<ReturnType<typeof getAnArtist>>>(
+export const getAnAlbumsTracksQueryOptions: typeof _getAnAlbumsTracksQueryOptions &
+  typeof _getAnAlbumsTracksQueryOptions<Awaited<ReturnType<typeof getAnAlbumsTracks>>> =
+  _getAnAlbumsTracksQueryOptions
+
+function _getAnArtistQueryOptions<TData = Awaited<ReturnType<typeof getAnArtist>>>(
   id: Parameters<typeof getAnArtist>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getAnArtist>>, ApiError, TData>,
@@ -388,10 +397,11 @@ export function getAnArtistQueryOptions<TData = Awaited<ReturnType<typeof getAnA
   })
 }
 
-/** @deprecated */
-export function getMultipleArtistsQueryOptions<
-  TData = Awaited<ReturnType<typeof getMultipleArtists>>,
->(
+export const getAnArtistQueryOptions: typeof _getAnArtistQueryOptions &
+  typeof _getAnArtistQueryOptions<Awaited<ReturnType<typeof getAnArtist>>> =
+  _getAnArtistQueryOptions
+
+function _getMultipleArtistsQueryOptions<TData = Awaited<ReturnType<typeof getMultipleArtists>>>(
   params: Parameters<typeof getMultipleArtists>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getMultipleArtists>>, ApiError, TData>,
@@ -407,9 +417,12 @@ export function getMultipleArtistsQueryOptions<
   })
 }
 
-export function getAnArtistsAlbumsQueryOptions<
-  TData = Awaited<ReturnType<typeof getAnArtistsAlbums>>,
->(
+/** @deprecated */
+export const getMultipleArtistsQueryOptions: typeof _getMultipleArtistsQueryOptions &
+  typeof _getMultipleArtistsQueryOptions<Awaited<ReturnType<typeof getMultipleArtists>>> =
+  _getMultipleArtistsQueryOptions
+
+function _getAnArtistsAlbumsQueryOptions<TData = Awaited<ReturnType<typeof getAnArtistsAlbums>>>(
   id: Parameters<typeof getAnArtistsAlbums>[0],
   params?: Parameters<typeof getAnArtistsAlbums>[1],
   options?: Omit<
@@ -426,8 +439,11 @@ export function getAnArtistsAlbumsQueryOptions<
   })
 }
 
-/** @deprecated */
-export function getAnArtistsTopTracksQueryOptions<
+export const getAnArtistsAlbumsQueryOptions: typeof _getAnArtistsAlbumsQueryOptions &
+  typeof _getAnArtistsAlbumsQueryOptions<Awaited<ReturnType<typeof getAnArtistsAlbums>>> =
+  _getAnArtistsAlbumsQueryOptions
+
+function _getAnArtistsTopTracksQueryOptions<
   TData = Awaited<ReturnType<typeof getAnArtistsTopTracks>>,
 >(
   id: Parameters<typeof getAnArtistsTopTracks>[0],
@@ -447,7 +463,11 @@ export function getAnArtistsTopTracksQueryOptions<
 }
 
 /** @deprecated */
-export function getAnArtistsRelatedArtistsQueryOptions<
+export const getAnArtistsTopTracksQueryOptions: typeof _getAnArtistsTopTracksQueryOptions &
+  typeof _getAnArtistsTopTracksQueryOptions<Awaited<ReturnType<typeof getAnArtistsTopTracks>>> =
+  _getAnArtistsTopTracksQueryOptions
+
+function _getAnArtistsRelatedArtistsQueryOptions<
   TData = Awaited<ReturnType<typeof getAnArtistsRelatedArtists>>,
 >(
   id: Parameters<typeof getAnArtistsRelatedArtists>[0],
@@ -465,7 +485,13 @@ export function getAnArtistsRelatedArtistsQueryOptions<
   })
 }
 
-export function getAShowQueryOptions<TData = Awaited<ReturnType<typeof getAShow>>>(
+/** @deprecated */
+export const getAnArtistsRelatedArtistsQueryOptions: typeof _getAnArtistsRelatedArtistsQueryOptions &
+  typeof _getAnArtistsRelatedArtistsQueryOptions<
+    Awaited<ReturnType<typeof getAnArtistsRelatedArtists>>
+  > = _getAnArtistsRelatedArtistsQueryOptions
+
+function _getAShowQueryOptions<TData = Awaited<ReturnType<typeof getAShow>>>(
   id: Parameters<typeof getAShow>[0],
   params?: Parameters<typeof getAShow>[1],
   options?: Omit<
@@ -482,8 +508,10 @@ export function getAShowQueryOptions<TData = Awaited<ReturnType<typeof getAShow>
   })
 }
 
-/** @deprecated */
-export function getMultipleShowsQueryOptions<TData = Awaited<ReturnType<typeof getMultipleShows>>>(
+export const getAShowQueryOptions: typeof _getAShowQueryOptions &
+  typeof _getAShowQueryOptions<Awaited<ReturnType<typeof getAShow>>> = _getAShowQueryOptions
+
+function _getMultipleShowsQueryOptions<TData = Awaited<ReturnType<typeof getMultipleShows>>>(
   params: Parameters<typeof getMultipleShows>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getMultipleShows>>, ApiError, TData>,
@@ -499,9 +527,12 @@ export function getMultipleShowsQueryOptions<TData = Awaited<ReturnType<typeof g
   })
 }
 
-export function getAShowsEpisodesQueryOptions<
-  TData = Awaited<ReturnType<typeof getAShowsEpisodes>>,
->(
+/** @deprecated */
+export const getMultipleShowsQueryOptions: typeof _getMultipleShowsQueryOptions &
+  typeof _getMultipleShowsQueryOptions<Awaited<ReturnType<typeof getMultipleShows>>> =
+  _getMultipleShowsQueryOptions
+
+function _getAShowsEpisodesQueryOptions<TData = Awaited<ReturnType<typeof getAShowsEpisodes>>>(
   id: Parameters<typeof getAShowsEpisodes>[0],
   params?: Parameters<typeof getAShowsEpisodes>[1],
   options?: Omit<
@@ -518,7 +549,11 @@ export function getAShowsEpisodesQueryOptions<
   })
 }
 
-export function getAnEpisodeQueryOptions<TData = Awaited<ReturnType<typeof getAnEpisode>>>(
+export const getAShowsEpisodesQueryOptions: typeof _getAShowsEpisodesQueryOptions &
+  typeof _getAShowsEpisodesQueryOptions<Awaited<ReturnType<typeof getAShowsEpisodes>>> =
+  _getAShowsEpisodesQueryOptions
+
+function _getAnEpisodeQueryOptions<TData = Awaited<ReturnType<typeof getAnEpisode>>>(
   id: Parameters<typeof getAnEpisode>[0],
   params?: Parameters<typeof getAnEpisode>[1],
   options?: Omit<
@@ -535,10 +570,11 @@ export function getAnEpisodeQueryOptions<TData = Awaited<ReturnType<typeof getAn
   })
 }
 
-/** @deprecated */
-export function getMultipleEpisodesQueryOptions<
-  TData = Awaited<ReturnType<typeof getMultipleEpisodes>>,
->(
+export const getAnEpisodeQueryOptions: typeof _getAnEpisodeQueryOptions &
+  typeof _getAnEpisodeQueryOptions<Awaited<ReturnType<typeof getAnEpisode>>> =
+  _getAnEpisodeQueryOptions
+
+function _getMultipleEpisodesQueryOptions<TData = Awaited<ReturnType<typeof getMultipleEpisodes>>>(
   params: Parameters<typeof getMultipleEpisodes>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getMultipleEpisodes>>, ApiError, TData>,
@@ -554,7 +590,12 @@ export function getMultipleEpisodesQueryOptions<
   })
 }
 
-export function getAnAudiobookQueryOptions<TData = Awaited<ReturnType<typeof getAnAudiobook>>>(
+/** @deprecated */
+export const getMultipleEpisodesQueryOptions: typeof _getMultipleEpisodesQueryOptions &
+  typeof _getMultipleEpisodesQueryOptions<Awaited<ReturnType<typeof getMultipleEpisodes>>> =
+  _getMultipleEpisodesQueryOptions
+
+function _getAnAudiobookQueryOptions<TData = Awaited<ReturnType<typeof getAnAudiobook>>>(
   id: Parameters<typeof getAnAudiobook>[0],
   params?: Parameters<typeof getAnAudiobook>[1],
   options?: Omit<
@@ -571,8 +612,11 @@ export function getAnAudiobookQueryOptions<TData = Awaited<ReturnType<typeof get
   })
 }
 
-/** @deprecated */
-export function getMultipleAudiobooksQueryOptions<
+export const getAnAudiobookQueryOptions: typeof _getAnAudiobookQueryOptions &
+  typeof _getAnAudiobookQueryOptions<Awaited<ReturnType<typeof getAnAudiobook>>> =
+  _getAnAudiobookQueryOptions
+
+function _getMultipleAudiobooksQueryOptions<
   TData = Awaited<ReturnType<typeof getMultipleAudiobooks>>,
 >(
   params: Parameters<typeof getMultipleAudiobooks>[0],
@@ -590,7 +634,12 @@ export function getMultipleAudiobooksQueryOptions<
   })
 }
 
-export function getAudiobookChaptersQueryOptions<
+/** @deprecated */
+export const getMultipleAudiobooksQueryOptions: typeof _getMultipleAudiobooksQueryOptions &
+  typeof _getMultipleAudiobooksQueryOptions<Awaited<ReturnType<typeof getMultipleAudiobooks>>> =
+  _getMultipleAudiobooksQueryOptions
+
+function _getAudiobookChaptersQueryOptions<
   TData = Awaited<ReturnType<typeof getAudiobookChapters>>,
 >(
   id: Parameters<typeof getAudiobookChapters>[0],
@@ -609,7 +658,11 @@ export function getAudiobookChaptersQueryOptions<
   })
 }
 
-export function getUsersSavedAudiobooksQueryOptions<
+export const getAudiobookChaptersQueryOptions: typeof _getAudiobookChaptersQueryOptions &
+  typeof _getAudiobookChaptersQueryOptions<Awaited<ReturnType<typeof getAudiobookChapters>>> =
+  _getAudiobookChaptersQueryOptions
+
+function _getUsersSavedAudiobooksQueryOptions<
   TData = Awaited<ReturnType<typeof getUsersSavedAudiobooks>>,
 >(
   params?: Parameters<typeof getUsersSavedAudiobooks>[0],
@@ -627,8 +680,11 @@ export function getUsersSavedAudiobooksQueryOptions<
   })
 }
 
-/** @deprecated */
-export function checkUsersSavedAudiobooksQueryOptions<
+export const getUsersSavedAudiobooksQueryOptions: typeof _getUsersSavedAudiobooksQueryOptions &
+  typeof _getUsersSavedAudiobooksQueryOptions<Awaited<ReturnType<typeof getUsersSavedAudiobooks>>> =
+  _getUsersSavedAudiobooksQueryOptions
+
+function _checkUsersSavedAudiobooksQueryOptions<
   TData = Awaited<ReturnType<typeof checkUsersSavedAudiobooks>>,
 >(
   params: Parameters<typeof checkUsersSavedAudiobooks>[0],
@@ -646,7 +702,13 @@ export function checkUsersSavedAudiobooksQueryOptions<
   })
 }
 
-export function getAChapterQueryOptions<TData = Awaited<ReturnType<typeof getAChapter>>>(
+/** @deprecated */
+export const checkUsersSavedAudiobooksQueryOptions: typeof _checkUsersSavedAudiobooksQueryOptions &
+  typeof _checkUsersSavedAudiobooksQueryOptions<
+    Awaited<ReturnType<typeof checkUsersSavedAudiobooks>>
+  > = _checkUsersSavedAudiobooksQueryOptions
+
+function _getAChapterQueryOptions<TData = Awaited<ReturnType<typeof getAChapter>>>(
   id: Parameters<typeof getAChapter>[0],
   params?: Parameters<typeof getAChapter>[1],
   options?: Omit<
@@ -663,10 +725,11 @@ export function getAChapterQueryOptions<TData = Awaited<ReturnType<typeof getACh
   })
 }
 
-/** @deprecated */
-export function getSeveralChaptersQueryOptions<
-  TData = Awaited<ReturnType<typeof getSeveralChapters>>,
->(
+export const getAChapterQueryOptions: typeof _getAChapterQueryOptions &
+  typeof _getAChapterQueryOptions<Awaited<ReturnType<typeof getAChapter>>> =
+  _getAChapterQueryOptions
+
+function _getSeveralChaptersQueryOptions<TData = Awaited<ReturnType<typeof getSeveralChapters>>>(
   params: Parameters<typeof getSeveralChapters>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getSeveralChapters>>, ApiError, TData>,
@@ -682,7 +745,12 @@ export function getSeveralChaptersQueryOptions<
   })
 }
 
-export function getTrackQueryOptions<TData = Awaited<ReturnType<typeof getTrack>>>(
+/** @deprecated */
+export const getSeveralChaptersQueryOptions: typeof _getSeveralChaptersQueryOptions &
+  typeof _getSeveralChaptersQueryOptions<Awaited<ReturnType<typeof getSeveralChapters>>> =
+  _getSeveralChaptersQueryOptions
+
+function _getTrackQueryOptions<TData = Awaited<ReturnType<typeof getTrack>>>(
   id: Parameters<typeof getTrack>[0],
   params?: Parameters<typeof getTrack>[1],
   options?: Omit<
@@ -699,8 +767,10 @@ export function getTrackQueryOptions<TData = Awaited<ReturnType<typeof getTrack>
   })
 }
 
-/** @deprecated */
-export function getSeveralTracksQueryOptions<TData = Awaited<ReturnType<typeof getSeveralTracks>>>(
+export const getTrackQueryOptions: typeof _getTrackQueryOptions &
+  typeof _getTrackQueryOptions<Awaited<ReturnType<typeof getTrack>>> = _getTrackQueryOptions
+
+function _getSeveralTracksQueryOptions<TData = Awaited<ReturnType<typeof getSeveralTracks>>>(
   params: Parameters<typeof getSeveralTracks>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getSeveralTracks>>, ApiError, TData>,
@@ -716,7 +786,12 @@ export function getSeveralTracksQueryOptions<TData = Awaited<ReturnType<typeof g
   })
 }
 
-export function searchQueryOptions<TData = Awaited<ReturnType<typeof search>>>(
+/** @deprecated */
+export const getSeveralTracksQueryOptions: typeof _getSeveralTracksQueryOptions &
+  typeof _getSeveralTracksQueryOptions<Awaited<ReturnType<typeof getSeveralTracks>>> =
+  _getSeveralTracksQueryOptions
+
+function _searchQueryOptions<TData = Awaited<ReturnType<typeof search>>>(
   params: Parameters<typeof search>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof search>>, ApiError, TData>,
@@ -732,7 +807,10 @@ export function searchQueryOptions<TData = Awaited<ReturnType<typeof search>>>(
   })
 }
 
-export function getCurrentUsersProfileQueryOptions<
+export const searchQueryOptions: typeof _searchQueryOptions &
+  typeof _searchQueryOptions<Awaited<ReturnType<typeof search>>> = _searchQueryOptions
+
+function _getCurrentUsersProfileQueryOptions<
   TData = Awaited<ReturnType<typeof getCurrentUsersProfile>>,
 >(
   options?: Omit<
@@ -749,7 +827,11 @@ export function getCurrentUsersProfileQueryOptions<
   })
 }
 
-export function getPlaylistQueryOptions<TData = Awaited<ReturnType<typeof getPlaylist>>>(
+export const getCurrentUsersProfileQueryOptions: typeof _getCurrentUsersProfileQueryOptions &
+  typeof _getCurrentUsersProfileQueryOptions<Awaited<ReturnType<typeof getCurrentUsersProfile>>> =
+  _getCurrentUsersProfileQueryOptions
+
+function _getPlaylistQueryOptions<TData = Awaited<ReturnType<typeof getPlaylist>>>(
   playlistId: Parameters<typeof getPlaylist>[0],
   params?: Parameters<typeof getPlaylist>[1],
   options?: Omit<
@@ -766,10 +848,11 @@ export function getPlaylistQueryOptions<TData = Awaited<ReturnType<typeof getPla
   })
 }
 
-/** @deprecated */
-export function getPlaylistsTracksQueryOptions<
-  TData = Awaited<ReturnType<typeof getPlaylistsTracks>>,
->(
+export const getPlaylistQueryOptions: typeof _getPlaylistQueryOptions &
+  typeof _getPlaylistQueryOptions<Awaited<ReturnType<typeof getPlaylist>>> =
+  _getPlaylistQueryOptions
+
+function _getPlaylistsTracksQueryOptions<TData = Awaited<ReturnType<typeof getPlaylistsTracks>>>(
   playlistId: Parameters<typeof getPlaylistsTracks>[0],
   params?: Parameters<typeof getPlaylistsTracks>[1],
   options?: Omit<
@@ -786,9 +869,12 @@ export function getPlaylistsTracksQueryOptions<
   })
 }
 
-export function getPlaylistsItemsQueryOptions<
-  TData = Awaited<ReturnType<typeof getPlaylistsItems>>,
->(
+/** @deprecated */
+export const getPlaylistsTracksQueryOptions: typeof _getPlaylistsTracksQueryOptions &
+  typeof _getPlaylistsTracksQueryOptions<Awaited<ReturnType<typeof getPlaylistsTracks>>> =
+  _getPlaylistsTracksQueryOptions
+
+function _getPlaylistsItemsQueryOptions<TData = Awaited<ReturnType<typeof getPlaylistsItems>>>(
   playlistId: Parameters<typeof getPlaylistsItems>[0],
   params?: Parameters<typeof getPlaylistsItems>[1],
   options?: Omit<
@@ -805,7 +891,11 @@ export function getPlaylistsItemsQueryOptions<
   })
 }
 
-export function getAListOfCurrentUsersPlaylistsQueryOptions<
+export const getPlaylistsItemsQueryOptions: typeof _getPlaylistsItemsQueryOptions &
+  typeof _getPlaylistsItemsQueryOptions<Awaited<ReturnType<typeof getPlaylistsItems>>> =
+  _getPlaylistsItemsQueryOptions
+
+function _getAListOfCurrentUsersPlaylistsQueryOptions<
   TData = Awaited<ReturnType<typeof getAListOfCurrentUsersPlaylists>>,
 >(
   params?: Parameters<typeof getAListOfCurrentUsersPlaylists>[0],
@@ -825,7 +915,12 @@ export function getAListOfCurrentUsersPlaylistsQueryOptions<
   )
 }
 
-export function checkLibraryContainsQueryOptions<
+export const getAListOfCurrentUsersPlaylistsQueryOptions: typeof _getAListOfCurrentUsersPlaylistsQueryOptions &
+  typeof _getAListOfCurrentUsersPlaylistsQueryOptions<
+    Awaited<ReturnType<typeof getAListOfCurrentUsersPlaylists>>
+  > = _getAListOfCurrentUsersPlaylistsQueryOptions
+
+function _checkLibraryContainsQueryOptions<
   TData = Awaited<ReturnType<typeof checkLibraryContains>>,
 >(
   params: Parameters<typeof checkLibraryContains>[0],
@@ -843,9 +938,11 @@ export function checkLibraryContainsQueryOptions<
   })
 }
 
-export function getUsersSavedAlbumsQueryOptions<
-  TData = Awaited<ReturnType<typeof getUsersSavedAlbums>>,
->(
+export const checkLibraryContainsQueryOptions: typeof _checkLibraryContainsQueryOptions &
+  typeof _checkLibraryContainsQueryOptions<Awaited<ReturnType<typeof checkLibraryContains>>> =
+  _checkLibraryContainsQueryOptions
+
+function _getUsersSavedAlbumsQueryOptions<TData = Awaited<ReturnType<typeof getUsersSavedAlbums>>>(
   params?: Parameters<typeof getUsersSavedAlbums>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedAlbums>>, ApiError, TData>,
@@ -861,8 +958,11 @@ export function getUsersSavedAlbumsQueryOptions<
   })
 }
 
-/** @deprecated */
-export function checkUsersSavedAlbumsQueryOptions<
+export const getUsersSavedAlbumsQueryOptions: typeof _getUsersSavedAlbumsQueryOptions &
+  typeof _getUsersSavedAlbumsQueryOptions<Awaited<ReturnType<typeof getUsersSavedAlbums>>> =
+  _getUsersSavedAlbumsQueryOptions
+
+function _checkUsersSavedAlbumsQueryOptions<
   TData = Awaited<ReturnType<typeof checkUsersSavedAlbums>>,
 >(
   params: Parameters<typeof checkUsersSavedAlbums>[0],
@@ -880,9 +980,12 @@ export function checkUsersSavedAlbumsQueryOptions<
   })
 }
 
-export function getUsersSavedTracksQueryOptions<
-  TData = Awaited<ReturnType<typeof getUsersSavedTracks>>,
->(
+/** @deprecated */
+export const checkUsersSavedAlbumsQueryOptions: typeof _checkUsersSavedAlbumsQueryOptions &
+  typeof _checkUsersSavedAlbumsQueryOptions<Awaited<ReturnType<typeof checkUsersSavedAlbums>>> =
+  _checkUsersSavedAlbumsQueryOptions
+
+function _getUsersSavedTracksQueryOptions<TData = Awaited<ReturnType<typeof getUsersSavedTracks>>>(
   params?: Parameters<typeof getUsersSavedTracks>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedTracks>>, ApiError, TData>,
@@ -898,8 +1001,11 @@ export function getUsersSavedTracksQueryOptions<
   })
 }
 
-/** @deprecated */
-export function checkUsersSavedTracksQueryOptions<
+export const getUsersSavedTracksQueryOptions: typeof _getUsersSavedTracksQueryOptions &
+  typeof _getUsersSavedTracksQueryOptions<Awaited<ReturnType<typeof getUsersSavedTracks>>> =
+  _getUsersSavedTracksQueryOptions
+
+function _checkUsersSavedTracksQueryOptions<
   TData = Awaited<ReturnType<typeof checkUsersSavedTracks>>,
 >(
   params: Parameters<typeof checkUsersSavedTracks>[0],
@@ -917,7 +1023,12 @@ export function checkUsersSavedTracksQueryOptions<
   })
 }
 
-export function getUsersSavedEpisodesQueryOptions<
+/** @deprecated */
+export const checkUsersSavedTracksQueryOptions: typeof _checkUsersSavedTracksQueryOptions &
+  typeof _checkUsersSavedTracksQueryOptions<Awaited<ReturnType<typeof checkUsersSavedTracks>>> =
+  _checkUsersSavedTracksQueryOptions
+
+function _getUsersSavedEpisodesQueryOptions<
   TData = Awaited<ReturnType<typeof getUsersSavedEpisodes>>,
 >(
   params?: Parameters<typeof getUsersSavedEpisodes>[0],
@@ -935,8 +1046,11 @@ export function getUsersSavedEpisodesQueryOptions<
   })
 }
 
-/** @deprecated */
-export function checkUsersSavedEpisodesQueryOptions<
+export const getUsersSavedEpisodesQueryOptions: typeof _getUsersSavedEpisodesQueryOptions &
+  typeof _getUsersSavedEpisodesQueryOptions<Awaited<ReturnType<typeof getUsersSavedEpisodes>>> =
+  _getUsersSavedEpisodesQueryOptions
+
+function _checkUsersSavedEpisodesQueryOptions<
   TData = Awaited<ReturnType<typeof checkUsersSavedEpisodes>>,
 >(
   params: Parameters<typeof checkUsersSavedEpisodes>[0],
@@ -954,9 +1068,12 @@ export function checkUsersSavedEpisodesQueryOptions<
   })
 }
 
-export function getUsersSavedShowsQueryOptions<
-  TData = Awaited<ReturnType<typeof getUsersSavedShows>>,
->(
+/** @deprecated */
+export const checkUsersSavedEpisodesQueryOptions: typeof _checkUsersSavedEpisodesQueryOptions &
+  typeof _checkUsersSavedEpisodesQueryOptions<Awaited<ReturnType<typeof checkUsersSavedEpisodes>>> =
+  _checkUsersSavedEpisodesQueryOptions
+
+function _getUsersSavedShowsQueryOptions<TData = Awaited<ReturnType<typeof getUsersSavedShows>>>(
   params?: Parameters<typeof getUsersSavedShows>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedShows>>, ApiError, TData>,
@@ -972,8 +1089,11 @@ export function getUsersSavedShowsQueryOptions<
   })
 }
 
-/** @deprecated */
-export function checkUsersSavedShowsQueryOptions<
+export const getUsersSavedShowsQueryOptions: typeof _getUsersSavedShowsQueryOptions &
+  typeof _getUsersSavedShowsQueryOptions<Awaited<ReturnType<typeof getUsersSavedShows>>> =
+  _getUsersSavedShowsQueryOptions
+
+function _checkUsersSavedShowsQueryOptions<
   TData = Awaited<ReturnType<typeof checkUsersSavedShows>>,
 >(
   params: Parameters<typeof checkUsersSavedShows>[0],
@@ -992,7 +1112,11 @@ export function checkUsersSavedShowsQueryOptions<
 }
 
 /** @deprecated */
-export function getUsersProfileQueryOptions<TData = Awaited<ReturnType<typeof getUsersProfile>>>(
+export const checkUsersSavedShowsQueryOptions: typeof _checkUsersSavedShowsQueryOptions &
+  typeof _checkUsersSavedShowsQueryOptions<Awaited<ReturnType<typeof checkUsersSavedShows>>> =
+  _checkUsersSavedShowsQueryOptions
+
+function _getUsersProfileQueryOptions<TData = Awaited<ReturnType<typeof getUsersProfile>>>(
   userId: Parameters<typeof getUsersProfile>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getUsersProfile>>, ApiError, TData>,
@@ -1009,7 +1133,11 @@ export function getUsersProfileQueryOptions<TData = Awaited<ReturnType<typeof ge
 }
 
 /** @deprecated */
-export function getListUsersPlaylistsQueryOptions<
+export const getUsersProfileQueryOptions: typeof _getUsersProfileQueryOptions &
+  typeof _getUsersProfileQueryOptions<Awaited<ReturnType<typeof getUsersProfile>>> =
+  _getUsersProfileQueryOptions
+
+function _getListUsersPlaylistsQueryOptions<
   TData = Awaited<ReturnType<typeof getListUsersPlaylists>>,
 >(
   userId: Parameters<typeof getListUsersPlaylists>[0],
@@ -1029,7 +1157,11 @@ export function getListUsersPlaylistsQueryOptions<
 }
 
 /** @deprecated */
-export function getFeaturedPlaylistsQueryOptions<
+export const getListUsersPlaylistsQueryOptions: typeof _getListUsersPlaylistsQueryOptions &
+  typeof _getListUsersPlaylistsQueryOptions<Awaited<ReturnType<typeof getListUsersPlaylists>>> =
+  _getListUsersPlaylistsQueryOptions
+
+function _getFeaturedPlaylistsQueryOptions<
   TData = Awaited<ReturnType<typeof getFeaturedPlaylists>>,
 >(
   params?: Parameters<typeof getFeaturedPlaylists>[0],
@@ -1048,7 +1180,11 @@ export function getFeaturedPlaylistsQueryOptions<
 }
 
 /** @deprecated */
-export function getCategoriesQueryOptions<TData = Awaited<ReturnType<typeof getCategories>>>(
+export const getFeaturedPlaylistsQueryOptions: typeof _getFeaturedPlaylistsQueryOptions &
+  typeof _getFeaturedPlaylistsQueryOptions<Awaited<ReturnType<typeof getFeaturedPlaylists>>> =
+  _getFeaturedPlaylistsQueryOptions
+
+function _getCategoriesQueryOptions<TData = Awaited<ReturnType<typeof getCategories>>>(
   params?: Parameters<typeof getCategories>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getCategories>>, ApiError, TData>,
@@ -1065,7 +1201,11 @@ export function getCategoriesQueryOptions<TData = Awaited<ReturnType<typeof getC
 }
 
 /** @deprecated */
-export function getACategoryQueryOptions<TData = Awaited<ReturnType<typeof getACategory>>>(
+export const getCategoriesQueryOptions: typeof _getCategoriesQueryOptions &
+  typeof _getCategoriesQueryOptions<Awaited<ReturnType<typeof getCategories>>> =
+  _getCategoriesQueryOptions
+
+function _getACategoryQueryOptions<TData = Awaited<ReturnType<typeof getACategory>>>(
   categoryId: Parameters<typeof getACategory>[0],
   params?: Parameters<typeof getACategory>[1],
   options?: Omit<
@@ -1083,7 +1223,11 @@ export function getACategoryQueryOptions<TData = Awaited<ReturnType<typeof getAC
 }
 
 /** @deprecated */
-export function getACategoriesPlaylistsQueryOptions<
+export const getACategoryQueryOptions: typeof _getACategoryQueryOptions &
+  typeof _getACategoryQueryOptions<Awaited<ReturnType<typeof getACategory>>> =
+  _getACategoryQueryOptions
+
+function _getACategoriesPlaylistsQueryOptions<
   TData = Awaited<ReturnType<typeof getACategoriesPlaylists>>,
 >(
   categoryId: Parameters<typeof getACategoriesPlaylists>[0],
@@ -1102,7 +1246,12 @@ export function getACategoriesPlaylistsQueryOptions<
   })
 }
 
-export function getPlaylistCoverQueryOptions<TData = Awaited<ReturnType<typeof getPlaylistCover>>>(
+/** @deprecated */
+export const getACategoriesPlaylistsQueryOptions: typeof _getACategoriesPlaylistsQueryOptions &
+  typeof _getACategoriesPlaylistsQueryOptions<Awaited<ReturnType<typeof getACategoriesPlaylists>>> =
+  _getACategoriesPlaylistsQueryOptions
+
+function _getPlaylistCoverQueryOptions<TData = Awaited<ReturnType<typeof getPlaylistCover>>>(
   playlistId: Parameters<typeof getPlaylistCover>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getPlaylistCover>>, ApiError, TData>,
@@ -1118,8 +1267,11 @@ export function getPlaylistCoverQueryOptions<TData = Awaited<ReturnType<typeof g
   })
 }
 
-/** @deprecated */
-export function getNewReleasesQueryOptions<TData = Awaited<ReturnType<typeof getNewReleases>>>(
+export const getPlaylistCoverQueryOptions: typeof _getPlaylistCoverQueryOptions &
+  typeof _getPlaylistCoverQueryOptions<Awaited<ReturnType<typeof getPlaylistCover>>> =
+  _getPlaylistCoverQueryOptions
+
+function _getNewReleasesQueryOptions<TData = Awaited<ReturnType<typeof getNewReleases>>>(
   params?: Parameters<typeof getNewReleases>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getNewReleases>>, ApiError, TData>,
@@ -1135,7 +1287,12 @@ export function getNewReleasesQueryOptions<TData = Awaited<ReturnType<typeof get
   })
 }
 
-export function getFollowedQueryOptions<TData = Awaited<ReturnType<typeof getFollowed>>>(
+/** @deprecated */
+export const getNewReleasesQueryOptions: typeof _getNewReleasesQueryOptions &
+  typeof _getNewReleasesQueryOptions<Awaited<ReturnType<typeof getNewReleases>>> =
+  _getNewReleasesQueryOptions
+
+function _getFollowedQueryOptions<TData = Awaited<ReturnType<typeof getFollowed>>>(
   params: Parameters<typeof getFollowed>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getFollowed>>, ApiError, TData>,
@@ -1151,8 +1308,11 @@ export function getFollowedQueryOptions<TData = Awaited<ReturnType<typeof getFol
   })
 }
 
-/** @deprecated */
-export function checkCurrentUserFollowsQueryOptions<
+export const getFollowedQueryOptions: typeof _getFollowedQueryOptions &
+  typeof _getFollowedQueryOptions<Awaited<ReturnType<typeof getFollowed>>> =
+  _getFollowedQueryOptions
+
+function _checkCurrentUserFollowsQueryOptions<
   TData = Awaited<ReturnType<typeof checkCurrentUserFollows>>,
 >(
   params: Parameters<typeof checkCurrentUserFollows>[0],
@@ -1171,7 +1331,11 @@ export function checkCurrentUserFollowsQueryOptions<
 }
 
 /** @deprecated */
-export function checkIfUserFollowsPlaylistQueryOptions<
+export const checkCurrentUserFollowsQueryOptions: typeof _checkCurrentUserFollowsQueryOptions &
+  typeof _checkCurrentUserFollowsQueryOptions<Awaited<ReturnType<typeof checkCurrentUserFollows>>> =
+  _checkCurrentUserFollowsQueryOptions
+
+function _checkIfUserFollowsPlaylistQueryOptions<
   TData = Awaited<ReturnType<typeof checkIfUserFollowsPlaylist>>,
 >(
   playlistId: Parameters<typeof checkIfUserFollowsPlaylist>[0],
@@ -1191,7 +1355,12 @@ export function checkIfUserFollowsPlaylistQueryOptions<
 }
 
 /** @deprecated */
-export function getSeveralAudioFeaturesQueryOptions<
+export const checkIfUserFollowsPlaylistQueryOptions: typeof _checkIfUserFollowsPlaylistQueryOptions &
+  typeof _checkIfUserFollowsPlaylistQueryOptions<
+    Awaited<ReturnType<typeof checkIfUserFollowsPlaylist>>
+  > = _checkIfUserFollowsPlaylistQueryOptions
+
+function _getSeveralAudioFeaturesQueryOptions<
   TData = Awaited<ReturnType<typeof getSeveralAudioFeatures>>,
 >(
   params: Parameters<typeof getSeveralAudioFeatures>[0],
@@ -1210,7 +1379,11 @@ export function getSeveralAudioFeaturesQueryOptions<
 }
 
 /** @deprecated */
-export function getAudioFeaturesQueryOptions<TData = Awaited<ReturnType<typeof getAudioFeatures>>>(
+export const getSeveralAudioFeaturesQueryOptions: typeof _getSeveralAudioFeaturesQueryOptions &
+  typeof _getSeveralAudioFeaturesQueryOptions<Awaited<ReturnType<typeof getSeveralAudioFeatures>>> =
+  _getSeveralAudioFeaturesQueryOptions
+
+function _getAudioFeaturesQueryOptions<TData = Awaited<ReturnType<typeof getAudioFeatures>>>(
   id: Parameters<typeof getAudioFeatures>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getAudioFeatures>>, ApiError, TData>,
@@ -1227,7 +1400,11 @@ export function getAudioFeaturesQueryOptions<TData = Awaited<ReturnType<typeof g
 }
 
 /** @deprecated */
-export function getAudioAnalysisQueryOptions<TData = Awaited<ReturnType<typeof getAudioAnalysis>>>(
+export const getAudioFeaturesQueryOptions: typeof _getAudioFeaturesQueryOptions &
+  typeof _getAudioFeaturesQueryOptions<Awaited<ReturnType<typeof getAudioFeatures>>> =
+  _getAudioFeaturesQueryOptions
+
+function _getAudioAnalysisQueryOptions<TData = Awaited<ReturnType<typeof getAudioAnalysis>>>(
   id: Parameters<typeof getAudioAnalysis>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getAudioAnalysis>>, ApiError, TData>,
@@ -1244,9 +1421,11 @@ export function getAudioAnalysisQueryOptions<TData = Awaited<ReturnType<typeof g
 }
 
 /** @deprecated */
-export function getRecommendationsQueryOptions<
-  TData = Awaited<ReturnType<typeof getRecommendations>>,
->(
+export const getAudioAnalysisQueryOptions: typeof _getAudioAnalysisQueryOptions &
+  typeof _getAudioAnalysisQueryOptions<Awaited<ReturnType<typeof getAudioAnalysis>>> =
+  _getAudioAnalysisQueryOptions
+
+function _getRecommendationsQueryOptions<TData = Awaited<ReturnType<typeof getRecommendations>>>(
   params?: Parameters<typeof getRecommendations>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getRecommendations>>, ApiError, TData>,
@@ -1263,7 +1442,11 @@ export function getRecommendationsQueryOptions<
 }
 
 /** @deprecated */
-export function getRecommendationGenresQueryOptions<
+export const getRecommendationsQueryOptions: typeof _getRecommendationsQueryOptions &
+  typeof _getRecommendationsQueryOptions<Awaited<ReturnType<typeof getRecommendations>>> =
+  _getRecommendationsQueryOptions
+
+function _getRecommendationGenresQueryOptions<
   TData = Awaited<ReturnType<typeof getRecommendationGenres>>,
 >(
   options?: Omit<
@@ -1280,7 +1463,12 @@ export function getRecommendationGenresQueryOptions<
   })
 }
 
-export function getInformationAboutTheUsersCurrentPlaybackQueryOptions<
+/** @deprecated */
+export const getRecommendationGenresQueryOptions: typeof _getRecommendationGenresQueryOptions &
+  typeof _getRecommendationGenresQueryOptions<Awaited<ReturnType<typeof getRecommendationGenres>>> =
+  _getRecommendationGenresQueryOptions
+
+function _getInformationAboutTheUsersCurrentPlaybackQueryOptions<
   TData = Awaited<ReturnType<typeof getInformationAboutTheUsersCurrentPlayback>>,
 >(
   params?: Parameters<typeof getInformationAboutTheUsersCurrentPlayback>[0],
@@ -1306,7 +1494,12 @@ export function getInformationAboutTheUsersCurrentPlaybackQueryOptions<
   })
 }
 
-export function getAUsersAvailableDevicesQueryOptions<
+export const getInformationAboutTheUsersCurrentPlaybackQueryOptions: typeof _getInformationAboutTheUsersCurrentPlaybackQueryOptions &
+  typeof _getInformationAboutTheUsersCurrentPlaybackQueryOptions<
+    Awaited<ReturnType<typeof getInformationAboutTheUsersCurrentPlayback>>
+  > = _getInformationAboutTheUsersCurrentPlaybackQueryOptions
+
+function _getAUsersAvailableDevicesQueryOptions<
   TData = Awaited<ReturnType<typeof getAUsersAvailableDevices>>,
 >(
   options?: Omit<
@@ -1323,7 +1516,12 @@ export function getAUsersAvailableDevicesQueryOptions<
   })
 }
 
-export function getTheUsersCurrentlyPlayingTrackQueryOptions<
+export const getAUsersAvailableDevicesQueryOptions: typeof _getAUsersAvailableDevicesQueryOptions &
+  typeof _getAUsersAvailableDevicesQueryOptions<
+    Awaited<ReturnType<typeof getAUsersAvailableDevices>>
+  > = _getAUsersAvailableDevicesQueryOptions
+
+function _getTheUsersCurrentlyPlayingTrackQueryOptions<
   TData = Awaited<ReturnType<typeof getTheUsersCurrentlyPlayingTrack>>,
 >(
   params?: Parameters<typeof getTheUsersCurrentlyPlayingTrack>[0],
@@ -1345,9 +1543,12 @@ export function getTheUsersCurrentlyPlayingTrackQueryOptions<
   })
 }
 
-export function getRecentlyPlayedQueryOptions<
-  TData = Awaited<ReturnType<typeof getRecentlyPlayed>>,
->(
+export const getTheUsersCurrentlyPlayingTrackQueryOptions: typeof _getTheUsersCurrentlyPlayingTrackQueryOptions &
+  typeof _getTheUsersCurrentlyPlayingTrackQueryOptions<
+    Awaited<ReturnType<typeof getTheUsersCurrentlyPlayingTrack>>
+  > = _getTheUsersCurrentlyPlayingTrackQueryOptions
+
+function _getRecentlyPlayedQueryOptions<TData = Awaited<ReturnType<typeof getRecentlyPlayed>>>(
   params?: Parameters<typeof getRecentlyPlayed>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getRecentlyPlayed>>, ApiError, TData>,
@@ -1363,7 +1564,11 @@ export function getRecentlyPlayedQueryOptions<
   })
 }
 
-export function getQueueQueryOptions<TData = Awaited<ReturnType<typeof getQueue>>>(
+export const getRecentlyPlayedQueryOptions: typeof _getRecentlyPlayedQueryOptions &
+  typeof _getRecentlyPlayedQueryOptions<Awaited<ReturnType<typeof getRecentlyPlayed>>> =
+  _getRecentlyPlayedQueryOptions
+
+function _getQueueQueryOptions<TData = Awaited<ReturnType<typeof getQueue>>>(
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getQueue>>, ApiError, TData>,
     'queryKey' | 'queryFn'
@@ -1378,10 +1583,10 @@ export function getQueueQueryOptions<TData = Awaited<ReturnType<typeof getQueue>
   })
 }
 
-/** @deprecated */
-export function getAvailableMarketsQueryOptions<
-  TData = Awaited<ReturnType<typeof getAvailableMarkets>>,
->(
+export const getQueueQueryOptions: typeof _getQueueQueryOptions &
+  typeof _getQueueQueryOptions<Awaited<ReturnType<typeof getQueue>>> = _getQueueQueryOptions
+
+function _getAvailableMarketsQueryOptions<TData = Awaited<ReturnType<typeof getAvailableMarkets>>>(
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getAvailableMarkets>>, ApiError, TData>,
     'queryKey' | 'queryFn'
@@ -1396,9 +1601,12 @@ export function getAvailableMarketsQueryOptions<
   })
 }
 
-export function getUsersTopArtistsQueryOptions<
-  TData = Awaited<ReturnType<typeof getUsersTopArtists>>,
->(
+/** @deprecated */
+export const getAvailableMarketsQueryOptions: typeof _getAvailableMarketsQueryOptions &
+  typeof _getAvailableMarketsQueryOptions<Awaited<ReturnType<typeof getAvailableMarkets>>> =
+  _getAvailableMarketsQueryOptions
+
+function _getUsersTopArtistsQueryOptions<TData = Awaited<ReturnType<typeof getUsersTopArtists>>>(
   params?: Parameters<typeof getUsersTopArtists>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getUsersTopArtists>>, ApiError, TData>,
@@ -1414,9 +1622,11 @@ export function getUsersTopArtistsQueryOptions<
   })
 }
 
-export function getUsersTopTracksQueryOptions<
-  TData = Awaited<ReturnType<typeof getUsersTopTracks>>,
->(
+export const getUsersTopArtistsQueryOptions: typeof _getUsersTopArtistsQueryOptions &
+  typeof _getUsersTopArtistsQueryOptions<Awaited<ReturnType<typeof getUsersTopArtists>>> =
+  _getUsersTopArtistsQueryOptions
+
+function _getUsersTopTracksQueryOptions<TData = Awaited<ReturnType<typeof getUsersTopTracks>>>(
   params?: Parameters<typeof getUsersTopTracks>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getUsersTopTracks>>, ApiError, TData>,
@@ -1432,8 +1642,32 @@ export function getUsersTopTracksQueryOptions<
   })
 }
 
+export const getUsersTopTracksQueryOptions: typeof _getUsersTopTracksQueryOptions &
+  typeof _getUsersTopTracksQueryOptions<Awaited<ReturnType<typeof getUsersTopTracks>>> =
+  _getUsersTopTracksQueryOptions
+
 // ── Queries ──────────────────────────────────────────────────
 
+export function useGetAnAlbum<TData = Awaited<ReturnType<typeof getAnAlbum>>>(
+  id: Parameters<typeof getAnAlbum>[0] | undefined | null,
+  params?: Parameters<typeof getAnAlbum>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAnAlbum>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetAnAlbum(
+  id: Parameters<typeof getAnAlbum>[0] | undefined | null,
+  params?: Parameters<typeof getAnAlbum>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAnAlbum>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAnAlbum>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAnAlbum>>, ApiError>
 export function useGetAnAlbum<TData = Awaited<ReturnType<typeof getAnAlbum>>>(
   id: Parameters<typeof getAnAlbum>[0] | undefined | null,
   params?: Parameters<typeof getAnAlbum>[1],
@@ -1459,6 +1693,25 @@ export function useGetMultipleAlbums<TData = Awaited<ReturnType<typeof getMultip
     UseQueryOptions<Awaited<ReturnType<typeof getMultipleAlbums>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetMultipleAlbums(
+  params: Parameters<typeof getMultipleAlbums>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getMultipleAlbums>>,
+      ApiError,
+      Awaited<ReturnType<typeof getMultipleAlbums>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getMultipleAlbums>>, ApiError>
+export function useGetMultipleAlbums<TData = Awaited<ReturnType<typeof getMultipleAlbums>>>(
+  params: Parameters<typeof getMultipleAlbums>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getMultipleAlbums>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getMultipleAlbums>>, ApiError, TData>({
     queryKey: albumKeys.list(params),
@@ -1469,6 +1722,26 @@ export function useGetMultipleAlbums<TData = Awaited<ReturnType<typeof getMultip
   })
 }
 
+export function useGetAnAlbumsTracks<TData = Awaited<ReturnType<typeof getAnAlbumsTracks>>>(
+  id: Parameters<typeof getAnAlbumsTracks>[0] | undefined | null,
+  params?: Parameters<typeof getAnAlbumsTracks>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAnAlbumsTracks>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetAnAlbumsTracks(
+  id: Parameters<typeof getAnAlbumsTracks>[0] | undefined | null,
+  params?: Parameters<typeof getAnAlbumsTracks>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAnAlbumsTracks>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAnAlbumsTracks>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAnAlbumsTracks>>, ApiError>
 export function useGetAnAlbumsTracks<TData = Awaited<ReturnType<typeof getAnAlbumsTracks>>>(
   id: Parameters<typeof getAnAlbumsTracks>[0] | undefined | null,
   params?: Parameters<typeof getAnAlbumsTracks>[1],
@@ -1493,6 +1766,24 @@ export function useGetAnArtist<TData = Awaited<ReturnType<typeof getAnArtist>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getAnArtist>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetAnArtist(
+  id: Parameters<typeof getAnArtist>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAnArtist>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAnArtist>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAnArtist>>, ApiError>
+export function useGetAnArtist<TData = Awaited<ReturnType<typeof getAnArtist>>>(
+  id: Parameters<typeof getAnArtist>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAnArtist>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getAnArtist>>, ApiError, TData>({
     queryKey: artistKeys.getAnArtist(id!),
@@ -1505,6 +1796,25 @@ export function useGetAnArtist<TData = Awaited<ReturnType<typeof getAnArtist>>>(
 }
 
 /** @deprecated */
+export function useGetMultipleArtists<TData = Awaited<ReturnType<typeof getMultipleArtists>>>(
+  params: Parameters<typeof getMultipleArtists>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getMultipleArtists>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetMultipleArtists(
+  params: Parameters<typeof getMultipleArtists>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getMultipleArtists>>,
+      ApiError,
+      Awaited<ReturnType<typeof getMultipleArtists>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getMultipleArtists>>, ApiError>
 export function useGetMultipleArtists<TData = Awaited<ReturnType<typeof getMultipleArtists>>>(
   params: Parameters<typeof getMultipleArtists>[0],
   options?: Omit<
@@ -1528,6 +1838,26 @@ export function useGetAnArtistsAlbums<TData = Awaited<ReturnType<typeof getAnArt
     UseQueryOptions<Awaited<ReturnType<typeof getAnArtistsAlbums>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetAnArtistsAlbums(
+  id: Parameters<typeof getAnArtistsAlbums>[0] | undefined | null,
+  params?: Parameters<typeof getAnArtistsAlbums>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAnArtistsAlbums>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAnArtistsAlbums>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAnArtistsAlbums>>, ApiError>
+export function useGetAnArtistsAlbums<TData = Awaited<ReturnType<typeof getAnArtistsAlbums>>>(
+  id: Parameters<typeof getAnArtistsAlbums>[0] | undefined | null,
+  params?: Parameters<typeof getAnArtistsAlbums>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAnArtistsAlbums>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getAnArtistsAlbums>>, ApiError, TData>({
     queryKey: artistKeys.getAnArtistsAlbums(id!, params),
@@ -1540,6 +1870,27 @@ export function useGetAnArtistsAlbums<TData = Awaited<ReturnType<typeof getAnArt
 }
 
 /** @deprecated */
+export function useGetAnArtistsTopTracks<TData = Awaited<ReturnType<typeof getAnArtistsTopTracks>>>(
+  id: Parameters<typeof getAnArtistsTopTracks>[0] | undefined | null,
+  params?: Parameters<typeof getAnArtistsTopTracks>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAnArtistsTopTracks>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetAnArtistsTopTracks(
+  id: Parameters<typeof getAnArtistsTopTracks>[0] | undefined | null,
+  params?: Parameters<typeof getAnArtistsTopTracks>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAnArtistsTopTracks>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAnArtistsTopTracks>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAnArtistsTopTracks>>, ApiError>
 export function useGetAnArtistsTopTracks<TData = Awaited<ReturnType<typeof getAnArtistsTopTracks>>>(
   id: Parameters<typeof getAnArtistsTopTracks>[0] | undefined | null,
   params?: Parameters<typeof getAnArtistsTopTracks>[1],
@@ -1567,6 +1918,27 @@ export function useGetAnArtistsRelatedArtists<
     UseQueryOptions<Awaited<ReturnType<typeof getAnArtistsRelatedArtists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetAnArtistsRelatedArtists(
+  id: Parameters<typeof getAnArtistsRelatedArtists>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAnArtistsRelatedArtists>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAnArtistsRelatedArtists>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAnArtistsRelatedArtists>>, ApiError>
+export function useGetAnArtistsRelatedArtists<
+  TData = Awaited<ReturnType<typeof getAnArtistsRelatedArtists>>,
+>(
+  id: Parameters<typeof getAnArtistsRelatedArtists>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAnArtistsRelatedArtists>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getAnArtistsRelatedArtists>>, ApiError, TData>({
     queryKey: artistKeys.getAnArtistsRelatedArtists(id!),
@@ -1578,6 +1950,26 @@ export function useGetAnArtistsRelatedArtists<
   })
 }
 
+export function useGetAShow<TData = Awaited<ReturnType<typeof getAShow>>>(
+  id: Parameters<typeof getAShow>[0] | undefined | null,
+  params?: Parameters<typeof getAShow>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAShow>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetAShow(
+  id: Parameters<typeof getAShow>[0] | undefined | null,
+  params?: Parameters<typeof getAShow>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAShow>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAShow>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAShow>>, ApiError>
 export function useGetAShow<TData = Awaited<ReturnType<typeof getAShow>>>(
   id: Parameters<typeof getAShow>[0] | undefined | null,
   params?: Parameters<typeof getAShow>[1],
@@ -1603,6 +1995,25 @@ export function useGetMultipleShows<TData = Awaited<ReturnType<typeof getMultipl
     UseQueryOptions<Awaited<ReturnType<typeof getMultipleShows>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetMultipleShows(
+  params: Parameters<typeof getMultipleShows>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getMultipleShows>>,
+      ApiError,
+      Awaited<ReturnType<typeof getMultipleShows>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getMultipleShows>>, ApiError>
+export function useGetMultipleShows<TData = Awaited<ReturnType<typeof getMultipleShows>>>(
+  params: Parameters<typeof getMultipleShows>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getMultipleShows>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getMultipleShows>>, ApiError, TData>({
     queryKey: showKeys.list(params),
@@ -1613,6 +2024,26 @@ export function useGetMultipleShows<TData = Awaited<ReturnType<typeof getMultipl
   })
 }
 
+export function useGetAShowsEpisodes<TData = Awaited<ReturnType<typeof getAShowsEpisodes>>>(
+  id: Parameters<typeof getAShowsEpisodes>[0] | undefined | null,
+  params?: Parameters<typeof getAShowsEpisodes>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAShowsEpisodes>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetAShowsEpisodes(
+  id: Parameters<typeof getAShowsEpisodes>[0] | undefined | null,
+  params?: Parameters<typeof getAShowsEpisodes>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAShowsEpisodes>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAShowsEpisodes>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAShowsEpisodes>>, ApiError>
 export function useGetAShowsEpisodes<TData = Awaited<ReturnType<typeof getAShowsEpisodes>>>(
   id: Parameters<typeof getAShowsEpisodes>[0] | undefined | null,
   params?: Parameters<typeof getAShowsEpisodes>[1],
@@ -1638,6 +2069,26 @@ export function useGetAnEpisode<TData = Awaited<ReturnType<typeof getAnEpisode>>
     UseQueryOptions<Awaited<ReturnType<typeof getAnEpisode>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetAnEpisode(
+  id: Parameters<typeof getAnEpisode>[0] | undefined | null,
+  params?: Parameters<typeof getAnEpisode>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAnEpisode>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAnEpisode>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAnEpisode>>, ApiError>
+export function useGetAnEpisode<TData = Awaited<ReturnType<typeof getAnEpisode>>>(
+  id: Parameters<typeof getAnEpisode>[0] | undefined | null,
+  params?: Parameters<typeof getAnEpisode>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAnEpisode>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getAnEpisode>>, ApiError, TData>({
     queryKey: episodeKeys.detail(id!, params),
@@ -1656,6 +2107,25 @@ export function useGetMultipleEpisodes<TData = Awaited<ReturnType<typeof getMult
     UseQueryOptions<Awaited<ReturnType<typeof getMultipleEpisodes>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetMultipleEpisodes(
+  params: Parameters<typeof getMultipleEpisodes>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getMultipleEpisodes>>,
+      ApiError,
+      Awaited<ReturnType<typeof getMultipleEpisodes>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getMultipleEpisodes>>, ApiError>
+export function useGetMultipleEpisodes<TData = Awaited<ReturnType<typeof getMultipleEpisodes>>>(
+  params: Parameters<typeof getMultipleEpisodes>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getMultipleEpisodes>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getMultipleEpisodes>>, ApiError, TData>({
     queryKey: episodeKeys.list(params),
@@ -1666,6 +2136,26 @@ export function useGetMultipleEpisodes<TData = Awaited<ReturnType<typeof getMult
   })
 }
 
+export function useGetAnAudiobook<TData = Awaited<ReturnType<typeof getAnAudiobook>>>(
+  id: Parameters<typeof getAnAudiobook>[0] | undefined | null,
+  params?: Parameters<typeof getAnAudiobook>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAnAudiobook>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetAnAudiobook(
+  id: Parameters<typeof getAnAudiobook>[0] | undefined | null,
+  params?: Parameters<typeof getAnAudiobook>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAnAudiobook>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAnAudiobook>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAnAudiobook>>, ApiError>
 export function useGetAnAudiobook<TData = Awaited<ReturnType<typeof getAnAudiobook>>>(
   id: Parameters<typeof getAnAudiobook>[0] | undefined | null,
   params?: Parameters<typeof getAnAudiobook>[1],
@@ -1691,6 +2181,25 @@ export function useGetMultipleAudiobooks<TData = Awaited<ReturnType<typeof getMu
     UseQueryOptions<Awaited<ReturnType<typeof getMultipleAudiobooks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetMultipleAudiobooks(
+  params: Parameters<typeof getMultipleAudiobooks>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getMultipleAudiobooks>>,
+      ApiError,
+      Awaited<ReturnType<typeof getMultipleAudiobooks>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getMultipleAudiobooks>>, ApiError>
+export function useGetMultipleAudiobooks<TData = Awaited<ReturnType<typeof getMultipleAudiobooks>>>(
+  params: Parameters<typeof getMultipleAudiobooks>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getMultipleAudiobooks>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getMultipleAudiobooks>>, ApiError, TData>({
     queryKey: audiobookKeys.list(params),
@@ -1701,6 +2210,26 @@ export function useGetMultipleAudiobooks<TData = Awaited<ReturnType<typeof getMu
   })
 }
 
+export function useGetAudiobookChapters<TData = Awaited<ReturnType<typeof getAudiobookChapters>>>(
+  id: Parameters<typeof getAudiobookChapters>[0] | undefined | null,
+  params?: Parameters<typeof getAudiobookChapters>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAudiobookChapters>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetAudiobookChapters(
+  id: Parameters<typeof getAudiobookChapters>[0] | undefined | null,
+  params?: Parameters<typeof getAudiobookChapters>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAudiobookChapters>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAudiobookChapters>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAudiobookChapters>>, ApiError>
 export function useGetAudiobookChapters<TData = Awaited<ReturnType<typeof getAudiobookChapters>>>(
   id: Parameters<typeof getAudiobookChapters>[0] | undefined | null,
   params?: Parameters<typeof getAudiobookChapters>[1],
@@ -1727,6 +2256,26 @@ export function useGetUsersSavedAudiobooks<
     UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedAudiobooks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetUsersSavedAudiobooks(
+  params?: Parameters<typeof getUsersSavedAudiobooks>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getUsersSavedAudiobooks>>,
+      ApiError,
+      Awaited<ReturnType<typeof getUsersSavedAudiobooks>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getUsersSavedAudiobooks>>, ApiError>
+export function useGetUsersSavedAudiobooks<
+  TData = Awaited<ReturnType<typeof getUsersSavedAudiobooks>>,
+>(
+  params?: Parameters<typeof getUsersSavedAudiobooks>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedAudiobooks>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getUsersSavedAudiobooks>>, ApiError, TData>({
     queryKey: meKeys.getUsersSavedAudiobooks(params),
@@ -1737,6 +2286,37 @@ export function useGetUsersSavedAudiobooks<
   })
 }
 
+export function useGetUsersSavedAudiobooksInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getUsersSavedAudiobooks>>>,
+>(
+  params?: Parameters<typeof getUsersSavedAudiobooks>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUsersSavedAudiobooks>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetUsersSavedAudiobooksInfinite(
+  params?: Parameters<typeof getUsersSavedAudiobooks>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUsersSavedAudiobooks>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getUsersSavedAudiobooks>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<
+  InfiniteData<Awaited<ReturnType<typeof getUsersSavedAudiobooks>>>,
+  ApiError
+>
 export function useGetUsersSavedAudiobooksInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getUsersSavedAudiobooks>>>,
 >(
@@ -1779,6 +2359,27 @@ export function useCheckUsersSavedAudiobooks<
     UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedAudiobooks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useCheckUsersSavedAudiobooks(
+  params: Parameters<typeof checkUsersSavedAudiobooks>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof checkUsersSavedAudiobooks>>,
+      ApiError,
+      Awaited<ReturnType<typeof checkUsersSavedAudiobooks>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof checkUsersSavedAudiobooks>>, ApiError>
+export function useCheckUsersSavedAudiobooks<
+  TData = Awaited<ReturnType<typeof checkUsersSavedAudiobooks>>,
+>(
+  params: Parameters<typeof checkUsersSavedAudiobooks>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedAudiobooks>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof checkUsersSavedAudiobooks>>, ApiError, TData>({
     queryKey: meKeys.checkUsersSavedAudiobooks(params),
@@ -1789,6 +2390,26 @@ export function useCheckUsersSavedAudiobooks<
   })
 }
 
+export function useGetAChapter<TData = Awaited<ReturnType<typeof getAChapter>>>(
+  id: Parameters<typeof getAChapter>[0] | undefined | null,
+  params?: Parameters<typeof getAChapter>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAChapter>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetAChapter(
+  id: Parameters<typeof getAChapter>[0] | undefined | null,
+  params?: Parameters<typeof getAChapter>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAChapter>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAChapter>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAChapter>>, ApiError>
 export function useGetAChapter<TData = Awaited<ReturnType<typeof getAChapter>>>(
   id: Parameters<typeof getAChapter>[0] | undefined | null,
   params?: Parameters<typeof getAChapter>[1],
@@ -1814,6 +2435,25 @@ export function useGetSeveralChapters<TData = Awaited<ReturnType<typeof getSever
     UseQueryOptions<Awaited<ReturnType<typeof getSeveralChapters>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetSeveralChapters(
+  params: Parameters<typeof getSeveralChapters>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getSeveralChapters>>,
+      ApiError,
+      Awaited<ReturnType<typeof getSeveralChapters>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getSeveralChapters>>, ApiError>
+export function useGetSeveralChapters<TData = Awaited<ReturnType<typeof getSeveralChapters>>>(
+  params: Parameters<typeof getSeveralChapters>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getSeveralChapters>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getSeveralChapters>>, ApiError, TData>({
     queryKey: chapterKeys.list(params),
@@ -1824,6 +2464,26 @@ export function useGetSeveralChapters<TData = Awaited<ReturnType<typeof getSever
   })
 }
 
+export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>>(
+  id: Parameters<typeof getTrack>[0] | undefined | null,
+  params?: Parameters<typeof getTrack>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetTrack(
+  id: Parameters<typeof getTrack>[0] | undefined | null,
+  params?: Parameters<typeof getTrack>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getTrack>>,
+      ApiError,
+      Awaited<ReturnType<typeof getTrack>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getTrack>>, ApiError>
 export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>>(
   id: Parameters<typeof getTrack>[0] | undefined | null,
   params?: Parameters<typeof getTrack>[1],
@@ -1849,6 +2509,25 @@ export function useGetSeveralTracks<TData = Awaited<ReturnType<typeof getSeveral
     UseQueryOptions<Awaited<ReturnType<typeof getSeveralTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetSeveralTracks(
+  params: Parameters<typeof getSeveralTracks>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getSeveralTracks>>,
+      ApiError,
+      Awaited<ReturnType<typeof getSeveralTracks>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getSeveralTracks>>, ApiError>
+export function useGetSeveralTracks<TData = Awaited<ReturnType<typeof getSeveralTracks>>>(
+  params: Parameters<typeof getSeveralTracks>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getSeveralTracks>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getSeveralTracks>>, ApiError, TData>({
     queryKey: trackKeys.list(params),
@@ -1865,6 +2544,24 @@ export function useSearch<TData = Awaited<ReturnType<typeof search>>>(
     UseQueryOptions<Awaited<ReturnType<typeof search>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useSearch(
+  params: Parameters<typeof search>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof search>>,
+      ApiError,
+      Awaited<ReturnType<typeof search>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof search>>, ApiError>
+export function useSearch<TData = Awaited<ReturnType<typeof search>>>(
+  params: Parameters<typeof search>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof search>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof search>>, ApiError, TData>({
     queryKey: searchKeys.list(params),
@@ -1875,6 +2572,26 @@ export function useSearch<TData = Awaited<ReturnType<typeof search>>>(
   })
 }
 
+export function useSearchInfinite<TData = InfiniteData<Awaited<ReturnType<typeof search>>>>(
+  params: Parameters<typeof search>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<Awaited<ReturnType<typeof search>>, ApiError, TData, QueryKey, unknown>,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useSearchInfinite(
+  params: Parameters<typeof search>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof search>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof search>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof search>>>, ApiError>
 export function useSearchInfinite<TData = InfiniteData<Awaited<ReturnType<typeof search>>>>(
   params: Parameters<typeof search>[0],
   options?: Omit<
@@ -1901,6 +2618,24 @@ export function useGetCurrentUsersProfile<
     UseQueryOptions<Awaited<ReturnType<typeof getCurrentUsersProfile>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetCurrentUsersProfile(
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getCurrentUsersProfile>>,
+      ApiError,
+      Awaited<ReturnType<typeof getCurrentUsersProfile>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getCurrentUsersProfile>>, ApiError>
+export function useGetCurrentUsersProfile<
+  TData = Awaited<ReturnType<typeof getCurrentUsersProfile>>,
+>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getCurrentUsersProfile>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getCurrentUsersProfile>>, ApiError, TData>({
     queryKey: meKeys.getCurrentUsersProfile(),
@@ -1911,6 +2646,26 @@ export function useGetCurrentUsersProfile<
   })
 }
 
+export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>>(
+  playlistId: Parameters<typeof getPlaylist>[0] | undefined | null,
+  params?: Parameters<typeof getPlaylist>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetPlaylist(
+  playlistId: Parameters<typeof getPlaylist>[0] | undefined | null,
+  params?: Parameters<typeof getPlaylist>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getPlaylist>>,
+      ApiError,
+      Awaited<ReturnType<typeof getPlaylist>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getPlaylist>>, ApiError>
 export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>>(
   playlistId: Parameters<typeof getPlaylist>[0] | undefined | null,
   params?: Parameters<typeof getPlaylist>[1],
@@ -1937,6 +2692,27 @@ export function useGetPlaylistsTracks<TData = Awaited<ReturnType<typeof getPlayl
     UseQueryOptions<Awaited<ReturnType<typeof getPlaylistsTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetPlaylistsTracks(
+  playlistId: Parameters<typeof getPlaylistsTracks>[0] | undefined | null,
+  params?: Parameters<typeof getPlaylistsTracks>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getPlaylistsTracks>>,
+      ApiError,
+      Awaited<ReturnType<typeof getPlaylistsTracks>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getPlaylistsTracks>>, ApiError>
+export function useGetPlaylistsTracks<TData = Awaited<ReturnType<typeof getPlaylistsTracks>>>(
+  playlistId: Parameters<typeof getPlaylistsTracks>[0] | undefined | null,
+  params?: Parameters<typeof getPlaylistsTracks>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getPlaylistsTracks>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getPlaylistsTracks>>, ApiError, TData>({
     queryKey: playlistKeys.getPlaylistsTracks(playlistId!, params),
@@ -1948,6 +2724,26 @@ export function useGetPlaylistsTracks<TData = Awaited<ReturnType<typeof getPlayl
   })
 }
 
+export function useGetPlaylistsItems<TData = Awaited<ReturnType<typeof getPlaylistsItems>>>(
+  playlistId: Parameters<typeof getPlaylistsItems>[0] | undefined | null,
+  params?: Parameters<typeof getPlaylistsItems>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getPlaylistsItems>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetPlaylistsItems(
+  playlistId: Parameters<typeof getPlaylistsItems>[0] | undefined | null,
+  params?: Parameters<typeof getPlaylistsItems>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getPlaylistsItems>>,
+      ApiError,
+      Awaited<ReturnType<typeof getPlaylistsItems>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getPlaylistsItems>>, ApiError>
 export function useGetPlaylistsItems<TData = Awaited<ReturnType<typeof getPlaylistsItems>>>(
   playlistId: Parameters<typeof getPlaylistsItems>[0] | undefined | null,
   params?: Parameters<typeof getPlaylistsItems>[1],
@@ -1974,6 +2770,26 @@ export function useGetAListOfCurrentUsersPlaylists<
     UseQueryOptions<Awaited<ReturnType<typeof getAListOfCurrentUsersPlaylists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetAListOfCurrentUsersPlaylists(
+  params?: Parameters<typeof getAListOfCurrentUsersPlaylists>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAListOfCurrentUsersPlaylists>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAListOfCurrentUsersPlaylists>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAListOfCurrentUsersPlaylists>>, ApiError>
+export function useGetAListOfCurrentUsersPlaylists<
+  TData = Awaited<ReturnType<typeof getAListOfCurrentUsersPlaylists>>,
+>(
+  params?: Parameters<typeof getAListOfCurrentUsersPlaylists>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAListOfCurrentUsersPlaylists>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getAListOfCurrentUsersPlaylists>>, ApiError, TData>({
     queryKey: meKeys.getAListOfCurrentUsersPlaylists(params),
@@ -1984,6 +2800,37 @@ export function useGetAListOfCurrentUsersPlaylists<
   })
 }
 
+export function useGetAListOfCurrentUsersPlaylistsInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getAListOfCurrentUsersPlaylists>>>,
+>(
+  params?: Parameters<typeof getAListOfCurrentUsersPlaylists>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getAListOfCurrentUsersPlaylists>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetAListOfCurrentUsersPlaylistsInfinite(
+  params?: Parameters<typeof getAListOfCurrentUsersPlaylists>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getAListOfCurrentUsersPlaylists>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getAListOfCurrentUsersPlaylists>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<
+  InfiniteData<Awaited<ReturnType<typeof getAListOfCurrentUsersPlaylists>>>,
+  ApiError
+>
 export function useGetAListOfCurrentUsersPlaylistsInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getAListOfCurrentUsersPlaylists>>>,
 >(
@@ -2024,6 +2871,24 @@ export function useCheckLibraryContains<TData = Awaited<ReturnType<typeof checkL
     UseQueryOptions<Awaited<ReturnType<typeof checkLibraryContains>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useCheckLibraryContains(
+  params: Parameters<typeof checkLibraryContains>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof checkLibraryContains>>,
+      ApiError,
+      Awaited<ReturnType<typeof checkLibraryContains>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof checkLibraryContains>>, ApiError>
+export function useCheckLibraryContains<TData = Awaited<ReturnType<typeof checkLibraryContains>>>(
+  params: Parameters<typeof checkLibraryContains>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof checkLibraryContains>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof checkLibraryContains>>, ApiError, TData>({
     queryKey: meKeys.checkLibraryContains(params),
@@ -2040,6 +2905,24 @@ export function useGetUsersSavedAlbums<TData = Awaited<ReturnType<typeof getUser
     UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedAlbums>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetUsersSavedAlbums(
+  params?: Parameters<typeof getUsersSavedAlbums>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getUsersSavedAlbums>>,
+      ApiError,
+      Awaited<ReturnType<typeof getUsersSavedAlbums>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getUsersSavedAlbums>>, ApiError>
+export function useGetUsersSavedAlbums<TData = Awaited<ReturnType<typeof getUsersSavedAlbums>>>(
+  params?: Parameters<typeof getUsersSavedAlbums>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedAlbums>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getUsersSavedAlbums>>, ApiError, TData>({
     queryKey: meKeys.getUsersSavedAlbums(params),
@@ -2050,6 +2933,34 @@ export function useGetUsersSavedAlbums<TData = Awaited<ReturnType<typeof getUser
   })
 }
 
+export function useGetUsersSavedAlbumsInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getUsersSavedAlbums>>>,
+>(
+  params?: Parameters<typeof getUsersSavedAlbums>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUsersSavedAlbums>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetUsersSavedAlbumsInfinite(
+  params?: Parameters<typeof getUsersSavedAlbums>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUsersSavedAlbums>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getUsersSavedAlbums>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getUsersSavedAlbums>>>, ApiError>
 export function useGetUsersSavedAlbumsInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getUsersSavedAlbums>>>,
 >(
@@ -2090,6 +3001,25 @@ export function useCheckUsersSavedAlbums<TData = Awaited<ReturnType<typeof check
     UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedAlbums>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useCheckUsersSavedAlbums(
+  params: Parameters<typeof checkUsersSavedAlbums>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof checkUsersSavedAlbums>>,
+      ApiError,
+      Awaited<ReturnType<typeof checkUsersSavedAlbums>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof checkUsersSavedAlbums>>, ApiError>
+export function useCheckUsersSavedAlbums<TData = Awaited<ReturnType<typeof checkUsersSavedAlbums>>>(
+  params: Parameters<typeof checkUsersSavedAlbums>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedAlbums>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof checkUsersSavedAlbums>>, ApiError, TData>({
     queryKey: meKeys.checkUsersSavedAlbums(params),
@@ -2106,6 +3036,24 @@ export function useGetUsersSavedTracks<TData = Awaited<ReturnType<typeof getUser
     UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetUsersSavedTracks(
+  params?: Parameters<typeof getUsersSavedTracks>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getUsersSavedTracks>>,
+      ApiError,
+      Awaited<ReturnType<typeof getUsersSavedTracks>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getUsersSavedTracks>>, ApiError>
+export function useGetUsersSavedTracks<TData = Awaited<ReturnType<typeof getUsersSavedTracks>>>(
+  params?: Parameters<typeof getUsersSavedTracks>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedTracks>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getUsersSavedTracks>>, ApiError, TData>({
     queryKey: meKeys.getUsersSavedTracks(params),
@@ -2116,6 +3064,34 @@ export function useGetUsersSavedTracks<TData = Awaited<ReturnType<typeof getUser
   })
 }
 
+export function useGetUsersSavedTracksInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getUsersSavedTracks>>>,
+>(
+  params?: Parameters<typeof getUsersSavedTracks>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUsersSavedTracks>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetUsersSavedTracksInfinite(
+  params?: Parameters<typeof getUsersSavedTracks>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUsersSavedTracks>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getUsersSavedTracks>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getUsersSavedTracks>>>, ApiError>
 export function useGetUsersSavedTracksInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getUsersSavedTracks>>>,
 >(
@@ -2156,6 +3132,25 @@ export function useCheckUsersSavedTracks<TData = Awaited<ReturnType<typeof check
     UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useCheckUsersSavedTracks(
+  params: Parameters<typeof checkUsersSavedTracks>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof checkUsersSavedTracks>>,
+      ApiError,
+      Awaited<ReturnType<typeof checkUsersSavedTracks>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof checkUsersSavedTracks>>, ApiError>
+export function useCheckUsersSavedTracks<TData = Awaited<ReturnType<typeof checkUsersSavedTracks>>>(
+  params: Parameters<typeof checkUsersSavedTracks>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedTracks>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof checkUsersSavedTracks>>, ApiError, TData>({
     queryKey: meKeys.checkUsersSavedTracks(params),
@@ -2172,6 +3167,24 @@ export function useGetUsersSavedEpisodes<TData = Awaited<ReturnType<typeof getUs
     UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedEpisodes>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetUsersSavedEpisodes(
+  params?: Parameters<typeof getUsersSavedEpisodes>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getUsersSavedEpisodes>>,
+      ApiError,
+      Awaited<ReturnType<typeof getUsersSavedEpisodes>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getUsersSavedEpisodes>>, ApiError>
+export function useGetUsersSavedEpisodes<TData = Awaited<ReturnType<typeof getUsersSavedEpisodes>>>(
+  params?: Parameters<typeof getUsersSavedEpisodes>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedEpisodes>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getUsersSavedEpisodes>>, ApiError, TData>({
     queryKey: meKeys.getUsersSavedEpisodes(params),
@@ -2182,6 +3195,34 @@ export function useGetUsersSavedEpisodes<TData = Awaited<ReturnType<typeof getUs
   })
 }
 
+export function useGetUsersSavedEpisodesInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getUsersSavedEpisodes>>>,
+>(
+  params?: Parameters<typeof getUsersSavedEpisodes>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUsersSavedEpisodes>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetUsersSavedEpisodesInfinite(
+  params?: Parameters<typeof getUsersSavedEpisodes>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUsersSavedEpisodes>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getUsersSavedEpisodes>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getUsersSavedEpisodes>>>, ApiError>
 export function useGetUsersSavedEpisodesInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getUsersSavedEpisodes>>>,
 >(
@@ -2224,6 +3265,27 @@ export function useCheckUsersSavedEpisodes<
     UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedEpisodes>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useCheckUsersSavedEpisodes(
+  params: Parameters<typeof checkUsersSavedEpisodes>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof checkUsersSavedEpisodes>>,
+      ApiError,
+      Awaited<ReturnType<typeof checkUsersSavedEpisodes>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof checkUsersSavedEpisodes>>, ApiError>
+export function useCheckUsersSavedEpisodes<
+  TData = Awaited<ReturnType<typeof checkUsersSavedEpisodes>>,
+>(
+  params: Parameters<typeof checkUsersSavedEpisodes>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedEpisodes>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof checkUsersSavedEpisodes>>, ApiError, TData>({
     queryKey: meKeys.checkUsersSavedEpisodes(params),
@@ -2240,6 +3302,24 @@ export function useGetUsersSavedShows<TData = Awaited<ReturnType<typeof getUsers
     UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedShows>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetUsersSavedShows(
+  params?: Parameters<typeof getUsersSavedShows>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getUsersSavedShows>>,
+      ApiError,
+      Awaited<ReturnType<typeof getUsersSavedShows>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getUsersSavedShows>>, ApiError>
+export function useGetUsersSavedShows<TData = Awaited<ReturnType<typeof getUsersSavedShows>>>(
+  params?: Parameters<typeof getUsersSavedShows>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedShows>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getUsersSavedShows>>, ApiError, TData>({
     queryKey: meKeys.getUsersSavedShows(params),
@@ -2250,6 +3330,34 @@ export function useGetUsersSavedShows<TData = Awaited<ReturnType<typeof getUsers
   })
 }
 
+export function useGetUsersSavedShowsInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getUsersSavedShows>>>,
+>(
+  params?: Parameters<typeof getUsersSavedShows>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUsersSavedShows>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetUsersSavedShowsInfinite(
+  params?: Parameters<typeof getUsersSavedShows>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUsersSavedShows>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getUsersSavedShows>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getUsersSavedShows>>>, ApiError>
 export function useGetUsersSavedShowsInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getUsersSavedShows>>>,
 >(
@@ -2290,6 +3398,25 @@ export function useCheckUsersSavedShows<TData = Awaited<ReturnType<typeof checkU
     UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedShows>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useCheckUsersSavedShows(
+  params: Parameters<typeof checkUsersSavedShows>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof checkUsersSavedShows>>,
+      ApiError,
+      Awaited<ReturnType<typeof checkUsersSavedShows>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof checkUsersSavedShows>>, ApiError>
+export function useCheckUsersSavedShows<TData = Awaited<ReturnType<typeof checkUsersSavedShows>>>(
+  params: Parameters<typeof checkUsersSavedShows>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedShows>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof checkUsersSavedShows>>, ApiError, TData>({
     queryKey: meKeys.checkUsersSavedShows(params),
@@ -2301,6 +3428,25 @@ export function useCheckUsersSavedShows<TData = Awaited<ReturnType<typeof checkU
 }
 
 /** @deprecated */
+export function useGetUsersProfile<TData = Awaited<ReturnType<typeof getUsersProfile>>>(
+  userId: Parameters<typeof getUsersProfile>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getUsersProfile>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetUsersProfile(
+  userId: Parameters<typeof getUsersProfile>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getUsersProfile>>,
+      ApiError,
+      Awaited<ReturnType<typeof getUsersProfile>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getUsersProfile>>, ApiError>
 export function useGetUsersProfile<TData = Awaited<ReturnType<typeof getUsersProfile>>>(
   userId: Parameters<typeof getUsersProfile>[0] | undefined | null,
   options?: Omit<
@@ -2326,6 +3472,27 @@ export function useGetListUsersPlaylists<TData = Awaited<ReturnType<typeof getLi
     UseQueryOptions<Awaited<ReturnType<typeof getListUsersPlaylists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetListUsersPlaylists(
+  userId: Parameters<typeof getListUsersPlaylists>[0] | undefined | null,
+  params?: Parameters<typeof getListUsersPlaylists>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getListUsersPlaylists>>,
+      ApiError,
+      Awaited<ReturnType<typeof getListUsersPlaylists>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getListUsersPlaylists>>, ApiError>
+export function useGetListUsersPlaylists<TData = Awaited<ReturnType<typeof getListUsersPlaylists>>>(
+  userId: Parameters<typeof getListUsersPlaylists>[0] | undefined | null,
+  params?: Parameters<typeof getListUsersPlaylists>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getListUsersPlaylists>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getListUsersPlaylists>>, ApiError, TData>({
     queryKey: userKeys.getListUsersPlaylists(userId!, params),
@@ -2344,6 +3511,25 @@ export function useGetFeaturedPlaylists<TData = Awaited<ReturnType<typeof getFea
     UseQueryOptions<Awaited<ReturnType<typeof getFeaturedPlaylists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetFeaturedPlaylists(
+  params?: Parameters<typeof getFeaturedPlaylists>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getFeaturedPlaylists>>,
+      ApiError,
+      Awaited<ReturnType<typeof getFeaturedPlaylists>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getFeaturedPlaylists>>, ApiError>
+export function useGetFeaturedPlaylists<TData = Awaited<ReturnType<typeof getFeaturedPlaylists>>>(
+  params?: Parameters<typeof getFeaturedPlaylists>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getFeaturedPlaylists>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getFeaturedPlaylists>>, ApiError, TData>({
     queryKey: browseKeys.getFeaturedPlaylists(params),
@@ -2355,6 +3541,35 @@ export function useGetFeaturedPlaylists<TData = Awaited<ReturnType<typeof getFea
 }
 
 /** @deprecated */
+export function useGetFeaturedPlaylistsInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getFeaturedPlaylists>>>,
+>(
+  params?: Parameters<typeof getFeaturedPlaylists>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getFeaturedPlaylists>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetFeaturedPlaylistsInfinite(
+  params?: Parameters<typeof getFeaturedPlaylists>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getFeaturedPlaylists>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getFeaturedPlaylists>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getFeaturedPlaylists>>>, ApiError>
 export function useGetFeaturedPlaylistsInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getFeaturedPlaylists>>>,
 >(
@@ -2395,6 +3610,25 @@ export function useGetCategories<TData = Awaited<ReturnType<typeof getCategories
     UseQueryOptions<Awaited<ReturnType<typeof getCategories>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetCategories(
+  params?: Parameters<typeof getCategories>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getCategories>>,
+      ApiError,
+      Awaited<ReturnType<typeof getCategories>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getCategories>>, ApiError>
+export function useGetCategories<TData = Awaited<ReturnType<typeof getCategories>>>(
+  params?: Parameters<typeof getCategories>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getCategories>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getCategories>>, ApiError, TData>({
     queryKey: browseKeys.getCategories(params),
@@ -2406,6 +3640,35 @@ export function useGetCategories<TData = Awaited<ReturnType<typeof getCategories
 }
 
 /** @deprecated */
+export function useGetCategoriesInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getCategories>>>,
+>(
+  params?: Parameters<typeof getCategories>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getCategories>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetCategoriesInfinite(
+  params?: Parameters<typeof getCategories>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getCategories>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getCategories>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getCategories>>>, ApiError>
 export function useGetCategoriesInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getCategories>>>,
 >(
@@ -2447,6 +3710,27 @@ export function useGetACategory<TData = Awaited<ReturnType<typeof getACategory>>
     UseQueryOptions<Awaited<ReturnType<typeof getACategory>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetACategory(
+  categoryId: Parameters<typeof getACategory>[0] | undefined | null,
+  params?: Parameters<typeof getACategory>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getACategory>>,
+      ApiError,
+      Awaited<ReturnType<typeof getACategory>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getACategory>>, ApiError>
+export function useGetACategory<TData = Awaited<ReturnType<typeof getACategory>>>(
+  categoryId: Parameters<typeof getACategory>[0] | undefined | null,
+  params?: Parameters<typeof getACategory>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getACategory>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getACategory>>, ApiError, TData>({
     queryKey: browseKeys.getACategory(categoryId!, params),
@@ -2459,6 +3743,29 @@ export function useGetACategory<TData = Awaited<ReturnType<typeof getACategory>>
 }
 
 /** @deprecated */
+export function useGetACategoriesPlaylists<
+  TData = Awaited<ReturnType<typeof getACategoriesPlaylists>>,
+>(
+  categoryId: Parameters<typeof getACategoriesPlaylists>[0] | undefined | null,
+  params?: Parameters<typeof getACategoriesPlaylists>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getACategoriesPlaylists>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetACategoriesPlaylists(
+  categoryId: Parameters<typeof getACategoriesPlaylists>[0] | undefined | null,
+  params?: Parameters<typeof getACategoriesPlaylists>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getACategoriesPlaylists>>,
+      ApiError,
+      Awaited<ReturnType<typeof getACategoriesPlaylists>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getACategoriesPlaylists>>, ApiError>
 export function useGetACategoriesPlaylists<
   TData = Awaited<ReturnType<typeof getACategoriesPlaylists>>,
 >(
@@ -2485,6 +3792,24 @@ export function useGetPlaylistCover<TData = Awaited<ReturnType<typeof getPlaylis
     UseQueryOptions<Awaited<ReturnType<typeof getPlaylistCover>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetPlaylistCover(
+  playlistId: Parameters<typeof getPlaylistCover>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getPlaylistCover>>,
+      ApiError,
+      Awaited<ReturnType<typeof getPlaylistCover>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getPlaylistCover>>, ApiError>
+export function useGetPlaylistCover<TData = Awaited<ReturnType<typeof getPlaylistCover>>>(
+  playlistId: Parameters<typeof getPlaylistCover>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getPlaylistCover>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getPlaylistCover>>, ApiError, TData>({
     queryKey: playlistKeys.getPlaylistCover(playlistId!),
@@ -2503,6 +3828,25 @@ export function useGetNewReleases<TData = Awaited<ReturnType<typeof getNewReleas
     UseQueryOptions<Awaited<ReturnType<typeof getNewReleases>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetNewReleases(
+  params?: Parameters<typeof getNewReleases>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getNewReleases>>,
+      ApiError,
+      Awaited<ReturnType<typeof getNewReleases>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getNewReleases>>, ApiError>
+export function useGetNewReleases<TData = Awaited<ReturnType<typeof getNewReleases>>>(
+  params?: Parameters<typeof getNewReleases>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getNewReleases>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getNewReleases>>, ApiError, TData>({
     queryKey: browseKeys.getNewReleases(params),
@@ -2514,6 +3858,35 @@ export function useGetNewReleases<TData = Awaited<ReturnType<typeof getNewReleas
 }
 
 /** @deprecated */
+export function useGetNewReleasesInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getNewReleases>>>,
+>(
+  params?: Parameters<typeof getNewReleases>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getNewReleases>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetNewReleasesInfinite(
+  params?: Parameters<typeof getNewReleases>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getNewReleases>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getNewReleases>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getNewReleases>>>, ApiError>
 export function useGetNewReleasesInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getNewReleases>>>,
 >(
@@ -2553,6 +3926,24 @@ export function useGetFollowed<TData = Awaited<ReturnType<typeof getFollowed>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getFollowed>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetFollowed(
+  params: Parameters<typeof getFollowed>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getFollowed>>,
+      ApiError,
+      Awaited<ReturnType<typeof getFollowed>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getFollowed>>, ApiError>
+export function useGetFollowed<TData = Awaited<ReturnType<typeof getFollowed>>>(
+  params: Parameters<typeof getFollowed>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getFollowed>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getFollowed>>, ApiError, TData>({
     queryKey: meKeys.getFollowed(params),
@@ -2563,6 +3954,34 @@ export function useGetFollowed<TData = Awaited<ReturnType<typeof getFollowed>>>(
   })
 }
 
+export function useGetFollowedInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getFollowed>>>,
+>(
+  params: Parameters<typeof getFollowed>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getFollowed>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetFollowedInfinite(
+  params: Parameters<typeof getFollowed>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getFollowed>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getFollowed>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getFollowed>>>, ApiError>
 export function useGetFollowedInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getFollowed>>>,
 >(
@@ -2605,6 +4024,27 @@ export function useCheckCurrentUserFollows<
     UseQueryOptions<Awaited<ReturnType<typeof checkCurrentUserFollows>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useCheckCurrentUserFollows(
+  params: Parameters<typeof checkCurrentUserFollows>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof checkCurrentUserFollows>>,
+      ApiError,
+      Awaited<ReturnType<typeof checkCurrentUserFollows>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof checkCurrentUserFollows>>, ApiError>
+export function useCheckCurrentUserFollows<
+  TData = Awaited<ReturnType<typeof checkCurrentUserFollows>>,
+>(
+  params: Parameters<typeof checkCurrentUserFollows>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof checkCurrentUserFollows>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof checkCurrentUserFollows>>, ApiError, TData>({
     queryKey: meKeys.checkCurrentUserFollows(params),
@@ -2616,6 +4056,29 @@ export function useCheckCurrentUserFollows<
 }
 
 /** @deprecated */
+export function useCheckIfUserFollowsPlaylist<
+  TData = Awaited<ReturnType<typeof checkIfUserFollowsPlaylist>>,
+>(
+  playlistId: Parameters<typeof checkIfUserFollowsPlaylist>[0] | undefined | null,
+  params?: Parameters<typeof checkIfUserFollowsPlaylist>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof checkIfUserFollowsPlaylist>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useCheckIfUserFollowsPlaylist(
+  playlistId: Parameters<typeof checkIfUserFollowsPlaylist>[0] | undefined | null,
+  params?: Parameters<typeof checkIfUserFollowsPlaylist>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof checkIfUserFollowsPlaylist>>,
+      ApiError,
+      Awaited<ReturnType<typeof checkIfUserFollowsPlaylist>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof checkIfUserFollowsPlaylist>>, ApiError>
 export function useCheckIfUserFollowsPlaylist<
   TData = Awaited<ReturnType<typeof checkIfUserFollowsPlaylist>>,
 >(
@@ -2645,6 +4108,27 @@ export function useGetSeveralAudioFeatures<
     UseQueryOptions<Awaited<ReturnType<typeof getSeveralAudioFeatures>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetSeveralAudioFeatures(
+  params: Parameters<typeof getSeveralAudioFeatures>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getSeveralAudioFeatures>>,
+      ApiError,
+      Awaited<ReturnType<typeof getSeveralAudioFeatures>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getSeveralAudioFeatures>>, ApiError>
+export function useGetSeveralAudioFeatures<
+  TData = Awaited<ReturnType<typeof getSeveralAudioFeatures>>,
+>(
+  params: Parameters<typeof getSeveralAudioFeatures>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getSeveralAudioFeatures>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getSeveralAudioFeatures>>, ApiError, TData>({
     queryKey: audioFeatureKeys.list(params),
@@ -2656,6 +4140,25 @@ export function useGetSeveralAudioFeatures<
 }
 
 /** @deprecated */
+export function useGetAudioFeatures<TData = Awaited<ReturnType<typeof getAudioFeatures>>>(
+  id: Parameters<typeof getAudioFeatures>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAudioFeatures>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetAudioFeatures(
+  id: Parameters<typeof getAudioFeatures>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAudioFeatures>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAudioFeatures>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAudioFeatures>>, ApiError>
 export function useGetAudioFeatures<TData = Awaited<ReturnType<typeof getAudioFeatures>>>(
   id: Parameters<typeof getAudioFeatures>[0] | undefined | null,
   options?: Omit<
@@ -2680,6 +4183,25 @@ export function useGetAudioAnalysis<TData = Awaited<ReturnType<typeof getAudioAn
     UseQueryOptions<Awaited<ReturnType<typeof getAudioAnalysis>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetAudioAnalysis(
+  id: Parameters<typeof getAudioAnalysis>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAudioAnalysis>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAudioAnalysis>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAudioAnalysis>>, ApiError>
+export function useGetAudioAnalysis<TData = Awaited<ReturnType<typeof getAudioAnalysis>>>(
+  id: Parameters<typeof getAudioAnalysis>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAudioAnalysis>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getAudioAnalysis>>, ApiError, TData>({
     queryKey: audioAnalysiKeys.detail(id!),
@@ -2692,6 +4214,25 @@ export function useGetAudioAnalysis<TData = Awaited<ReturnType<typeof getAudioAn
 }
 
 /** @deprecated */
+export function useGetRecommendations<TData = Awaited<ReturnType<typeof getRecommendations>>>(
+  params?: Parameters<typeof getRecommendations>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getRecommendations>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetRecommendations(
+  params?: Parameters<typeof getRecommendations>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getRecommendations>>,
+      ApiError,
+      Awaited<ReturnType<typeof getRecommendations>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getRecommendations>>, ApiError>
 export function useGetRecommendations<TData = Awaited<ReturnType<typeof getRecommendations>>>(
   params?: Parameters<typeof getRecommendations>[0],
   options?: Omit<
@@ -2716,6 +4257,25 @@ export function useGetRecommendationGenres<
     UseQueryOptions<Awaited<ReturnType<typeof getRecommendationGenres>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetRecommendationGenres(
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getRecommendationGenres>>,
+      ApiError,
+      Awaited<ReturnType<typeof getRecommendationGenres>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getRecommendationGenres>>, ApiError>
+export function useGetRecommendationGenres<
+  TData = Awaited<ReturnType<typeof getRecommendationGenres>>,
+>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getRecommendationGenres>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getRecommendationGenres>>, ApiError, TData>({
     queryKey: recommendationKeys.getRecommendationGenres(),
@@ -2726,6 +4286,30 @@ export function useGetRecommendationGenres<
   })
 }
 
+export function useGetInformationAboutTheUsersCurrentPlayback<
+  TData = Awaited<ReturnType<typeof getInformationAboutTheUsersCurrentPlayback>>,
+>(
+  params?: Parameters<typeof getInformationAboutTheUsersCurrentPlayback>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getInformationAboutTheUsersCurrentPlayback>>,
+      ApiError,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetInformationAboutTheUsersCurrentPlayback(
+  params?: Parameters<typeof getInformationAboutTheUsersCurrentPlayback>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getInformationAboutTheUsersCurrentPlayback>>,
+      ApiError,
+      Awaited<ReturnType<typeof getInformationAboutTheUsersCurrentPlayback>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getInformationAboutTheUsersCurrentPlayback>>, ApiError>
 export function useGetInformationAboutTheUsersCurrentPlayback<
   TData = Awaited<ReturnType<typeof getInformationAboutTheUsersCurrentPlayback>>,
 >(
@@ -2759,6 +4343,24 @@ export function useGetAUsersAvailableDevices<
     UseQueryOptions<Awaited<ReturnType<typeof getAUsersAvailableDevices>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetAUsersAvailableDevices(
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAUsersAvailableDevices>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAUsersAvailableDevices>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAUsersAvailableDevices>>, ApiError>
+export function useGetAUsersAvailableDevices<
+  TData = Awaited<ReturnType<typeof getAUsersAvailableDevices>>,
+>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAUsersAvailableDevices>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getAUsersAvailableDevices>>, ApiError, TData>({
     queryKey: meKeys.getAUsersAvailableDevices(),
@@ -2769,6 +4371,26 @@ export function useGetAUsersAvailableDevices<
   })
 }
 
+export function useGetTheUsersCurrentlyPlayingTrack<
+  TData = Awaited<ReturnType<typeof getTheUsersCurrentlyPlayingTrack>>,
+>(
+  params?: Parameters<typeof getTheUsersCurrentlyPlayingTrack>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getTheUsersCurrentlyPlayingTrack>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetTheUsersCurrentlyPlayingTrack(
+  params?: Parameters<typeof getTheUsersCurrentlyPlayingTrack>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getTheUsersCurrentlyPlayingTrack>>,
+      ApiError,
+      Awaited<ReturnType<typeof getTheUsersCurrentlyPlayingTrack>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getTheUsersCurrentlyPlayingTrack>>, ApiError>
 export function useGetTheUsersCurrentlyPlayingTrack<
   TData = Awaited<ReturnType<typeof getTheUsersCurrentlyPlayingTrack>>,
 >(
@@ -2793,6 +4415,24 @@ export function useGetRecentlyPlayed<TData = Awaited<ReturnType<typeof getRecent
     UseQueryOptions<Awaited<ReturnType<typeof getRecentlyPlayed>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetRecentlyPlayed(
+  params?: Parameters<typeof getRecentlyPlayed>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getRecentlyPlayed>>,
+      ApiError,
+      Awaited<ReturnType<typeof getRecentlyPlayed>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getRecentlyPlayed>>, ApiError>
+export function useGetRecentlyPlayed<TData = Awaited<ReturnType<typeof getRecentlyPlayed>>>(
+  params?: Parameters<typeof getRecentlyPlayed>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getRecentlyPlayed>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getRecentlyPlayed>>, ApiError, TData>({
     queryKey: meKeys.getRecentlyPlayed(params),
@@ -2803,6 +4443,34 @@ export function useGetRecentlyPlayed<TData = Awaited<ReturnType<typeof getRecent
   })
 }
 
+export function useGetRecentlyPlayedInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getRecentlyPlayed>>>,
+>(
+  params?: Parameters<typeof getRecentlyPlayed>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getRecentlyPlayed>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetRecentlyPlayedInfinite(
+  params?: Parameters<typeof getRecentlyPlayed>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getRecentlyPlayed>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getRecentlyPlayed>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getRecentlyPlayed>>>, ApiError>
 export function useGetRecentlyPlayedInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getRecentlyPlayed>>>,
 >(
@@ -2841,6 +4509,22 @@ export function useGetQueue<TData = Awaited<ReturnType<typeof getQueue>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getQueue>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetQueue(
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getQueue>>,
+      ApiError,
+      Awaited<ReturnType<typeof getQueue>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getQueue>>, ApiError>
+export function useGetQueue<TData = Awaited<ReturnType<typeof getQueue>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getQueue>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getQueue>>, ApiError, TData>({
     queryKey: meKeys.getQueue(),
@@ -2852,6 +4536,23 @@ export function useGetQueue<TData = Awaited<ReturnType<typeof getQueue>>>(
 }
 
 /** @deprecated */
+export function useGetAvailableMarkets<TData = Awaited<ReturnType<typeof getAvailableMarkets>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAvailableMarkets>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetAvailableMarkets(
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAvailableMarkets>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAvailableMarkets>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAvailableMarkets>>, ApiError>
 export function useGetAvailableMarkets<TData = Awaited<ReturnType<typeof getAvailableMarkets>>>(
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getAvailableMarkets>>, ApiError, TData>,
@@ -2873,6 +4574,24 @@ export function useGetUsersTopArtists<TData = Awaited<ReturnType<typeof getUsers
     UseQueryOptions<Awaited<ReturnType<typeof getUsersTopArtists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetUsersTopArtists(
+  params?: Parameters<typeof getUsersTopArtists>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getUsersTopArtists>>,
+      ApiError,
+      Awaited<ReturnType<typeof getUsersTopArtists>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getUsersTopArtists>>, ApiError>
+export function useGetUsersTopArtists<TData = Awaited<ReturnType<typeof getUsersTopArtists>>>(
+  params?: Parameters<typeof getUsersTopArtists>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getUsersTopArtists>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getUsersTopArtists>>, ApiError, TData>({
     queryKey: meKeys.getUsersTopArtists(params),
@@ -2883,6 +4602,34 @@ export function useGetUsersTopArtists<TData = Awaited<ReturnType<typeof getUsers
   })
 }
 
+export function useGetUsersTopArtistsInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getUsersTopArtists>>>,
+>(
+  params?: Parameters<typeof getUsersTopArtists>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUsersTopArtists>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetUsersTopArtistsInfinite(
+  params?: Parameters<typeof getUsersTopArtists>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUsersTopArtists>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getUsersTopArtists>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getUsersTopArtists>>>, ApiError>
 export function useGetUsersTopArtistsInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getUsersTopArtists>>>,
 >(
@@ -2922,6 +4669,24 @@ export function useGetUsersTopTracks<TData = Awaited<ReturnType<typeof getUsersT
     UseQueryOptions<Awaited<ReturnType<typeof getUsersTopTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetUsersTopTracks(
+  params?: Parameters<typeof getUsersTopTracks>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getUsersTopTracks>>,
+      ApiError,
+      Awaited<ReturnType<typeof getUsersTopTracks>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getUsersTopTracks>>, ApiError>
+export function useGetUsersTopTracks<TData = Awaited<ReturnType<typeof getUsersTopTracks>>>(
+  params?: Parameters<typeof getUsersTopTracks>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getUsersTopTracks>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getUsersTopTracks>>, ApiError, TData>({
     queryKey: meKeys.getUsersTopTracks(params),
@@ -2932,6 +4697,34 @@ export function useGetUsersTopTracks<TData = Awaited<ReturnType<typeof getUsersT
   })
 }
 
+export function useGetUsersTopTracksInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getUsersTopTracks>>>,
+>(
+  params?: Parameters<typeof getUsersTopTracks>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUsersTopTracks>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetUsersTopTracksInfinite(
+  params?: Parameters<typeof getUsersTopTracks>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUsersTopTracks>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getUsersTopTracks>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getUsersTopTracks>>>, ApiError>
 export function useGetUsersTopTracksInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getUsersTopTracks>>>,
 >(

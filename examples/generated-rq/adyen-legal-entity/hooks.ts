@@ -4,6 +4,7 @@ import {
   queryOptions,
   useQuery,
   type UseQueryOptions,
+  type UseQueryResult,
   useMutation,
   type UseMutationOptions,
 } from '@tanstack/react-query'
@@ -113,9 +114,7 @@ export const transferInstrumentKeys = {
 
 // ── Query options factories ──────────────────────────────────
 
-export function getBusinessLinesIdQueryOptions<
-  TData = Awaited<ReturnType<typeof getBusinessLinesId>>,
->(
+function _getBusinessLinesIdQueryOptions<TData = Awaited<ReturnType<typeof getBusinessLinesId>>>(
   id: Parameters<typeof getBusinessLinesId>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getBusinessLinesId>>, ApiError, TData>,
@@ -131,7 +130,11 @@ export function getBusinessLinesIdQueryOptions<
   })
 }
 
-export function getDocumentsIdQueryOptions<TData = Awaited<ReturnType<typeof getDocumentsId>>>(
+export const getBusinessLinesIdQueryOptions: typeof _getBusinessLinesIdQueryOptions &
+  typeof _getBusinessLinesIdQueryOptions<Awaited<ReturnType<typeof getBusinessLinesId>>> =
+  _getBusinessLinesIdQueryOptions
+
+function _getDocumentsIdQueryOptions<TData = Awaited<ReturnType<typeof getDocumentsId>>>(
   id: Parameters<typeof getDocumentsId>[0],
   params?: Parameters<typeof getDocumentsId>[1],
   options?: Omit<
@@ -148,9 +151,11 @@ export function getDocumentsIdQueryOptions<TData = Awaited<ReturnType<typeof get
   })
 }
 
-export function getLegalEntitiesIdQueryOptions<
-  TData = Awaited<ReturnType<typeof getLegalEntitiesId>>,
->(
+export const getDocumentsIdQueryOptions: typeof _getDocumentsIdQueryOptions &
+  typeof _getDocumentsIdQueryOptions<Awaited<ReturnType<typeof getDocumentsId>>> =
+  _getDocumentsIdQueryOptions
+
+function _getLegalEntitiesIdQueryOptions<TData = Awaited<ReturnType<typeof getLegalEntitiesId>>>(
   id: Parameters<typeof getLegalEntitiesId>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getLegalEntitiesId>>, ApiError, TData>,
@@ -166,7 +171,11 @@ export function getLegalEntitiesIdQueryOptions<
   })
 }
 
-export function getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereferenceQueryOptions<
+export const getLegalEntitiesIdQueryOptions: typeof _getLegalEntitiesIdQueryOptions &
+  typeof _getLegalEntitiesIdQueryOptions<Awaited<ReturnType<typeof getLegalEntitiesId>>> =
+  _getLegalEntitiesIdQueryOptions
+
+function _getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereferenceQueryOptions<
   TData = Awaited<
     ReturnType<
       typeof getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereference
@@ -222,7 +231,16 @@ export function getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceac
   })
 }
 
-export function getLegalEntitiesIdBusinessLinesQueryOptions<
+export const getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereferenceQueryOptions: typeof _getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereferenceQueryOptions &
+  typeof _getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereferenceQueryOptions<
+    Awaited<
+      ReturnType<
+        typeof getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereference
+      >
+    >
+  > = _getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereferenceQueryOptions
+
+function _getLegalEntitiesIdBusinessLinesQueryOptions<
   TData = Awaited<ReturnType<typeof getLegalEntitiesIdBusinessLines>>,
 >(
   id: Parameters<typeof getLegalEntitiesIdBusinessLines>[0],
@@ -242,7 +260,12 @@ export function getLegalEntitiesIdBusinessLinesQueryOptions<
   )
 }
 
-export function getLegalEntitiesIdPciQuestionnairesQueryOptions<
+export const getLegalEntitiesIdBusinessLinesQueryOptions: typeof _getLegalEntitiesIdBusinessLinesQueryOptions &
+  typeof _getLegalEntitiesIdBusinessLinesQueryOptions<
+    Awaited<ReturnType<typeof getLegalEntitiesIdBusinessLines>>
+  > = _getLegalEntitiesIdBusinessLinesQueryOptions
+
+function _getLegalEntitiesIdPciQuestionnairesQueryOptions<
   TData = Awaited<ReturnType<typeof getLegalEntitiesIdPciQuestionnaires>>,
 >(
   id: Parameters<typeof getLegalEntitiesIdPciQuestionnaires>[0],
@@ -268,7 +291,12 @@ export function getLegalEntitiesIdPciQuestionnairesQueryOptions<
   })
 }
 
-export function getLegalEntitiesIdPciQuestionnairesPciidQueryOptions<
+export const getLegalEntitiesIdPciQuestionnairesQueryOptions: typeof _getLegalEntitiesIdPciQuestionnairesQueryOptions &
+  typeof _getLegalEntitiesIdPciQuestionnairesQueryOptions<
+    Awaited<ReturnType<typeof getLegalEntitiesIdPciQuestionnaires>>
+  > = _getLegalEntitiesIdPciQuestionnairesQueryOptions
+
+function _getLegalEntitiesIdPciQuestionnairesPciidQueryOptions<
   TData = Awaited<ReturnType<typeof getLegalEntitiesIdPciQuestionnairesPciid>>,
 >(
   id: Parameters<typeof getLegalEntitiesIdPciQuestionnairesPciid>[0],
@@ -295,7 +323,12 @@ export function getLegalEntitiesIdPciQuestionnairesPciidQueryOptions<
   })
 }
 
-export function getLegalEntitiesIdTermsOfServiceAcceptanceInfosQueryOptions<
+export const getLegalEntitiesIdPciQuestionnairesPciidQueryOptions: typeof _getLegalEntitiesIdPciQuestionnairesPciidQueryOptions &
+  typeof _getLegalEntitiesIdPciQuestionnairesPciidQueryOptions<
+    Awaited<ReturnType<typeof getLegalEntitiesIdPciQuestionnairesPciid>>
+  > = _getLegalEntitiesIdPciQuestionnairesPciidQueryOptions
+
+function _getLegalEntitiesIdTermsOfServiceAcceptanceInfosQueryOptions<
   TData = Awaited<ReturnType<typeof getLegalEntitiesIdTermsOfServiceAcceptanceInfos>>,
 >(
   id: Parameters<typeof getLegalEntitiesIdTermsOfServiceAcceptanceInfos>[0],
@@ -321,7 +354,12 @@ export function getLegalEntitiesIdTermsOfServiceAcceptanceInfosQueryOptions<
   })
 }
 
-export function getLegalEntitiesIdTermsOfServiceStatusQueryOptions<
+export const getLegalEntitiesIdTermsOfServiceAcceptanceInfosQueryOptions: typeof _getLegalEntitiesIdTermsOfServiceAcceptanceInfosQueryOptions &
+  typeof _getLegalEntitiesIdTermsOfServiceAcceptanceInfosQueryOptions<
+    Awaited<ReturnType<typeof getLegalEntitiesIdTermsOfServiceAcceptanceInfos>>
+  > = _getLegalEntitiesIdTermsOfServiceAcceptanceInfosQueryOptions
+
+function _getLegalEntitiesIdTermsOfServiceStatusQueryOptions<
   TData = Awaited<ReturnType<typeof getLegalEntitiesIdTermsOfServiceStatus>>,
 >(
   id: Parameters<typeof getLegalEntitiesIdTermsOfServiceStatus>[0],
@@ -347,7 +385,12 @@ export function getLegalEntitiesIdTermsOfServiceStatusQueryOptions<
   })
 }
 
-export function getThemesQueryOptions<TData = Awaited<ReturnType<typeof getThemes>>>(
+export const getLegalEntitiesIdTermsOfServiceStatusQueryOptions: typeof _getLegalEntitiesIdTermsOfServiceStatusQueryOptions &
+  typeof _getLegalEntitiesIdTermsOfServiceStatusQueryOptions<
+    Awaited<ReturnType<typeof getLegalEntitiesIdTermsOfServiceStatus>>
+  > = _getLegalEntitiesIdTermsOfServiceStatusQueryOptions
+
+function _getThemesQueryOptions<TData = Awaited<ReturnType<typeof getThemes>>>(
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getThemes>>, ApiError, TData>,
     'queryKey' | 'queryFn'
@@ -362,7 +405,10 @@ export function getThemesQueryOptions<TData = Awaited<ReturnType<typeof getTheme
   })
 }
 
-export function getThemesIdQueryOptions<TData = Awaited<ReturnType<typeof getThemesId>>>(
+export const getThemesQueryOptions: typeof _getThemesQueryOptions &
+  typeof _getThemesQueryOptions<Awaited<ReturnType<typeof getThemes>>> = _getThemesQueryOptions
+
+function _getThemesIdQueryOptions<TData = Awaited<ReturnType<typeof getThemesId>>>(
   id: Parameters<typeof getThemesId>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getThemesId>>, ApiError, TData>,
@@ -378,7 +424,11 @@ export function getThemesIdQueryOptions<TData = Awaited<ReturnType<typeof getThe
   })
 }
 
-export function getTransferInstrumentsIdQueryOptions<
+export const getThemesIdQueryOptions: typeof _getThemesIdQueryOptions &
+  typeof _getThemesIdQueryOptions<Awaited<ReturnType<typeof getThemesId>>> =
+  _getThemesIdQueryOptions
+
+function _getTransferInstrumentsIdQueryOptions<
   TData = Awaited<ReturnType<typeof getTransferInstrumentsId>>,
 >(
   id: Parameters<typeof getTransferInstrumentsId>[0],
@@ -396,8 +446,31 @@ export function getTransferInstrumentsIdQueryOptions<
   })
 }
 
+export const getTransferInstrumentsIdQueryOptions: typeof _getTransferInstrumentsIdQueryOptions &
+  typeof _getTransferInstrumentsIdQueryOptions<
+    Awaited<ReturnType<typeof getTransferInstrumentsId>>
+  > = _getTransferInstrumentsIdQueryOptions
+
 // ── Queries ──────────────────────────────────────────────────
 
+export function useGetBusinessLinesId<TData = Awaited<ReturnType<typeof getBusinessLinesId>>>(
+  id: Parameters<typeof getBusinessLinesId>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getBusinessLinesId>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetBusinessLinesId(
+  id: Parameters<typeof getBusinessLinesId>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getBusinessLinesId>>,
+      ApiError,
+      Awaited<ReturnType<typeof getBusinessLinesId>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getBusinessLinesId>>, ApiError>
 export function useGetBusinessLinesId<TData = Awaited<ReturnType<typeof getBusinessLinesId>>>(
   id: Parameters<typeof getBusinessLinesId>[0] | undefined | null,
   options?: Omit<
@@ -422,6 +495,26 @@ export function useGetDocumentsId<TData = Awaited<ReturnType<typeof getDocuments
     UseQueryOptions<Awaited<ReturnType<typeof getDocumentsId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetDocumentsId(
+  id: Parameters<typeof getDocumentsId>[0] | undefined | null,
+  params?: Parameters<typeof getDocumentsId>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getDocumentsId>>,
+      ApiError,
+      Awaited<ReturnType<typeof getDocumentsId>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getDocumentsId>>, ApiError>
+export function useGetDocumentsId<TData = Awaited<ReturnType<typeof getDocumentsId>>>(
+  id: Parameters<typeof getDocumentsId>[0] | undefined | null,
+  params?: Parameters<typeof getDocumentsId>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getDocumentsId>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getDocumentsId>>, ApiError, TData>({
     queryKey: documentKeys.detail(id!, params),
@@ -439,6 +532,24 @@ export function useGetLegalEntitiesId<TData = Awaited<ReturnType<typeof getLegal
     UseQueryOptions<Awaited<ReturnType<typeof getLegalEntitiesId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetLegalEntitiesId(
+  id: Parameters<typeof getLegalEntitiesId>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getLegalEntitiesId>>,
+      ApiError,
+      Awaited<ReturnType<typeof getLegalEntitiesId>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getLegalEntitiesId>>, ApiError>
+export function useGetLegalEntitiesId<TData = Awaited<ReturnType<typeof getLegalEntitiesId>>>(
+  id: Parameters<typeof getLegalEntitiesId>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getLegalEntitiesId>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getLegalEntitiesId>>, ApiError, TData>({
     queryKey: legalEntityKeys.getLegalEntitiesId(id!),
@@ -450,6 +561,81 @@ export function useGetLegalEntitiesId<TData = Awaited<ReturnType<typeof getLegal
   })
 }
 
+export function useGetLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereference<
+  TData = Awaited<
+    ReturnType<
+      typeof getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereference
+    >
+  >,
+>(
+  id:
+    | Parameters<
+        typeof getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereference
+      >[0]
+    | undefined
+    | null,
+  termsofserviceacceptancereference:
+    | Parameters<
+        typeof getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereference
+      >[1]
+    | undefined
+    | null,
+  params?: Parameters<
+    typeof getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereference
+  >[2],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<
+        ReturnType<
+          typeof getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereference
+        >
+      >,
+      ApiError,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereference(
+  id:
+    | Parameters<
+        typeof getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereference
+      >[0]
+    | undefined
+    | null,
+  termsofserviceacceptancereference:
+    | Parameters<
+        typeof getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereference
+      >[1]
+    | undefined
+    | null,
+  params?: Parameters<
+    typeof getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereference
+  >[2],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<
+        ReturnType<
+          typeof getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereference
+        >
+      >,
+      ApiError,
+      Awaited<
+        ReturnType<
+          typeof getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereference
+        >
+      >
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<
+  Awaited<
+    ReturnType<
+      typeof getLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereference
+    >
+  >,
+  ApiError
+>
 export function useGetLegalEntitiesIdAcceptedTermsOfServiceDocumentTermsofserviceacceptancereference<
   TData = Awaited<
     ReturnType<
@@ -521,6 +707,26 @@ export function useGetLegalEntitiesIdBusinessLines<
     UseQueryOptions<Awaited<ReturnType<typeof getLegalEntitiesIdBusinessLines>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetLegalEntitiesIdBusinessLines(
+  id: Parameters<typeof getLegalEntitiesIdBusinessLines>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getLegalEntitiesIdBusinessLines>>,
+      ApiError,
+      Awaited<ReturnType<typeof getLegalEntitiesIdBusinessLines>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getLegalEntitiesIdBusinessLines>>, ApiError>
+export function useGetLegalEntitiesIdBusinessLines<
+  TData = Awaited<ReturnType<typeof getLegalEntitiesIdBusinessLines>>,
+>(
+  id: Parameters<typeof getLegalEntitiesIdBusinessLines>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getLegalEntitiesIdBusinessLines>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getLegalEntitiesIdBusinessLines>>, ApiError, TData>({
     queryKey: legalEntityKeys.getLegalEntitiesIdBusinessLines(id!),
@@ -532,6 +738,30 @@ export function useGetLegalEntitiesIdBusinessLines<
   })
 }
 
+export function useGetLegalEntitiesIdPciQuestionnaires<
+  TData = Awaited<ReturnType<typeof getLegalEntitiesIdPciQuestionnaires>>,
+>(
+  id: Parameters<typeof getLegalEntitiesIdPciQuestionnaires>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getLegalEntitiesIdPciQuestionnaires>>,
+      ApiError,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetLegalEntitiesIdPciQuestionnaires(
+  id: Parameters<typeof getLegalEntitiesIdPciQuestionnaires>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getLegalEntitiesIdPciQuestionnaires>>,
+      ApiError,
+      Awaited<ReturnType<typeof getLegalEntitiesIdPciQuestionnaires>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getLegalEntitiesIdPciQuestionnaires>>, ApiError>
 export function useGetLegalEntitiesIdPciQuestionnaires<
   TData = Awaited<ReturnType<typeof getLegalEntitiesIdPciQuestionnaires>>,
 >(
@@ -557,6 +787,32 @@ export function useGetLegalEntitiesIdPciQuestionnaires<
   )
 }
 
+export function useGetLegalEntitiesIdPciQuestionnairesPciid<
+  TData = Awaited<ReturnType<typeof getLegalEntitiesIdPciQuestionnairesPciid>>,
+>(
+  id: Parameters<typeof getLegalEntitiesIdPciQuestionnairesPciid>[0] | undefined | null,
+  pciid: Parameters<typeof getLegalEntitiesIdPciQuestionnairesPciid>[1] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getLegalEntitiesIdPciQuestionnairesPciid>>,
+      ApiError,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetLegalEntitiesIdPciQuestionnairesPciid(
+  id: Parameters<typeof getLegalEntitiesIdPciQuestionnairesPciid>[0] | undefined | null,
+  pciid: Parameters<typeof getLegalEntitiesIdPciQuestionnairesPciid>[1] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getLegalEntitiesIdPciQuestionnairesPciid>>,
+      ApiError,
+      Awaited<ReturnType<typeof getLegalEntitiesIdPciQuestionnairesPciid>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getLegalEntitiesIdPciQuestionnairesPciid>>, ApiError>
 export function useGetLegalEntitiesIdPciQuestionnairesPciid<
   TData = Awaited<ReturnType<typeof getLegalEntitiesIdPciQuestionnairesPciid>>,
 >(
@@ -597,6 +853,33 @@ export function useGetLegalEntitiesIdTermsOfServiceAcceptanceInfos<
     >,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetLegalEntitiesIdTermsOfServiceAcceptanceInfos(
+  id: Parameters<typeof getLegalEntitiesIdTermsOfServiceAcceptanceInfos>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getLegalEntitiesIdTermsOfServiceAcceptanceInfos>>,
+      ApiError,
+      Awaited<ReturnType<typeof getLegalEntitiesIdTermsOfServiceAcceptanceInfos>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<
+  Awaited<ReturnType<typeof getLegalEntitiesIdTermsOfServiceAcceptanceInfos>>,
+  ApiError
+>
+export function useGetLegalEntitiesIdTermsOfServiceAcceptanceInfos<
+  TData = Awaited<ReturnType<typeof getLegalEntitiesIdTermsOfServiceAcceptanceInfos>>,
+>(
+  id: Parameters<typeof getLegalEntitiesIdTermsOfServiceAcceptanceInfos>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getLegalEntitiesIdTermsOfServiceAcceptanceInfos>>,
+      ApiError,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<
     Awaited<ReturnType<typeof getLegalEntitiesIdTermsOfServiceAcceptanceInfos>>,
@@ -612,6 +895,30 @@ export function useGetLegalEntitiesIdTermsOfServiceAcceptanceInfos<
   })
 }
 
+export function useGetLegalEntitiesIdTermsOfServiceStatus<
+  TData = Awaited<ReturnType<typeof getLegalEntitiesIdTermsOfServiceStatus>>,
+>(
+  id: Parameters<typeof getLegalEntitiesIdTermsOfServiceStatus>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getLegalEntitiesIdTermsOfServiceStatus>>,
+      ApiError,
+      TData
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetLegalEntitiesIdTermsOfServiceStatus(
+  id: Parameters<typeof getLegalEntitiesIdTermsOfServiceStatus>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getLegalEntitiesIdTermsOfServiceStatus>>,
+      ApiError,
+      Awaited<ReturnType<typeof getLegalEntitiesIdTermsOfServiceStatus>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getLegalEntitiesIdTermsOfServiceStatus>>, ApiError>
 export function useGetLegalEntitiesIdTermsOfServiceStatus<
   TData = Awaited<ReturnType<typeof getLegalEntitiesIdTermsOfServiceStatus>>,
 >(
@@ -644,6 +951,22 @@ export function useGetThemes<TData = Awaited<ReturnType<typeof getThemes>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getThemes>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetThemes(
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getThemes>>,
+      ApiError,
+      Awaited<ReturnType<typeof getThemes>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getThemes>>, ApiError>
+export function useGetThemes<TData = Awaited<ReturnType<typeof getThemes>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getThemes>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getThemes>>, ApiError, TData>({
     queryKey: themeKeys.list(),
@@ -654,6 +977,24 @@ export function useGetThemes<TData = Awaited<ReturnType<typeof getThemes>>>(
   })
 }
 
+export function useGetThemesId<TData = Awaited<ReturnType<typeof getThemesId>>>(
+  id: Parameters<typeof getThemesId>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getThemesId>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetThemesId(
+  id: Parameters<typeof getThemesId>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getThemesId>>,
+      ApiError,
+      Awaited<ReturnType<typeof getThemesId>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getThemesId>>, ApiError>
 export function useGetThemesId<TData = Awaited<ReturnType<typeof getThemesId>>>(
   id: Parameters<typeof getThemesId>[0] | undefined | null,
   options?: Omit<
@@ -671,6 +1012,26 @@ export function useGetThemesId<TData = Awaited<ReturnType<typeof getThemesId>>>(
   })
 }
 
+export function useGetTransferInstrumentsId<
+  TData = Awaited<ReturnType<typeof getTransferInstrumentsId>>,
+>(
+  id: Parameters<typeof getTransferInstrumentsId>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getTransferInstrumentsId>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetTransferInstrumentsId(
+  id: Parameters<typeof getTransferInstrumentsId>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getTransferInstrumentsId>>,
+      ApiError,
+      Awaited<ReturnType<typeof getTransferInstrumentsId>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getTransferInstrumentsId>>, ApiError>
 export function useGetTransferInstrumentsId<
   TData = Awaited<ReturnType<typeof getTransferInstrumentsId>>,
 >(

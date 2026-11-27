@@ -35,6 +35,7 @@ Default: `openapi-react-query.config.json` in CWD. Fields:
 
 ## Key non-obvious decisions
 - **Every query hook / factory has a `TData` generic** defaulting to `Awaited<ReturnType<typeof fn>>` (`InfiniteData<...>` for infinite hooks), so `select` changes the `data` type. Mutations have none.
+- **A generic function must end in its non-generic default signature.** `ReturnType` / `Parameters` read the last signature with type parameters erased to `unknown`, so a lone `fn<TData = Data>` types `data` as `unknown` for every `ReturnType<typeof useX>` wrapper. Hooks (`buildDefaultedOverloads`) are overload lists, generic first, default last. Factories are a private `_xQueryOptions` plus `export const xQueryOptions: typeof _x & typeof _x<Default>` (the `queryOptions` result type cannot be named across TanStack 5.x). Guarded by `packages/integration/src/consumer-simulation*.ts`, run by `pnpm --filter @codewithagents/integration run lint`.
 - **Multiple detail ops produce an operation-name key segment**: when a resource has >1 GET with path params (e.g. `/items/{id}` and `/items/{id}/usage`), each key includes the operation name to prevent cache collisions: `['items', 'getItemById', id]` vs `['items', 'getItemUsage', id]`. Single detail ops keep the canonical `['resource', id]` shape.
 - **`...options` spread before `onSuccess` in auto-invalidate hooks**, so the generated `onSuccess` (which calls `queryClient.invalidateQueries`) always wins; the caller's `onSuccess` is composed inside via `options?.onSuccess?.(...args)`.
 

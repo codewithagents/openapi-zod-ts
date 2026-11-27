@@ -1989,15 +1989,17 @@ describe('Feature #188: queryOptions factories', () => {
   })
 
   it('generates listTasksQueryOptions for the list GET operation', () => {
-    expect(qoContent).toContain('export function listTasksQueryOptions<TData = ')
+    expect(qoContent).toContain('function _listTasksQueryOptions<TData = ')
+    expect(qoContent).toContain('export const listTasksQueryOptions:')
   })
 
   it('generates getTaskQueryOptions for the detail GET operation', () => {
-    expect(qoContent).toContain('export function getTaskQueryOptions<TData = ')
+    expect(qoContent).toContain('function _getTaskQueryOptions<TData = ')
+    expect(qoContent).toContain('export const getTaskQueryOptions:')
   })
 
   it('listTasksQueryOptions uses queryOptions() call (not useQuery)', () => {
-    const factoryStart = qoContent.indexOf('export function listTasksQueryOptions')
+    const factoryStart = qoContent.indexOf('function _listTasksQueryOptions')
     const factoryEnd = qoContent.indexOf('\n}', factoryStart) + 2
     const factoryBody = qoContent.slice(factoryStart, factoryEnd)
     expect(factoryBody).toContain('return queryOptions<')
@@ -2006,7 +2008,7 @@ describe('Feature #188: queryOptions factories', () => {
   })
 
   it('getTaskQueryOptions uses queryOptions() call (not useQuery)', () => {
-    const factoryStart = qoContent.indexOf('export function getTaskQueryOptions')
+    const factoryStart = qoContent.indexOf('function _getTaskQueryOptions')
     const factoryEnd = qoContent.indexOf('\n}', factoryStart) + 2
     const factoryBody = qoContent.slice(factoryStart, factoryEnd)
     expect(factoryBody).toContain('return queryOptions<')
@@ -2014,7 +2016,7 @@ describe('Feature #188: queryOptions factories', () => {
   })
 
   it('listTasksQueryOptions has correct queryKey referencing taskKeys.list', () => {
-    const factoryStart = qoContent.indexOf('export function listTasksQueryOptions')
+    const factoryStart = qoContent.indexOf('function _listTasksQueryOptions')
     const factoryEnd = qoContent.indexOf('\n}', factoryStart) + 2
     const factoryBody = qoContent.slice(factoryStart, factoryEnd)
     expect(factoryBody).toContain('queryKey: taskKeys.list(params)')
@@ -2022,7 +2024,7 @@ describe('Feature #188: queryOptions factories', () => {
 
   it('getTaskQueryOptions has correct queryKey referencing taskKeys.detail without non-null assertion', () => {
     // Factory receives a plain required string, no ! needed
-    const factoryStart = qoContent.indexOf('export function getTaskQueryOptions')
+    const factoryStart = qoContent.indexOf('function _getTaskQueryOptions')
     const factoryEnd = qoContent.indexOf('\n}', factoryStart) + 2
     const factoryBody = qoContent.slice(factoryStart, factoryEnd)
     expect(factoryBody).toContain('queryKey: taskKeys.detail(id)')
@@ -2031,7 +2033,7 @@ describe('Feature #188: queryOptions factories', () => {
 
   it('getTaskQueryOptions path param is plain (not nullish widened)', () => {
     // Factory takes the derived param type (not widened with | undefined | null)
-    const factoryStart = qoContent.indexOf('export function getTaskQueryOptions')
+    const factoryStart = qoContent.indexOf('function _getTaskQueryOptions')
     const factoryEnd = qoContent.indexOf('\n}', factoryStart) + 2
     const factoryBody = qoContent.slice(factoryStart, factoryEnd)
     expect(factoryBody).toContain('id: Parameters<typeof getTask>[0]')
@@ -2039,7 +2041,7 @@ describe('Feature #188: queryOptions factories', () => {
   })
 
   it('listTasksQueryOptions contains staleTime and gcTime', () => {
-    const factoryStart = qoContent.indexOf('export function listTasksQueryOptions')
+    const factoryStart = qoContent.indexOf('function _listTasksQueryOptions')
     const factoryEnd = qoContent.indexOf('\n}', factoryStart) + 2
     const factoryBody = qoContent.slice(factoryStart, factoryEnd)
     expect(factoryBody).toContain('staleTime: 30000,')
@@ -2095,14 +2097,14 @@ describe('Feature #188: queryOptions factories', () => {
       },
     }
     const { content: depContent } = generateHooks(deprecatedSpec, { staleTime: 0, gcTime: 0 })
-    const factoryIdx = depContent.indexOf('export function listLegacyQueryOptions')
+    const factoryIdx = depContent.indexOf('export const listLegacyQueryOptions')
     expect(factoryIdx).toBeGreaterThan(-1)
     const before = depContent.slice(0, factoryIdx)
     expect(before.slice(before.lastIndexOf('/**'))).toContain('@deprecated')
   })
 
   it('queryOptions factory appears before the useQuery hook in the file', () => {
-    const listFactoryIdx = qoContent.indexOf('export function listTasksQueryOptions')
+    const listFactoryIdx = qoContent.indexOf('export const listTasksQueryOptions')
     const listHookIdx = qoContent.indexOf('export function useListTasks')
     expect(listFactoryIdx).toBeGreaterThan(-1)
     expect(listHookIdx).toBeGreaterThan(-1)
@@ -2115,7 +2117,7 @@ describe('Feature #188: queryOptions factories', () => {
       gcTime: 300_000,
       overrides: { tasks: { staleTime: 5000, gcTime: 60_000 } },
     })
-    const factoryStart = overrideContent.indexOf('export function listTasksQueryOptions')
+    const factoryStart = overrideContent.indexOf('function _listTasksQueryOptions')
     const factoryEnd = overrideContent.indexOf('\n}', factoryStart) + 2
     const factoryBody = overrideContent.slice(factoryStart, factoryEnd)
     expect(factoryBody).toContain('staleTime: 5000,')
@@ -2140,7 +2142,7 @@ describe('Feature #188: queryOptions factories', () => {
       },
     }
     const { content: mpContent } = generateHooks(multiParamSpec, { staleTime: 0, gcTime: 0 })
-    const factoryStart = mpContent.indexOf('export function getProjectTaskQueryOptions')
+    const factoryStart = mpContent.indexOf('function _getProjectTaskQueryOptions')
     expect(factoryStart).toBeGreaterThan(-1)
     const factoryEnd = mpContent.indexOf('\n}', factoryStart) + 2
     const factoryBody = mpContent.slice(factoryStart, factoryEnd)

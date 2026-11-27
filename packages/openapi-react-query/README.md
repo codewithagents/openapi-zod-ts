@@ -183,6 +183,8 @@ useQuery(getTaskQueryOptions(id, { select: (task) => task.id }))
 
 Without `select`, `data` is still the raw response type, so existing call sites (including explicit `UseQueryResult<Task, ApiError>` annotations) keep compiling.
 
+`ReturnType<typeof useGetTask>` and `Parameters<typeof useGetTask>` still give the plain response type, because each generic hook is followed by its non-generic signature (TypeScript reads the last overload). A wrapper typed as `ReturnType<typeof useGetTask>` keeps `data: Task | undefined`; `ReturnType<typeof useGetTask<string>>` gives the selected shape.
+
 ## Typed per-status errors
 
 `openapi-zod-ts` exports a per-operation error alias from `client.ts` for every operation that documents explicit `4xx` / `5xx` responses, e.g. `export type GetTaskError = ApiError<404, NotFound> | ApiError<422, ValidationProblem>`. With `typed_errors: true` the hooks use it as their error type:

@@ -414,6 +414,42 @@ function queryDataType(funcName: string): string {
 }
 
 /**
+ * `ReturnType<typeof fn>` and `Parameters<typeof fn>` read a generic function
+ * with every type parameter erased to `unknown`, so a lone `fn<TData = Data>`
+ * would hand consumers that type a wrapper as `ReturnType<typeof useX>` an
+ * `unknown` data type. TypeScript reads the LAST overload of a function, and a
+ * call resolves to the FIRST matching one: the generic signature goes first
+ * (typed `select`, explicit `useX<Foo>()`), the same signature at its default
+ * type argument goes last (the pre-TData shape). The implementation is the
+ * generic body that follows these signatures.
+ */
+interface DefaultedOverloads {
+  name: string
+  deprecated: boolean
+  /** Type parameter name, e.g. `TData`. */
+  typeParam: string
+  /** The type the parameter defaults to, e.g. the response type. */
+  typeDefault: string
+  /** Parameter list for a given type argument: the parameter name, or the default. */
+  params: (typeArg: string) => string[]
+  /** Explicit return type for a given type argument (overload signatures need one). */
+  result: (typeArg: string) => string
+}
+
+function buildDefaultedOverloads(fn: DefaultedOverloads): string[] {
+  const lines: string[] = []
+  const signature = (typeParams: string, typeArg: string) => {
+    if (fn.deprecated) lines.push(`/** @deprecated */`)
+    lines.push(`export function ${fn.name}${typeParams}(`)
+    lines.push(`  ${fn.params(typeArg).join(',\n  ')},`)
+    lines.push(`): ${fn.result(typeArg)}`)
+  }
+  signature(`<${fn.typeParam} = ${fn.typeDefault}>`, fn.typeParam)
+  signature('', fn.typeDefault)
+  return lines
+}
+
+/**
  * Derives the factory function name for a GET operation.
  * e.g. funcName "listTasks" -> "listTasksQueryOptions"
  */
@@ -492,11 +528,9 @@ function buildQueryOptionsFactory(
   const queryFnCall = `${op.funcName}(${queryFnArgs.join(', ')})`
 
   const factoryName = queryOptionsFuncName(op.funcName)
+  const implName = `_${factoryName}`
 
-  if (op.deprecated) {
-    lines.push(`/** @deprecated */`)
-  }
-  lines.push(`export function ${factoryName}<TData = ${dataType}>(`)
+  lines.push(`function ${implName}<TData = ${dataType}>(`)
   lines.push(`  ${sigParts.join(',\n  ')},`)
   lines.push(`) {`)
   lines.push(`  return queryOptions<${dataType}, ${op.errorType}, TData>({`)
@@ -507,6 +541,17 @@ function buildQueryOptionsFactory(
   lines.push(`    ...options,`)
   lines.push(`  })`)
   lines.push(`}`)
+  lines.push(``)
+  // The queryOptions result type is whichever `queryOptions` overload TanStack
+  // resolves, which differs between 5.x releases and cannot be named here. The
+  // implementation's own type, intersected with itself at the default type
+  // argument, is an overload list that ends in the non-generic signature.
+  if (op.deprecated) {
+    lines.push(`/** @deprecated */`)
+  }
+  lines.push(
+    `export const ${factoryName}: typeof ${implName} & typeof ${implName}<${dataType}> = ${implName}`
+  )
 
   return lines.join('\n')
 }
@@ -539,9 +584,10 @@ function buildQueryHook(
     const paramsToken = paramsRequired ? 'params' : 'params?'
     sigParts.push(`${paramsToken}: Parameters<typeof ${op.funcName}>[${pathParams.length}]`)
   }
-  sigParts.push(
-    `options?: Omit<UseQueryOptions<${dataType}, ${op.errorType}, TData>, 'queryKey' | 'queryFn'>`
-  )
+  const optionsPart = (typeArg: string) =>
+    `options?: Omit<UseQueryOptions<${dataType}, ${op.errorType}, ${typeArg}>, 'queryKey' | 'queryFn'>`
+  const leadingParts = [...sigParts]
+  sigParts.push(optionsPart('TData'))
 
   // Build queryKey call (with non-null assertions for path params, since hook has enabled guard)
   const queryKeyCall = buildQueryKeyCall(keyFactoryName, keyEntry, pathParams, hasQueryParams, true)
@@ -556,10 +602,17 @@ function buildQueryHook(
     ? `${pathParams.map((p) => `${p} != null`).join(' && ')} && (options?.enabled ?? true)`
     : undefined
 
-  // @deprecated JSDoc on deprecated operations
-  if (op.deprecated) {
-    lines.push(`/** @deprecated */`)
-  }
+  // @deprecated JSDoc on deprecated operations (on each overload signature)
+  lines.push(
+    ...buildDefaultedOverloads({
+      name: op.hookName,
+      deprecated: op.deprecated,
+      typeParam: 'TData',
+      typeDefault: dataType,
+      params: (typeArg) => [...leadingParts, optionsPart(typeArg)],
+      result: (typeArg) => `UseQueryResult<${typeArg}, ${op.errorType}>`,
+    })
+  )
   lines.push(`export function ${op.hookName}<TData = ${dataType}>(`)
   lines.push(`  ${sigParts.join(',\n  ')},`)
   lines.push(`) {`)
@@ -602,9 +655,10 @@ function buildSuspenseQueryHook(
     const paramsToken = paramsRequired ? 'params' : 'params?'
     sigParts.push(`${paramsToken}: Parameters<typeof ${op.funcName}>[${pathParams.length}]`)
   }
-  sigParts.push(
-    `options?: Omit<UseSuspenseQueryOptions<${dataType}, ${op.errorType}, TData>, 'queryKey' | 'queryFn'>`
-  )
+  const optionsPart = (typeArg: string) =>
+    `options?: Omit<UseSuspenseQueryOptions<${dataType}, ${op.errorType}, ${typeArg}>, 'queryKey' | 'queryFn'>`
+  const leadingParts = [...sigParts]
+  sigParts.push(optionsPart('TData'))
 
   // Build queryKey call (no non-null assertions — suspense params are always required strings)
   const queryKeyCall = buildQueryKeyCall(
@@ -622,9 +676,16 @@ function buildSuspenseQueryHook(
 
   const suspenseHookName = `useSuspense${capitalize(op.funcName)}`
 
-  if (op.deprecated) {
-    lines.push(`/** @deprecated */`)
-  }
+  lines.push(
+    ...buildDefaultedOverloads({
+      name: suspenseHookName,
+      deprecated: op.deprecated,
+      typeParam: 'TData',
+      typeDefault: dataType,
+      params: (typeArg) => [...leadingParts, optionsPart(typeArg)],
+      result: (typeArg) => `UseSuspenseQueryResult<${typeArg}, ${op.errorType}>`,
+    })
+  )
   lines.push(`export function ${suspenseHookName}<TData = ${dataType}>(`)
   lines.push(`  ${sigParts.join(',\n  ')},`)
   lines.push(`) {`)
@@ -674,7 +735,20 @@ function buildQueriesHook(op: OperationMeta, hookName: string): string | undefin
   }
 
   const lines: string[] = []
-  if (op.deprecated) lines.push(`/** @deprecated */`)
+  lines.push(
+    ...buildDefaultedOverloads({
+      name: hookName,
+      deprecated: op.deprecated,
+      typeParam: 'TCombinedResult',
+      typeDefault: resultType,
+      params: (typeArg) => [
+        `paramsList: ReadonlyArray<${entryType}>`,
+        `options?: Omit<UseQueryOptions<${dataType}, ${op.errorType}>, 'queryKey' | 'queryFn'>`,
+        `combine?: (results: ${resultType}) => ${typeArg}`,
+      ],
+      result: (typeArg) => typeArg,
+    })
+  )
   lines.push(`export function ${hookName}<TCombinedResult = ${resultType}>(`)
   lines.push(`  paramsList: ReadonlyArray<${entryType}>,`)
   lines.push(
@@ -737,9 +811,11 @@ function buildInfiniteQueryHook(
     const paramsToken = hasRequiredQueryParams ? 'params' : 'params?'
     sigParts.push(`${paramsToken}: Parameters<typeof ${funcName}>[0]`)
   }
-  sigParts.push(
-    `options?: Omit<UseInfiniteQueryOptions<${dataType}, ${op.errorType}, TData, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>`
-  )
+  const optionsPart = (typeArg: string) =>
+    `options?: Omit<UseInfiniteQueryOptions<${dataType}, ${op.errorType}, ${typeArg}, QueryKey, unknown>, 'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'>`
+  const leadingParts = [...sigParts]
+  sigParts.push(optionsPart('TData'))
+  const infiniteDataType = `InfiniteData<${dataType}>`
 
   const queryKeyCall = buildInfiniteQueryKeyCall(keyFactoryName, keyEntry, hasQueryParams)
 
@@ -751,10 +827,17 @@ function buildInfiniteQueryHook(
     queryFnBody = `({ pageParam }) => ${funcName}({ ${JSON.stringify(pageParamName)}: pageParam as never } as never)`
   }
 
-  if (deprecated) {
-    lines.push(`/** @deprecated */`)
-  }
-  lines.push(`export function ${infiniteHookName}<TData = InfiniteData<${dataType}>>(`)
+  lines.push(
+    ...buildDefaultedOverloads({
+      name: infiniteHookName,
+      deprecated,
+      typeParam: 'TData',
+      typeDefault: infiniteDataType,
+      params: (typeArg) => [...leadingParts, optionsPart(typeArg)],
+      result: (typeArg) => `UseInfiniteQueryResult<${typeArg}, ${op.errorType}>`,
+    })
+  )
+  lines.push(`export function ${infiniteHookName}<TData = ${infiniteDataType}>(`)
   lines.push(`  ${sigParts.join(',\n  ')},`)
   lines.push(`) {`)
   lines.push(`  return useInfiniteQuery<${dataType}, ${op.errorType}, TData, QueryKey, unknown>({`)
@@ -1180,12 +1263,21 @@ interface ReactQueryImportNeeds {
 
 function buildReactQueryImports(needs: ReactQueryImportNeeds): string[] {
   const groups: Array<[boolean, string[]]> = [
-    [needs.queries, ['queryOptions', 'useQuery', 'type UseQueryOptions']],
-    [needs.useQueries, ['useQueries', 'type UseQueryResult']],
-    [needs.suspense, ['useSuspenseQuery', 'type UseSuspenseQueryOptions']],
+    [needs.queries, ['queryOptions', 'useQuery', 'type UseQueryOptions', 'type UseQueryResult']],
+    [needs.useQueries, ['useQueries']],
+    [
+      needs.suspense,
+      ['useSuspenseQuery', 'type UseSuspenseQueryOptions', 'type UseSuspenseQueryResult'],
+    ],
     [
       needs.infinite,
-      ['useInfiniteQuery', 'type UseInfiniteQueryOptions', 'type InfiniteData', 'type QueryKey'],
+      [
+        'useInfiniteQuery',
+        'type UseInfiniteQueryOptions',
+        'type UseInfiniteQueryResult',
+        'type InfiniteData',
+        'type QueryKey',
+      ],
     ],
     [needs.mutations, ['useMutation', 'type UseMutationOptions']],
     [needs.queryClient, ['useQueryClient']],

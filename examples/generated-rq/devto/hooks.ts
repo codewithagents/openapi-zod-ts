@@ -4,8 +4,10 @@ import {
   queryOptions,
   useQuery,
   type UseQueryOptions,
+  type UseQueryResult,
   useInfiniteQuery,
   type UseInfiniteQueryOptions,
+  type UseInfiniteQueryResult,
   type InfiniteData,
   type QueryKey,
   useMutation,
@@ -164,7 +166,7 @@ export const apiKeys = {
 
 // ── Query options factories ──────────────────────────────────
 
-export function getAgentSessionsQueryOptions<TData = Awaited<ReturnType<typeof getAgentSessions>>>(
+function _getAgentSessionsQueryOptions<TData = Awaited<ReturnType<typeof getAgentSessions>>>(
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getAgentSessions>>, ApiError, TData>,
     'queryKey' | 'queryFn'
@@ -179,9 +181,11 @@ export function getAgentSessionsQueryOptions<TData = Awaited<ReturnType<typeof g
   })
 }
 
-export function getAgentSessionByIdQueryOptions<
-  TData = Awaited<ReturnType<typeof getAgentSessionById>>,
->(
+export const getAgentSessionsQueryOptions: typeof _getAgentSessionsQueryOptions &
+  typeof _getAgentSessionsQueryOptions<Awaited<ReturnType<typeof getAgentSessions>>> =
+  _getAgentSessionsQueryOptions
+
+function _getAgentSessionByIdQueryOptions<TData = Awaited<ReturnType<typeof getAgentSessionById>>>(
   id: Parameters<typeof getAgentSessionById>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getAgentSessionById>>, ApiError, TData>,
@@ -197,7 +201,11 @@ export function getAgentSessionByIdQueryOptions<
   })
 }
 
-export function getArticlesQueryOptions<TData = Awaited<ReturnType<typeof getArticles>>>(
+export const getAgentSessionByIdQueryOptions: typeof _getAgentSessionByIdQueryOptions &
+  typeof _getAgentSessionByIdQueryOptions<Awaited<ReturnType<typeof getAgentSessionById>>> =
+  _getAgentSessionByIdQueryOptions
+
+function _getArticlesQueryOptions<TData = Awaited<ReturnType<typeof getArticles>>>(
   params?: Parameters<typeof getArticles>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getArticles>>, ApiError, TData>,
@@ -213,9 +221,11 @@ export function getArticlesQueryOptions<TData = Awaited<ReturnType<typeof getArt
   })
 }
 
-export function getLatestArticlesQueryOptions<
-  TData = Awaited<ReturnType<typeof getLatestArticles>>,
->(
+export const getArticlesQueryOptions: typeof _getArticlesQueryOptions &
+  typeof _getArticlesQueryOptions<Awaited<ReturnType<typeof getArticles>>> =
+  _getArticlesQueryOptions
+
+function _getLatestArticlesQueryOptions<TData = Awaited<ReturnType<typeof getLatestArticles>>>(
   params?: Parameters<typeof getLatestArticles>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getLatestArticles>>, ApiError, TData>,
@@ -231,7 +241,11 @@ export function getLatestArticlesQueryOptions<
   })
 }
 
-export function getArticleByIdQueryOptions<TData = Awaited<ReturnType<typeof getArticleById>>>(
+export const getLatestArticlesQueryOptions: typeof _getLatestArticlesQueryOptions &
+  typeof _getLatestArticlesQueryOptions<Awaited<ReturnType<typeof getLatestArticles>>> =
+  _getLatestArticlesQueryOptions
+
+function _getArticleByIdQueryOptions<TData = Awaited<ReturnType<typeof getArticleById>>>(
   id: Parameters<typeof getArticleById>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getArticleById>>, ApiError, TData>,
@@ -247,7 +261,11 @@ export function getArticleByIdQueryOptions<TData = Awaited<ReturnType<typeof get
   })
 }
 
-export function getArticleByPathQueryOptions<TData = Awaited<ReturnType<typeof getArticleByPath>>>(
+export const getArticleByIdQueryOptions: typeof _getArticleByIdQueryOptions &
+  typeof _getArticleByIdQueryOptions<Awaited<ReturnType<typeof getArticleById>>> =
+  _getArticleByIdQueryOptions
+
+function _getArticleByPathQueryOptions<TData = Awaited<ReturnType<typeof getArticleByPath>>>(
   username: Parameters<typeof getArticleByPath>[0],
   slug: Parameters<typeof getArticleByPath>[1],
   options?: Omit<
@@ -264,7 +282,11 @@ export function getArticleByPathQueryOptions<TData = Awaited<ReturnType<typeof g
   })
 }
 
-export function getUserArticlesQueryOptions<TData = Awaited<ReturnType<typeof getUserArticles>>>(
+export const getArticleByPathQueryOptions: typeof _getArticleByPathQueryOptions &
+  typeof _getArticleByPathQueryOptions<Awaited<ReturnType<typeof getArticleByPath>>> =
+  _getArticleByPathQueryOptions
+
+function _getUserArticlesQueryOptions<TData = Awaited<ReturnType<typeof getUserArticles>>>(
   params?: Parameters<typeof getUserArticles>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getUserArticles>>, ApiError, TData>,
@@ -280,7 +302,11 @@ export function getUserArticlesQueryOptions<TData = Awaited<ReturnType<typeof ge
   })
 }
 
-export function getUserPublishedArticlesQueryOptions<
+export const getUserArticlesQueryOptions: typeof _getUserArticlesQueryOptions &
+  typeof _getUserArticlesQueryOptions<Awaited<ReturnType<typeof getUserArticles>>> =
+  _getUserArticlesQueryOptions
+
+function _getUserPublishedArticlesQueryOptions<
   TData = Awaited<ReturnType<typeof getUserPublishedArticles>>,
 >(
   params?: Parameters<typeof getUserPublishedArticles>[0],
@@ -298,7 +324,12 @@ export function getUserPublishedArticlesQueryOptions<
   })
 }
 
-export function getUserUnpublishedArticlesQueryOptions<
+export const getUserPublishedArticlesQueryOptions: typeof _getUserPublishedArticlesQueryOptions &
+  typeof _getUserPublishedArticlesQueryOptions<
+    Awaited<ReturnType<typeof getUserPublishedArticles>>
+  > = _getUserPublishedArticlesQueryOptions
+
+function _getUserUnpublishedArticlesQueryOptions<
   TData = Awaited<ReturnType<typeof getUserUnpublishedArticles>>,
 >(
   params?: Parameters<typeof getUserUnpublishedArticles>[0],
@@ -316,9 +347,12 @@ export function getUserUnpublishedArticlesQueryOptions<
   })
 }
 
-export function getUserAllArticlesQueryOptions<
-  TData = Awaited<ReturnType<typeof getUserAllArticles>>,
->(
+export const getUserUnpublishedArticlesQueryOptions: typeof _getUserUnpublishedArticlesQueryOptions &
+  typeof _getUserUnpublishedArticlesQueryOptions<
+    Awaited<ReturnType<typeof getUserUnpublishedArticles>>
+  > = _getUserUnpublishedArticlesQueryOptions
+
+function _getUserAllArticlesQueryOptions<TData = Awaited<ReturnType<typeof getUserAllArticles>>>(
   params?: Parameters<typeof getUserAllArticles>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getUserAllArticles>>, ApiError, TData>,
@@ -334,7 +368,11 @@ export function getUserAllArticlesQueryOptions<
   })
 }
 
-export function getSegmentsQueryOptions<TData = Awaited<ReturnType<typeof getSegments>>>(
+export const getUserAllArticlesQueryOptions: typeof _getUserAllArticlesQueryOptions &
+  typeof _getUserAllArticlesQueryOptions<Awaited<ReturnType<typeof getUserAllArticles>>> =
+  _getUserAllArticlesQueryOptions
+
+function _getSegmentsQueryOptions<TData = Awaited<ReturnType<typeof getSegments>>>(
   params?: Parameters<typeof getSegments>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getSegments>>, ApiError, TData>,
@@ -350,7 +388,11 @@ export function getSegmentsQueryOptions<TData = Awaited<ReturnType<typeof getSeg
   })
 }
 
-export function getSegmentQueryOptions<TData = Awaited<ReturnType<typeof getSegment>>>(
+export const getSegmentsQueryOptions: typeof _getSegmentsQueryOptions &
+  typeof _getSegmentsQueryOptions<Awaited<ReturnType<typeof getSegments>>> =
+  _getSegmentsQueryOptions
+
+function _getSegmentQueryOptions<TData = Awaited<ReturnType<typeof getSegment>>>(
   id: Parameters<typeof getSegment>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getSegment>>, ApiError, TData>,
@@ -366,9 +408,10 @@ export function getSegmentQueryOptions<TData = Awaited<ReturnType<typeof getSegm
   })
 }
 
-export function getUsersInSegmentQueryOptions<
-  TData = Awaited<ReturnType<typeof getUsersInSegment>>,
->(
+export const getSegmentQueryOptions: typeof _getSegmentQueryOptions &
+  typeof _getSegmentQueryOptions<Awaited<ReturnType<typeof getSegment>>> = _getSegmentQueryOptions
+
+function _getUsersInSegmentQueryOptions<TData = Awaited<ReturnType<typeof getUsersInSegment>>>(
   id: Parameters<typeof getUsersInSegment>[0],
   params?: Parameters<typeof getUsersInSegment>[1],
   options?: Omit<
@@ -385,7 +428,11 @@ export function getUsersInSegmentQueryOptions<
   })
 }
 
-export function getApiBillboardsQueryOptions<TData = Awaited<ReturnType<typeof getApiBillboards>>>(
+export const getUsersInSegmentQueryOptions: typeof _getUsersInSegmentQueryOptions &
+  typeof _getUsersInSegmentQueryOptions<Awaited<ReturnType<typeof getUsersInSegment>>> =
+  _getUsersInSegmentQueryOptions
+
+function _getApiBillboardsQueryOptions<TData = Awaited<ReturnType<typeof getApiBillboards>>>(
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getApiBillboards>>, ApiError, TData>,
     'queryKey' | 'queryFn'
@@ -400,7 +447,11 @@ export function getApiBillboardsQueryOptions<TData = Awaited<ReturnType<typeof g
   })
 }
 
-export function getApiBillboardsByIdQueryOptions<
+export const getApiBillboardsQueryOptions: typeof _getApiBillboardsQueryOptions &
+  typeof _getApiBillboardsQueryOptions<Awaited<ReturnType<typeof getApiBillboards>>> =
+  _getApiBillboardsQueryOptions
+
+function _getApiBillboardsByIdQueryOptions<
   TData = Awaited<ReturnType<typeof getApiBillboardsById>>,
 >(
   id: Parameters<typeof getApiBillboardsById>[0],
@@ -418,7 +469,11 @@ export function getApiBillboardsByIdQueryOptions<
   })
 }
 
-export function getCommentsByArticleIdQueryOptions<
+export const getApiBillboardsByIdQueryOptions: typeof _getApiBillboardsByIdQueryOptions &
+  typeof _getApiBillboardsByIdQueryOptions<Awaited<ReturnType<typeof getApiBillboardsById>>> =
+  _getApiBillboardsByIdQueryOptions
+
+function _getCommentsByArticleIdQueryOptions<
   TData = Awaited<ReturnType<typeof getCommentsByArticleId>>,
 >(
   params?: Parameters<typeof getCommentsByArticleId>[0],
@@ -436,7 +491,11 @@ export function getCommentsByArticleIdQueryOptions<
   })
 }
 
-export function getCommentByIdQueryOptions<TData = Awaited<ReturnType<typeof getCommentById>>>(
+export const getCommentsByArticleIdQueryOptions: typeof _getCommentsByArticleIdQueryOptions &
+  typeof _getCommentsByArticleIdQueryOptions<Awaited<ReturnType<typeof getCommentsByArticleId>>> =
+  _getCommentsByArticleIdQueryOptions
+
+function _getCommentByIdQueryOptions<TData = Awaited<ReturnType<typeof getCommentById>>>(
   id: Parameters<typeof getCommentById>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getCommentById>>, ApiError, TData>,
@@ -452,7 +511,11 @@ export function getCommentByIdQueryOptions<TData = Awaited<ReturnType<typeof get
   })
 }
 
-export function getFollowedTagsQueryOptions<TData = Awaited<ReturnType<typeof getFollowedTags>>>(
+export const getCommentByIdQueryOptions: typeof _getCommentByIdQueryOptions &
+  typeof _getCommentByIdQueryOptions<Awaited<ReturnType<typeof getCommentById>>> =
+  _getCommentByIdQueryOptions
+
+function _getFollowedTagsQueryOptions<TData = Awaited<ReturnType<typeof getFollowedTags>>>(
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getFollowedTags>>, ApiError, TData>,
     'queryKey' | 'queryFn'
@@ -467,7 +530,11 @@ export function getFollowedTagsQueryOptions<TData = Awaited<ReturnType<typeof ge
   })
 }
 
-export function getFollowersQueryOptions<TData = Awaited<ReturnType<typeof getFollowers>>>(
+export const getFollowedTagsQueryOptions: typeof _getFollowedTagsQueryOptions &
+  typeof _getFollowedTagsQueryOptions<Awaited<ReturnType<typeof getFollowedTags>>> =
+  _getFollowedTagsQueryOptions
+
+function _getFollowersQueryOptions<TData = Awaited<ReturnType<typeof getFollowers>>>(
   params?: Parameters<typeof getFollowers>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getFollowers>>, ApiError, TData>,
@@ -483,7 +550,11 @@ export function getFollowersQueryOptions<TData = Awaited<ReturnType<typeof getFo
   })
 }
 
-export function getOrganizationQueryOptions<TData = Awaited<ReturnType<typeof getOrganization>>>(
+export const getFollowersQueryOptions: typeof _getFollowersQueryOptions &
+  typeof _getFollowersQueryOptions<Awaited<ReturnType<typeof getFollowers>>> =
+  _getFollowersQueryOptions
+
+function _getOrganizationQueryOptions<TData = Awaited<ReturnType<typeof getOrganization>>>(
   username: Parameters<typeof getOrganization>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getOrganization>>, ApiError, TData>,
@@ -499,7 +570,11 @@ export function getOrganizationQueryOptions<TData = Awaited<ReturnType<typeof ge
   })
 }
 
-export function getOrgUsersQueryOptions<TData = Awaited<ReturnType<typeof getOrgUsers>>>(
+export const getOrganizationQueryOptions: typeof _getOrganizationQueryOptions &
+  typeof _getOrganizationQueryOptions<Awaited<ReturnType<typeof getOrganization>>> =
+  _getOrganizationQueryOptions
+
+function _getOrgUsersQueryOptions<TData = Awaited<ReturnType<typeof getOrgUsers>>>(
   organizationIdOrUsername: Parameters<typeof getOrgUsers>[0],
   params?: Parameters<typeof getOrgUsers>[1],
   options?: Omit<
@@ -516,7 +591,11 @@ export function getOrgUsersQueryOptions<TData = Awaited<ReturnType<typeof getOrg
   })
 }
 
-export function getOrgArticlesQueryOptions<TData = Awaited<ReturnType<typeof getOrgArticles>>>(
+export const getOrgUsersQueryOptions: typeof _getOrgUsersQueryOptions &
+  typeof _getOrgUsersQueryOptions<Awaited<ReturnType<typeof getOrgUsers>>> =
+  _getOrgUsersQueryOptions
+
+function _getOrgArticlesQueryOptions<TData = Awaited<ReturnType<typeof getOrgArticles>>>(
   organizationIdOrUsername: Parameters<typeof getOrgArticles>[0],
   params?: Parameters<typeof getOrgArticles>[1],
   options?: Omit<
@@ -533,7 +612,11 @@ export function getOrgArticlesQueryOptions<TData = Awaited<ReturnType<typeof get
   })
 }
 
-export function getOrganizationsQueryOptions<TData = Awaited<ReturnType<typeof getOrganizations>>>(
+export const getOrgArticlesQueryOptions: typeof _getOrgArticlesQueryOptions &
+  typeof _getOrgArticlesQueryOptions<Awaited<ReturnType<typeof getOrgArticles>>> =
+  _getOrgArticlesQueryOptions
+
+function _getOrganizationsQueryOptions<TData = Awaited<ReturnType<typeof getOrganizations>>>(
   params?: Parameters<typeof getOrganizations>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getOrganizations>>, ApiError, TData>,
@@ -549,9 +632,11 @@ export function getOrganizationsQueryOptions<TData = Awaited<ReturnType<typeof g
   })
 }
 
-export function getOrganizationByIdQueryOptions<
-  TData = Awaited<ReturnType<typeof getOrganizationById>>,
->(
+export const getOrganizationsQueryOptions: typeof _getOrganizationsQueryOptions &
+  typeof _getOrganizationsQueryOptions<Awaited<ReturnType<typeof getOrganizations>>> =
+  _getOrganizationsQueryOptions
+
+function _getOrganizationByIdQueryOptions<TData = Awaited<ReturnType<typeof getOrganizationById>>>(
   id: Parameters<typeof getOrganizationById>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getOrganizationById>>, ApiError, TData>,
@@ -567,7 +652,11 @@ export function getOrganizationByIdQueryOptions<
   })
 }
 
-export function getApiPagesQueryOptions<TData = Awaited<ReturnType<typeof getApiPages>>>(
+export const getOrganizationByIdQueryOptions: typeof _getOrganizationByIdQueryOptions &
+  typeof _getOrganizationByIdQueryOptions<Awaited<ReturnType<typeof getOrganizationById>>> =
+  _getOrganizationByIdQueryOptions
+
+function _getApiPagesQueryOptions<TData = Awaited<ReturnType<typeof getApiPages>>>(
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getApiPages>>, ApiError, TData>,
     'queryKey' | 'queryFn'
@@ -582,7 +671,11 @@ export function getApiPagesQueryOptions<TData = Awaited<ReturnType<typeof getApi
   })
 }
 
-export function getApiPagesByIdQueryOptions<TData = Awaited<ReturnType<typeof getApiPagesById>>>(
+export const getApiPagesQueryOptions: typeof _getApiPagesQueryOptions &
+  typeof _getApiPagesQueryOptions<Awaited<ReturnType<typeof getApiPages>>> =
+  _getApiPagesQueryOptions
+
+function _getApiPagesByIdQueryOptions<TData = Awaited<ReturnType<typeof getApiPagesById>>>(
   id: Parameters<typeof getApiPagesById>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getApiPagesById>>, ApiError, TData>,
@@ -598,9 +691,11 @@ export function getApiPagesByIdQueryOptions<TData = Awaited<ReturnType<typeof ge
   })
 }
 
-export function getPodcastEpisodesQueryOptions<
-  TData = Awaited<ReturnType<typeof getPodcastEpisodes>>,
->(
+export const getApiPagesByIdQueryOptions: typeof _getApiPagesByIdQueryOptions &
+  typeof _getApiPagesByIdQueryOptions<Awaited<ReturnType<typeof getApiPagesById>>> =
+  _getApiPagesByIdQueryOptions
+
+function _getPodcastEpisodesQueryOptions<TData = Awaited<ReturnType<typeof getPodcastEpisodes>>>(
   params?: Parameters<typeof getPodcastEpisodes>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getPodcastEpisodes>>, ApiError, TData>,
@@ -616,7 +711,11 @@ export function getPodcastEpisodesQueryOptions<
   })
 }
 
-export function getProfileImageQueryOptions<TData = Awaited<ReturnType<typeof getProfileImage>>>(
+export const getPodcastEpisodesQueryOptions: typeof _getPodcastEpisodesQueryOptions &
+  typeof _getPodcastEpisodesQueryOptions<Awaited<ReturnType<typeof getPodcastEpisodes>>> =
+  _getPodcastEpisodesQueryOptions
+
+function _getProfileImageQueryOptions<TData = Awaited<ReturnType<typeof getProfileImage>>>(
   username: Parameters<typeof getProfileImage>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getProfileImage>>, ApiError, TData>,
@@ -632,7 +731,11 @@ export function getProfileImageQueryOptions<TData = Awaited<ReturnType<typeof ge
   })
 }
 
-export function getReadinglistQueryOptions<TData = Awaited<ReturnType<typeof getReadinglist>>>(
+export const getProfileImageQueryOptions: typeof _getProfileImageQueryOptions &
+  typeof _getProfileImageQueryOptions<Awaited<ReturnType<typeof getProfileImage>>> =
+  _getProfileImageQueryOptions
+
+function _getReadinglistQueryOptions<TData = Awaited<ReturnType<typeof getReadinglist>>>(
   params?: Parameters<typeof getReadinglist>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getReadinglist>>, ApiError, TData>,
@@ -648,7 +751,11 @@ export function getReadinglistQueryOptions<TData = Awaited<ReturnType<typeof get
   })
 }
 
-export function getSurveysQueryOptions<TData = Awaited<ReturnType<typeof getSurveys>>>(
+export const getReadinglistQueryOptions: typeof _getReadinglistQueryOptions &
+  typeof _getReadinglistQueryOptions<Awaited<ReturnType<typeof getReadinglist>>> =
+  _getReadinglistQueryOptions
+
+function _getSurveysQueryOptions<TData = Awaited<ReturnType<typeof getSurveys>>>(
   params?: Parameters<typeof getSurveys>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getSurveys>>, ApiError, TData>,
@@ -664,9 +771,10 @@ export function getSurveysQueryOptions<TData = Awaited<ReturnType<typeof getSurv
   })
 }
 
-export function getSurveyByIdOrSlugQueryOptions<
-  TData = Awaited<ReturnType<typeof getSurveyByIdOrSlug>>,
->(
+export const getSurveysQueryOptions: typeof _getSurveysQueryOptions &
+  typeof _getSurveysQueryOptions<Awaited<ReturnType<typeof getSurveys>>> = _getSurveysQueryOptions
+
+function _getSurveyByIdOrSlugQueryOptions<TData = Awaited<ReturnType<typeof getSurveyByIdOrSlug>>>(
   idOrSlug: Parameters<typeof getSurveyByIdOrSlug>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getSurveyByIdOrSlug>>, ApiError, TData>,
@@ -682,9 +790,11 @@ export function getSurveyByIdOrSlugQueryOptions<
   })
 }
 
-export function getSurveyPollVotesQueryOptions<
-  TData = Awaited<ReturnType<typeof getSurveyPollVotes>>,
->(
+export const getSurveyByIdOrSlugQueryOptions: typeof _getSurveyByIdOrSlugQueryOptions &
+  typeof _getSurveyByIdOrSlugQueryOptions<Awaited<ReturnType<typeof getSurveyByIdOrSlug>>> =
+  _getSurveyByIdOrSlugQueryOptions
+
+function _getSurveyPollVotesQueryOptions<TData = Awaited<ReturnType<typeof getSurveyPollVotes>>>(
   idOrSlug: Parameters<typeof getSurveyPollVotes>[0],
   params?: Parameters<typeof getSurveyPollVotes>[1],
   options?: Omit<
@@ -701,7 +811,11 @@ export function getSurveyPollVotesQueryOptions<
   })
 }
 
-export function getSurveyPollTextResponsesQueryOptions<
+export const getSurveyPollVotesQueryOptions: typeof _getSurveyPollVotesQueryOptions &
+  typeof _getSurveyPollVotesQueryOptions<Awaited<ReturnType<typeof getSurveyPollVotes>>> =
+  _getSurveyPollVotesQueryOptions
+
+function _getSurveyPollTextResponsesQueryOptions<
   TData = Awaited<ReturnType<typeof getSurveyPollTextResponses>>,
 >(
   idOrSlug: Parameters<typeof getSurveyPollTextResponses>[0],
@@ -720,7 +834,12 @@ export function getSurveyPollTextResponsesQueryOptions<
   })
 }
 
-export function getTagsQueryOptions<TData = Awaited<ReturnType<typeof getTags>>>(
+export const getSurveyPollTextResponsesQueryOptions: typeof _getSurveyPollTextResponsesQueryOptions &
+  typeof _getSurveyPollTextResponsesQueryOptions<
+    Awaited<ReturnType<typeof getSurveyPollTextResponses>>
+  > = _getSurveyPollTextResponsesQueryOptions
+
+function _getTagsQueryOptions<TData = Awaited<ReturnType<typeof getTags>>>(
   params?: Parameters<typeof getTags>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getTags>>, ApiError, TData>,
@@ -736,7 +855,10 @@ export function getTagsQueryOptions<TData = Awaited<ReturnType<typeof getTags>>>
   })
 }
 
-export function getUserMeQueryOptions<TData = Awaited<ReturnType<typeof getUserMe>>>(
+export const getTagsQueryOptions: typeof _getTagsQueryOptions &
+  typeof _getTagsQueryOptions<Awaited<ReturnType<typeof getTags>>> = _getTagsQueryOptions
+
+function _getUserMeQueryOptions<TData = Awaited<ReturnType<typeof getUserMe>>>(
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getUserMe>>, ApiError, TData>,
     'queryKey' | 'queryFn'
@@ -751,7 +873,10 @@ export function getUserMeQueryOptions<TData = Awaited<ReturnType<typeof getUserM
   })
 }
 
-export function getUserQueryOptions<TData = Awaited<ReturnType<typeof getUser>>>(
+export const getUserMeQueryOptions: typeof _getUserMeQueryOptions &
+  typeof _getUserMeQueryOptions<Awaited<ReturnType<typeof getUserMe>>> = _getUserMeQueryOptions
+
+function _getUserQueryOptions<TData = Awaited<ReturnType<typeof getUser>>>(
   id: Parameters<typeof getUser>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getUser>>, ApiError, TData>,
@@ -767,7 +892,10 @@ export function getUserQueryOptions<TData = Awaited<ReturnType<typeof getUser>>>
   })
 }
 
-export function videosQueryOptions<TData = Awaited<ReturnType<typeof videos>>>(
+export const getUserQueryOptions: typeof _getUserQueryOptions &
+  typeof _getUserQueryOptions<Awaited<ReturnType<typeof getUser>>> = _getUserQueryOptions
+
+function _videosQueryOptions<TData = Awaited<ReturnType<typeof videos>>>(
   params?: Parameters<typeof videos>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof videos>>, ApiError, TData>,
@@ -783,8 +911,27 @@ export function videosQueryOptions<TData = Awaited<ReturnType<typeof videos>>>(
   })
 }
 
+export const videosQueryOptions: typeof _videosQueryOptions &
+  typeof _videosQueryOptions<Awaited<ReturnType<typeof videos>>> = _videosQueryOptions
+
 // ── Queries ──────────────────────────────────────────────────
 
+export function useGetAgentSessions<TData = Awaited<ReturnType<typeof getAgentSessions>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAgentSessions>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetAgentSessions(
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAgentSessions>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAgentSessions>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAgentSessions>>, ApiError>
 export function useGetAgentSessions<TData = Awaited<ReturnType<typeof getAgentSessions>>>(
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getAgentSessions>>, ApiError, TData>,
@@ -800,6 +947,24 @@ export function useGetAgentSessions<TData = Awaited<ReturnType<typeof getAgentSe
   })
 }
 
+export function useGetAgentSessionById<TData = Awaited<ReturnType<typeof getAgentSessionById>>>(
+  id: Parameters<typeof getAgentSessionById>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getAgentSessionById>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetAgentSessionById(
+  id: Parameters<typeof getAgentSessionById>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getAgentSessionById>>,
+      ApiError,
+      Awaited<ReturnType<typeof getAgentSessionById>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getAgentSessionById>>, ApiError>
 export function useGetAgentSessionById<TData = Awaited<ReturnType<typeof getAgentSessionById>>>(
   id: Parameters<typeof getAgentSessionById>[0] | undefined | null,
   options?: Omit<
@@ -823,6 +988,24 @@ export function useGetArticles<TData = Awaited<ReturnType<typeof getArticles>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getArticles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetArticles(
+  params?: Parameters<typeof getArticles>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getArticles>>,
+      ApiError,
+      Awaited<ReturnType<typeof getArticles>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getArticles>>, ApiError>
+export function useGetArticles<TData = Awaited<ReturnType<typeof getArticles>>>(
+  params?: Parameters<typeof getArticles>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getArticles>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getArticles>>, ApiError, TData>({
     queryKey: apiKeys.getArticles(params),
@@ -833,6 +1016,34 @@ export function useGetArticles<TData = Awaited<ReturnType<typeof getArticles>>>(
   })
 }
 
+export function useGetArticlesInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getArticles>>>,
+>(
+  params?: Parameters<typeof getArticles>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getArticles>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetArticlesInfinite(
+  params?: Parameters<typeof getArticles>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getArticles>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getArticles>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getArticles>>>, ApiError>
 export function useGetArticlesInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getArticles>>>,
 >(
@@ -872,6 +1083,24 @@ export function useGetLatestArticles<TData = Awaited<ReturnType<typeof getLatest
     UseQueryOptions<Awaited<ReturnType<typeof getLatestArticles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetLatestArticles(
+  params?: Parameters<typeof getLatestArticles>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getLatestArticles>>,
+      ApiError,
+      Awaited<ReturnType<typeof getLatestArticles>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getLatestArticles>>, ApiError>
+export function useGetLatestArticles<TData = Awaited<ReturnType<typeof getLatestArticles>>>(
+  params?: Parameters<typeof getLatestArticles>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getLatestArticles>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getLatestArticles>>, ApiError, TData>({
     queryKey: apiKeys.getLatestArticles(params),
@@ -882,6 +1111,34 @@ export function useGetLatestArticles<TData = Awaited<ReturnType<typeof getLatest
   })
 }
 
+export function useGetLatestArticlesInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getLatestArticles>>>,
+>(
+  params?: Parameters<typeof getLatestArticles>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getLatestArticles>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetLatestArticlesInfinite(
+  params?: Parameters<typeof getLatestArticles>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getLatestArticles>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getLatestArticles>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getLatestArticles>>>, ApiError>
 export function useGetLatestArticlesInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getLatestArticles>>>,
 >(
@@ -921,6 +1178,24 @@ export function useGetArticleById<TData = Awaited<ReturnType<typeof getArticleBy
     UseQueryOptions<Awaited<ReturnType<typeof getArticleById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetArticleById(
+  id: Parameters<typeof getArticleById>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getArticleById>>,
+      ApiError,
+      Awaited<ReturnType<typeof getArticleById>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getArticleById>>, ApiError>
+export function useGetArticleById<TData = Awaited<ReturnType<typeof getArticleById>>>(
+  id: Parameters<typeof getArticleById>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getArticleById>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getArticleById>>, ApiError, TData>({
     queryKey: apiKeys.getArticleById(id!),
@@ -932,6 +1207,26 @@ export function useGetArticleById<TData = Awaited<ReturnType<typeof getArticleBy
   })
 }
 
+export function useGetArticleByPath<TData = Awaited<ReturnType<typeof getArticleByPath>>>(
+  username: Parameters<typeof getArticleByPath>[0] | undefined | null,
+  slug: Parameters<typeof getArticleByPath>[1] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getArticleByPath>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetArticleByPath(
+  username: Parameters<typeof getArticleByPath>[0] | undefined | null,
+  slug: Parameters<typeof getArticleByPath>[1] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getArticleByPath>>,
+      ApiError,
+      Awaited<ReturnType<typeof getArticleByPath>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getArticleByPath>>, ApiError>
 export function useGetArticleByPath<TData = Awaited<ReturnType<typeof getArticleByPath>>>(
   username: Parameters<typeof getArticleByPath>[0] | undefined | null,
   slug: Parameters<typeof getArticleByPath>[1] | undefined | null,
@@ -956,6 +1251,24 @@ export function useGetUserArticles<TData = Awaited<ReturnType<typeof getUserArti
     UseQueryOptions<Awaited<ReturnType<typeof getUserArticles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetUserArticles(
+  params?: Parameters<typeof getUserArticles>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getUserArticles>>,
+      ApiError,
+      Awaited<ReturnType<typeof getUserArticles>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getUserArticles>>, ApiError>
+export function useGetUserArticles<TData = Awaited<ReturnType<typeof getUserArticles>>>(
+  params?: Parameters<typeof getUserArticles>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getUserArticles>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getUserArticles>>, ApiError, TData>({
     queryKey: apiKeys.getUserArticles(params),
@@ -966,6 +1279,34 @@ export function useGetUserArticles<TData = Awaited<ReturnType<typeof getUserArti
   })
 }
 
+export function useGetUserArticlesInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getUserArticles>>>,
+>(
+  params?: Parameters<typeof getUserArticles>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUserArticles>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetUserArticlesInfinite(
+  params?: Parameters<typeof getUserArticles>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUserArticles>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getUserArticles>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getUserArticles>>>, ApiError>
 export function useGetUserArticlesInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getUserArticles>>>,
 >(
@@ -1007,6 +1348,26 @@ export function useGetUserPublishedArticles<
     UseQueryOptions<Awaited<ReturnType<typeof getUserPublishedArticles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetUserPublishedArticles(
+  params?: Parameters<typeof getUserPublishedArticles>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getUserPublishedArticles>>,
+      ApiError,
+      Awaited<ReturnType<typeof getUserPublishedArticles>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getUserPublishedArticles>>, ApiError>
+export function useGetUserPublishedArticles<
+  TData = Awaited<ReturnType<typeof getUserPublishedArticles>>,
+>(
+  params?: Parameters<typeof getUserPublishedArticles>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getUserPublishedArticles>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getUserPublishedArticles>>, ApiError, TData>({
     queryKey: apiKeys.getUserPublishedArticles(params),
@@ -1017,6 +1378,37 @@ export function useGetUserPublishedArticles<
   })
 }
 
+export function useGetUserPublishedArticlesInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getUserPublishedArticles>>>,
+>(
+  params?: Parameters<typeof getUserPublishedArticles>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUserPublishedArticles>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetUserPublishedArticlesInfinite(
+  params?: Parameters<typeof getUserPublishedArticles>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUserPublishedArticles>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getUserPublishedArticles>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<
+  InfiniteData<Awaited<ReturnType<typeof getUserPublishedArticles>>>,
+  ApiError
+>
 export function useGetUserPublishedArticlesInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getUserPublishedArticles>>>,
 >(
@@ -1058,6 +1450,26 @@ export function useGetUserUnpublishedArticles<
     UseQueryOptions<Awaited<ReturnType<typeof getUserUnpublishedArticles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetUserUnpublishedArticles(
+  params?: Parameters<typeof getUserUnpublishedArticles>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getUserUnpublishedArticles>>,
+      ApiError,
+      Awaited<ReturnType<typeof getUserUnpublishedArticles>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getUserUnpublishedArticles>>, ApiError>
+export function useGetUserUnpublishedArticles<
+  TData = Awaited<ReturnType<typeof getUserUnpublishedArticles>>,
+>(
+  params?: Parameters<typeof getUserUnpublishedArticles>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getUserUnpublishedArticles>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getUserUnpublishedArticles>>, ApiError, TData>({
     queryKey: apiKeys.getUserUnpublishedArticles(params),
@@ -1068,6 +1480,37 @@ export function useGetUserUnpublishedArticles<
   })
 }
 
+export function useGetUserUnpublishedArticlesInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getUserUnpublishedArticles>>>,
+>(
+  params?: Parameters<typeof getUserUnpublishedArticles>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUserUnpublishedArticles>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetUserUnpublishedArticlesInfinite(
+  params?: Parameters<typeof getUserUnpublishedArticles>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUserUnpublishedArticles>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getUserUnpublishedArticles>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<
+  InfiniteData<Awaited<ReturnType<typeof getUserUnpublishedArticles>>>,
+  ApiError
+>
 export function useGetUserUnpublishedArticlesInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getUserUnpublishedArticles>>>,
 >(
@@ -1107,6 +1550,24 @@ export function useGetUserAllArticles<TData = Awaited<ReturnType<typeof getUserA
     UseQueryOptions<Awaited<ReturnType<typeof getUserAllArticles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetUserAllArticles(
+  params?: Parameters<typeof getUserAllArticles>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getUserAllArticles>>,
+      ApiError,
+      Awaited<ReturnType<typeof getUserAllArticles>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getUserAllArticles>>, ApiError>
+export function useGetUserAllArticles<TData = Awaited<ReturnType<typeof getUserAllArticles>>>(
+  params?: Parameters<typeof getUserAllArticles>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getUserAllArticles>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getUserAllArticles>>, ApiError, TData>({
     queryKey: apiKeys.getUserAllArticles(params),
@@ -1117,6 +1578,34 @@ export function useGetUserAllArticles<TData = Awaited<ReturnType<typeof getUserA
   })
 }
 
+export function useGetUserAllArticlesInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getUserAllArticles>>>,
+>(
+  params?: Parameters<typeof getUserAllArticles>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUserAllArticles>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetUserAllArticlesInfinite(
+  params?: Parameters<typeof getUserAllArticles>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getUserAllArticles>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getUserAllArticles>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getUserAllArticles>>>, ApiError>
 export function useGetUserAllArticlesInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getUserAllArticles>>>,
 >(
@@ -1156,6 +1645,24 @@ export function useGetSegments<TData = Awaited<ReturnType<typeof getSegments>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getSegments>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetSegments(
+  params?: Parameters<typeof getSegments>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getSegments>>,
+      ApiError,
+      Awaited<ReturnType<typeof getSegments>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getSegments>>, ApiError>
+export function useGetSegments<TData = Awaited<ReturnType<typeof getSegments>>>(
+  params?: Parameters<typeof getSegments>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getSegments>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getSegments>>, ApiError, TData>({
     queryKey: apiKeys.getSegments(params),
@@ -1166,6 +1673,24 @@ export function useGetSegments<TData = Awaited<ReturnType<typeof getSegments>>>(
   })
 }
 
+export function useGetSegment<TData = Awaited<ReturnType<typeof getSegment>>>(
+  id: Parameters<typeof getSegment>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getSegment>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetSegment(
+  id: Parameters<typeof getSegment>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getSegment>>,
+      ApiError,
+      Awaited<ReturnType<typeof getSegment>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getSegment>>, ApiError>
 export function useGetSegment<TData = Awaited<ReturnType<typeof getSegment>>>(
   id: Parameters<typeof getSegment>[0] | undefined | null,
   options?: Omit<
@@ -1190,6 +1715,26 @@ export function useGetUsersInSegment<TData = Awaited<ReturnType<typeof getUsersI
     UseQueryOptions<Awaited<ReturnType<typeof getUsersInSegment>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetUsersInSegment(
+  id: Parameters<typeof getUsersInSegment>[0] | undefined | null,
+  params?: Parameters<typeof getUsersInSegment>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getUsersInSegment>>,
+      ApiError,
+      Awaited<ReturnType<typeof getUsersInSegment>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getUsersInSegment>>, ApiError>
+export function useGetUsersInSegment<TData = Awaited<ReturnType<typeof getUsersInSegment>>>(
+  id: Parameters<typeof getUsersInSegment>[0] | undefined | null,
+  params?: Parameters<typeof getUsersInSegment>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getUsersInSegment>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getUsersInSegment>>, ApiError, TData>({
     queryKey: apiKeys.getUsersInSegment(id!, params),
@@ -1206,6 +1751,22 @@ export function useGetApiBillboards<TData = Awaited<ReturnType<typeof getApiBill
     UseQueryOptions<Awaited<ReturnType<typeof getApiBillboards>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetApiBillboards(
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiBillboards>>,
+      ApiError,
+      Awaited<ReturnType<typeof getApiBillboards>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getApiBillboards>>, ApiError>
+export function useGetApiBillboards<TData = Awaited<ReturnType<typeof getApiBillboards>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getApiBillboards>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getApiBillboards>>, ApiError, TData>({
     queryKey: apiKeys.getApiBillboards(),
@@ -1216,6 +1777,24 @@ export function useGetApiBillboards<TData = Awaited<ReturnType<typeof getApiBill
   })
 }
 
+export function useGetApiBillboardsById<TData = Awaited<ReturnType<typeof getApiBillboardsById>>>(
+  id: Parameters<typeof getApiBillboardsById>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getApiBillboardsById>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetApiBillboardsById(
+  id: Parameters<typeof getApiBillboardsById>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiBillboardsById>>,
+      ApiError,
+      Awaited<ReturnType<typeof getApiBillboardsById>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getApiBillboardsById>>, ApiError>
 export function useGetApiBillboardsById<TData = Awaited<ReturnType<typeof getApiBillboardsById>>>(
   id: Parameters<typeof getApiBillboardsById>[0] | undefined | null,
   options?: Omit<
@@ -1241,6 +1820,26 @@ export function useGetCommentsByArticleId<
     UseQueryOptions<Awaited<ReturnType<typeof getCommentsByArticleId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetCommentsByArticleId(
+  params?: Parameters<typeof getCommentsByArticleId>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getCommentsByArticleId>>,
+      ApiError,
+      Awaited<ReturnType<typeof getCommentsByArticleId>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getCommentsByArticleId>>, ApiError>
+export function useGetCommentsByArticleId<
+  TData = Awaited<ReturnType<typeof getCommentsByArticleId>>,
+>(
+  params?: Parameters<typeof getCommentsByArticleId>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getCommentsByArticleId>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getCommentsByArticleId>>, ApiError, TData>({
     queryKey: apiKeys.getCommentsByArticleId(params),
@@ -1251,6 +1850,37 @@ export function useGetCommentsByArticleId<
   })
 }
 
+export function useGetCommentsByArticleIdInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getCommentsByArticleId>>>,
+>(
+  params?: Parameters<typeof getCommentsByArticleId>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getCommentsByArticleId>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetCommentsByArticleIdInfinite(
+  params?: Parameters<typeof getCommentsByArticleId>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getCommentsByArticleId>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getCommentsByArticleId>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<
+  InfiniteData<Awaited<ReturnType<typeof getCommentsByArticleId>>>,
+  ApiError
+>
 export function useGetCommentsByArticleIdInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getCommentsByArticleId>>>,
 >(
@@ -1290,6 +1920,24 @@ export function useGetCommentById<TData = Awaited<ReturnType<typeof getCommentBy
     UseQueryOptions<Awaited<ReturnType<typeof getCommentById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetCommentById(
+  id: Parameters<typeof getCommentById>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getCommentById>>,
+      ApiError,
+      Awaited<ReturnType<typeof getCommentById>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getCommentById>>, ApiError>
+export function useGetCommentById<TData = Awaited<ReturnType<typeof getCommentById>>>(
+  id: Parameters<typeof getCommentById>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getCommentById>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getCommentById>>, ApiError, TData>({
     queryKey: apiKeys.getCommentById(id!),
@@ -1301,6 +1949,22 @@ export function useGetCommentById<TData = Awaited<ReturnType<typeof getCommentBy
   })
 }
 
+export function useGetFollowedTags<TData = Awaited<ReturnType<typeof getFollowedTags>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getFollowedTags>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetFollowedTags(
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getFollowedTags>>,
+      ApiError,
+      Awaited<ReturnType<typeof getFollowedTags>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getFollowedTags>>, ApiError>
 export function useGetFollowedTags<TData = Awaited<ReturnType<typeof getFollowedTags>>>(
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getFollowedTags>>, ApiError, TData>,
@@ -1322,6 +1986,24 @@ export function useGetFollowers<TData = Awaited<ReturnType<typeof getFollowers>>
     UseQueryOptions<Awaited<ReturnType<typeof getFollowers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetFollowers(
+  params?: Parameters<typeof getFollowers>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getFollowers>>,
+      ApiError,
+      Awaited<ReturnType<typeof getFollowers>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getFollowers>>, ApiError>
+export function useGetFollowers<TData = Awaited<ReturnType<typeof getFollowers>>>(
+  params?: Parameters<typeof getFollowers>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getFollowers>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getFollowers>>, ApiError, TData>({
     queryKey: apiKeys.getFollowers(params),
@@ -1332,6 +2014,34 @@ export function useGetFollowers<TData = Awaited<ReturnType<typeof getFollowers>>
   })
 }
 
+export function useGetFollowersInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getFollowers>>>,
+>(
+  params?: Parameters<typeof getFollowers>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getFollowers>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetFollowersInfinite(
+  params?: Parameters<typeof getFollowers>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getFollowers>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getFollowers>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getFollowers>>>, ApiError>
 export function useGetFollowersInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getFollowers>>>,
 >(
@@ -1371,6 +2081,24 @@ export function useGetOrganization<TData = Awaited<ReturnType<typeof getOrganiza
     UseQueryOptions<Awaited<ReturnType<typeof getOrganization>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetOrganization(
+  username: Parameters<typeof getOrganization>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getOrganization>>,
+      ApiError,
+      Awaited<ReturnType<typeof getOrganization>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getOrganization>>, ApiError>
+export function useGetOrganization<TData = Awaited<ReturnType<typeof getOrganization>>>(
+  username: Parameters<typeof getOrganization>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getOrganization>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getOrganization>>, ApiError, TData>({
     queryKey: apiKeys.getOrganization(username!),
@@ -1382,6 +2110,26 @@ export function useGetOrganization<TData = Awaited<ReturnType<typeof getOrganiza
   })
 }
 
+export function useGetOrgUsers<TData = Awaited<ReturnType<typeof getOrgUsers>>>(
+  organizationIdOrUsername: Parameters<typeof getOrgUsers>[0] | undefined | null,
+  params?: Parameters<typeof getOrgUsers>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getOrgUsers>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetOrgUsers(
+  organizationIdOrUsername: Parameters<typeof getOrgUsers>[0] | undefined | null,
+  params?: Parameters<typeof getOrgUsers>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getOrgUsers>>,
+      ApiError,
+      Awaited<ReturnType<typeof getOrgUsers>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getOrgUsers>>, ApiError>
 export function useGetOrgUsers<TData = Awaited<ReturnType<typeof getOrgUsers>>>(
   organizationIdOrUsername: Parameters<typeof getOrgUsers>[0] | undefined | null,
   params?: Parameters<typeof getOrgUsers>[1],
@@ -1407,6 +2155,26 @@ export function useGetOrgArticles<TData = Awaited<ReturnType<typeof getOrgArticl
     UseQueryOptions<Awaited<ReturnType<typeof getOrgArticles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetOrgArticles(
+  organizationIdOrUsername: Parameters<typeof getOrgArticles>[0] | undefined | null,
+  params?: Parameters<typeof getOrgArticles>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getOrgArticles>>,
+      ApiError,
+      Awaited<ReturnType<typeof getOrgArticles>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getOrgArticles>>, ApiError>
+export function useGetOrgArticles<TData = Awaited<ReturnType<typeof getOrgArticles>>>(
+  organizationIdOrUsername: Parameters<typeof getOrgArticles>[0] | undefined | null,
+  params?: Parameters<typeof getOrgArticles>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getOrgArticles>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getOrgArticles>>, ApiError, TData>({
     queryKey: apiKeys.getOrgArticles(organizationIdOrUsername!, params),
@@ -1424,6 +2192,24 @@ export function useGetOrganizations<TData = Awaited<ReturnType<typeof getOrganiz
     UseQueryOptions<Awaited<ReturnType<typeof getOrganizations>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetOrganizations(
+  params?: Parameters<typeof getOrganizations>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getOrganizations>>,
+      ApiError,
+      Awaited<ReturnType<typeof getOrganizations>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getOrganizations>>, ApiError>
+export function useGetOrganizations<TData = Awaited<ReturnType<typeof getOrganizations>>>(
+  params?: Parameters<typeof getOrganizations>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getOrganizations>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getOrganizations>>, ApiError, TData>({
     queryKey: apiKeys.getOrganizations(params),
@@ -1434,6 +2220,34 @@ export function useGetOrganizations<TData = Awaited<ReturnType<typeof getOrganiz
   })
 }
 
+export function useGetOrganizationsInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getOrganizations>>>,
+>(
+  params?: Parameters<typeof getOrganizations>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getOrganizations>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetOrganizationsInfinite(
+  params?: Parameters<typeof getOrganizations>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getOrganizations>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getOrganizations>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getOrganizations>>>, ApiError>
 export function useGetOrganizationsInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getOrganizations>>>,
 >(
@@ -1473,6 +2287,24 @@ export function useGetOrganizationById<TData = Awaited<ReturnType<typeof getOrga
     UseQueryOptions<Awaited<ReturnType<typeof getOrganizationById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetOrganizationById(
+  id: Parameters<typeof getOrganizationById>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getOrganizationById>>,
+      ApiError,
+      Awaited<ReturnType<typeof getOrganizationById>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getOrganizationById>>, ApiError>
+export function useGetOrganizationById<TData = Awaited<ReturnType<typeof getOrganizationById>>>(
+  id: Parameters<typeof getOrganizationById>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getOrganizationById>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getOrganizationById>>, ApiError, TData>({
     queryKey: apiKeys.getOrganizationById(id!),
@@ -1489,6 +2321,22 @@ export function useGetApiPages<TData = Awaited<ReturnType<typeof getApiPages>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getApiPages>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetApiPages(
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiPages>>,
+      ApiError,
+      Awaited<ReturnType<typeof getApiPages>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getApiPages>>, ApiError>
+export function useGetApiPages<TData = Awaited<ReturnType<typeof getApiPages>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getApiPages>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getApiPages>>, ApiError, TData>({
     queryKey: apiKeys.getApiPages(),
@@ -1499,6 +2347,24 @@ export function useGetApiPages<TData = Awaited<ReturnType<typeof getApiPages>>>(
   })
 }
 
+export function useGetApiPagesById<TData = Awaited<ReturnType<typeof getApiPagesById>>>(
+  id: Parameters<typeof getApiPagesById>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getApiPagesById>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetApiPagesById(
+  id: Parameters<typeof getApiPagesById>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiPagesById>>,
+      ApiError,
+      Awaited<ReturnType<typeof getApiPagesById>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getApiPagesById>>, ApiError>
 export function useGetApiPagesById<TData = Awaited<ReturnType<typeof getApiPagesById>>>(
   id: Parameters<typeof getApiPagesById>[0] | undefined | null,
   options?: Omit<
@@ -1522,6 +2388,24 @@ export function useGetPodcastEpisodes<TData = Awaited<ReturnType<typeof getPodca
     UseQueryOptions<Awaited<ReturnType<typeof getPodcastEpisodes>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetPodcastEpisodes(
+  params?: Parameters<typeof getPodcastEpisodes>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getPodcastEpisodes>>,
+      ApiError,
+      Awaited<ReturnType<typeof getPodcastEpisodes>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getPodcastEpisodes>>, ApiError>
+export function useGetPodcastEpisodes<TData = Awaited<ReturnType<typeof getPodcastEpisodes>>>(
+  params?: Parameters<typeof getPodcastEpisodes>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getPodcastEpisodes>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getPodcastEpisodes>>, ApiError, TData>({
     queryKey: apiKeys.getPodcastEpisodes(params),
@@ -1532,6 +2416,34 @@ export function useGetPodcastEpisodes<TData = Awaited<ReturnType<typeof getPodca
   })
 }
 
+export function useGetPodcastEpisodesInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getPodcastEpisodes>>>,
+>(
+  params?: Parameters<typeof getPodcastEpisodes>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getPodcastEpisodes>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetPodcastEpisodesInfinite(
+  params?: Parameters<typeof getPodcastEpisodes>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getPodcastEpisodes>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getPodcastEpisodes>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getPodcastEpisodes>>>, ApiError>
 export function useGetPodcastEpisodesInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getPodcastEpisodes>>>,
 >(
@@ -1571,6 +2483,24 @@ export function useGetProfileImage<TData = Awaited<ReturnType<typeof getProfileI
     UseQueryOptions<Awaited<ReturnType<typeof getProfileImage>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetProfileImage(
+  username: Parameters<typeof getProfileImage>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getProfileImage>>,
+      ApiError,
+      Awaited<ReturnType<typeof getProfileImage>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getProfileImage>>, ApiError>
+export function useGetProfileImage<TData = Awaited<ReturnType<typeof getProfileImage>>>(
+  username: Parameters<typeof getProfileImage>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getProfileImage>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getProfileImage>>, ApiError, TData>({
     queryKey: apiKeys.getProfileImage(username!),
@@ -1588,6 +2518,24 @@ export function useGetReadinglist<TData = Awaited<ReturnType<typeof getReadingli
     UseQueryOptions<Awaited<ReturnType<typeof getReadinglist>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetReadinglist(
+  params?: Parameters<typeof getReadinglist>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getReadinglist>>,
+      ApiError,
+      Awaited<ReturnType<typeof getReadinglist>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getReadinglist>>, ApiError>
+export function useGetReadinglist<TData = Awaited<ReturnType<typeof getReadinglist>>>(
+  params?: Parameters<typeof getReadinglist>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getReadinglist>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getReadinglist>>, ApiError, TData>({
     queryKey: apiKeys.getReadinglist(params),
@@ -1598,6 +2546,34 @@ export function useGetReadinglist<TData = Awaited<ReturnType<typeof getReadingli
   })
 }
 
+export function useGetReadinglistInfinite<
+  TData = InfiniteData<Awaited<ReturnType<typeof getReadinglist>>>,
+>(
+  params?: Parameters<typeof getReadinglist>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getReadinglist>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetReadinglistInfinite(
+  params?: Parameters<typeof getReadinglist>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getReadinglist>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getReadinglist>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getReadinglist>>>, ApiError>
 export function useGetReadinglistInfinite<
   TData = InfiniteData<Awaited<ReturnType<typeof getReadinglist>>>,
 >(
@@ -1637,6 +2613,24 @@ export function useGetSurveys<TData = Awaited<ReturnType<typeof getSurveys>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getSurveys>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetSurveys(
+  params?: Parameters<typeof getSurveys>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getSurveys>>,
+      ApiError,
+      Awaited<ReturnType<typeof getSurveys>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getSurveys>>, ApiError>
+export function useGetSurveys<TData = Awaited<ReturnType<typeof getSurveys>>>(
+  params?: Parameters<typeof getSurveys>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getSurveys>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getSurveys>>, ApiError, TData>({
     queryKey: apiKeys.getSurveys(params),
@@ -1647,6 +2641,32 @@ export function useGetSurveys<TData = Awaited<ReturnType<typeof getSurveys>>>(
   })
 }
 
+export function useGetSurveysInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getSurveys>>>>(
+  params?: Parameters<typeof getSurveys>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getSurveys>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetSurveysInfinite(
+  params?: Parameters<typeof getSurveys>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getSurveys>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getSurveys>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getSurveys>>>, ApiError>
 export function useGetSurveysInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getSurveys>>>>(
   params?: Parameters<typeof getSurveys>[0],
   options?: Omit<
@@ -1684,6 +2704,24 @@ export function useGetSurveyByIdOrSlug<TData = Awaited<ReturnType<typeof getSurv
     UseQueryOptions<Awaited<ReturnType<typeof getSurveyByIdOrSlug>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetSurveyByIdOrSlug(
+  idOrSlug: Parameters<typeof getSurveyByIdOrSlug>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getSurveyByIdOrSlug>>,
+      ApiError,
+      Awaited<ReturnType<typeof getSurveyByIdOrSlug>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getSurveyByIdOrSlug>>, ApiError>
+export function useGetSurveyByIdOrSlug<TData = Awaited<ReturnType<typeof getSurveyByIdOrSlug>>>(
+  idOrSlug: Parameters<typeof getSurveyByIdOrSlug>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getSurveyByIdOrSlug>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getSurveyByIdOrSlug>>, ApiError, TData>({
     queryKey: apiKeys.getSurveyByIdOrSlug(idOrSlug!),
@@ -1695,6 +2733,26 @@ export function useGetSurveyByIdOrSlug<TData = Awaited<ReturnType<typeof getSurv
   })
 }
 
+export function useGetSurveyPollVotes<TData = Awaited<ReturnType<typeof getSurveyPollVotes>>>(
+  idOrSlug: Parameters<typeof getSurveyPollVotes>[0] | undefined | null,
+  params?: Parameters<typeof getSurveyPollVotes>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getSurveyPollVotes>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetSurveyPollVotes(
+  idOrSlug: Parameters<typeof getSurveyPollVotes>[0] | undefined | null,
+  params?: Parameters<typeof getSurveyPollVotes>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getSurveyPollVotes>>,
+      ApiError,
+      Awaited<ReturnType<typeof getSurveyPollVotes>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getSurveyPollVotes>>, ApiError>
 export function useGetSurveyPollVotes<TData = Awaited<ReturnType<typeof getSurveyPollVotes>>>(
   idOrSlug: Parameters<typeof getSurveyPollVotes>[0] | undefined | null,
   params?: Parameters<typeof getSurveyPollVotes>[1],
@@ -1722,6 +2780,28 @@ export function useGetSurveyPollTextResponses<
     UseQueryOptions<Awaited<ReturnType<typeof getSurveyPollTextResponses>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetSurveyPollTextResponses(
+  idOrSlug: Parameters<typeof getSurveyPollTextResponses>[0] | undefined | null,
+  params?: Parameters<typeof getSurveyPollTextResponses>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getSurveyPollTextResponses>>,
+      ApiError,
+      Awaited<ReturnType<typeof getSurveyPollTextResponses>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getSurveyPollTextResponses>>, ApiError>
+export function useGetSurveyPollTextResponses<
+  TData = Awaited<ReturnType<typeof getSurveyPollTextResponses>>,
+>(
+  idOrSlug: Parameters<typeof getSurveyPollTextResponses>[0] | undefined | null,
+  params?: Parameters<typeof getSurveyPollTextResponses>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getSurveyPollTextResponses>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getSurveyPollTextResponses>>, ApiError, TData>({
     queryKey: apiKeys.getSurveyPollTextResponses(idOrSlug!, params),
@@ -1739,6 +2819,24 @@ export function useGetTags<TData = Awaited<ReturnType<typeof getTags>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getTags>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetTags(
+  params?: Parameters<typeof getTags>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getTags>>,
+      ApiError,
+      Awaited<ReturnType<typeof getTags>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getTags>>, ApiError>
+export function useGetTags<TData = Awaited<ReturnType<typeof getTags>>>(
+  params?: Parameters<typeof getTags>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getTags>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getTags>>, ApiError, TData>({
     queryKey: apiKeys.getTags(params),
@@ -1749,6 +2847,32 @@ export function useGetTags<TData = Awaited<ReturnType<typeof getTags>>>(
   })
 }
 
+export function useGetTagsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getTags>>>>(
+  params?: Parameters<typeof getTags>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getTags>>,
+      ApiError,
+      TData,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useGetTagsInfinite(
+  params?: Parameters<typeof getTags>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof getTags>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof getTags>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof getTags>>>, ApiError>
 export function useGetTagsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof getTags>>>>(
   params?: Parameters<typeof getTags>[0],
   options?: Omit<
@@ -1779,6 +2903,22 @@ export function useGetUserMe<TData = Awaited<ReturnType<typeof getUserMe>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getUserMe>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useGetUserMe(
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getUserMe>>,
+      ApiError,
+      Awaited<ReturnType<typeof getUserMe>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getUserMe>>, ApiError>
+export function useGetUserMe<TData = Awaited<ReturnType<typeof getUserMe>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getUserMe>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getUserMe>>, ApiError, TData>({
     queryKey: apiKeys.getUserMe(),
@@ -1789,6 +2929,24 @@ export function useGetUserMe<TData = Awaited<ReturnType<typeof getUserMe>>>(
   })
 }
 
+export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>>(
+  id: Parameters<typeof getUser>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getUser>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+export function useGetUser(
+  id: Parameters<typeof getUser>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getUser>>,
+      ApiError,
+      Awaited<ReturnType<typeof getUser>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getUser>>, ApiError>
 export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>>(
   id: Parameters<typeof getUser>[0] | undefined | null,
   options?: Omit<
@@ -1812,6 +2970,24 @@ export function useVideos<TData = Awaited<ReturnType<typeof videos>>>(
     UseQueryOptions<Awaited<ReturnType<typeof videos>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<TData, ApiError>
+export function useVideos(
+  params?: Parameters<typeof videos>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof videos>>,
+      ApiError,
+      Awaited<ReturnType<typeof videos>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof videos>>, ApiError>
+export function useVideos<TData = Awaited<ReturnType<typeof videos>>>(
+  params?: Parameters<typeof videos>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof videos>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof videos>>, ApiError, TData>({
     queryKey: apiKeys.videos(params),
@@ -1822,6 +2998,26 @@ export function useVideos<TData = Awaited<ReturnType<typeof videos>>>(
   })
 }
 
+export function useVideosInfinite<TData = InfiniteData<Awaited<ReturnType<typeof videos>>>>(
+  params?: Parameters<typeof videos>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<Awaited<ReturnType<typeof videos>>, ApiError, TData, QueryKey, unknown>,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<TData, ApiError>
+export function useVideosInfinite(
+  params?: Parameters<typeof videos>[0],
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      Awaited<ReturnType<typeof videos>>,
+      ApiError,
+      InfiniteData<Awaited<ReturnType<typeof videos>>>,
+      QueryKey,
+      unknown
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+): UseInfiniteQueryResult<InfiniteData<Awaited<ReturnType<typeof videos>>>, ApiError>
 export function useVideosInfinite<TData = InfiniteData<Awaited<ReturnType<typeof videos>>>>(
   params?: Parameters<typeof videos>[0],
   options?: Omit<

@@ -4,18 +4,31 @@
 // tsc --noEmit exercises these patterns on every `pnpm lint` run in CI.
 
 import type {
+  InfiniteData,
+  UseInfiniteQueryResult,
+  UseQueryResult,
+  UseSuspenseQueryResult,
+} from '@tanstack/react-query'
+import { queryOptions } from '@tanstack/react-query'
+import type {
   ProblemDetail,
   Task,
+  TaskPage,
   UpdateTaskRequest,
   ValidationProblem,
 } from '../generated/models.js'
-import type { ApiError } from '../generated/client.js'
+import { getTask, type ApiError, type GetTaskError } from '../generated/client.js'
 import {
+  getTaskQueryOptions,
   taskKeys,
   useGetTask,
   useGetTaskQueries,
   useListTasks,
+  useListTasksInfinite,
+  useListTasksQueries,
   useCreateTask,
+  useSuspenseGetTask,
+  useSuspenseListTasks,
   useUpdateTask,
 } from '../generated-hooks-extended/hooks.js'
 
@@ -104,6 +117,67 @@ function _useUpdateTaskPlain() {
   return useUpdateTask({ onSuccess: (data) => void data.id })
 }
 
+// ── ReturnType of generated functions (TData and TCombinedResult erasure) ────
+// `ReturnType<typeof f>` reads a generic function with its type parameters erased to
+// `unknown`; the non-generic default signature kept last is what it reads instead.
+
+// Pattern R1: query hooks, suspense hooks and the infinite hook, with typed errors.
+function _returnTypeOfQueryHooks() {
+  assertType<Equal<ReturnType<typeof useGetTask>, UseQueryResult<Task, GetTaskError>>>()
+  assertType<Equal<ReturnType<typeof useListTasks>, UseQueryResult<TaskPage, ApiError>>>()
+  assertType<
+    Equal<ReturnType<typeof useSuspenseGetTask>, UseSuspenseQueryResult<Task, GetTaskError>>
+  >()
+  assertType<
+    Equal<ReturnType<typeof useSuspenseListTasks>, UseSuspenseQueryResult<TaskPage, ApiError>>
+  >()
+  assertType<
+    Equal<
+      ReturnType<typeof useListTasksInfinite>,
+      UseInfiniteQueryResult<InfiniteData<TaskPage>, ApiError>
+    >
+  >()
+}
+
+// Pattern R2: the queryOptions factory, with the typed error alias.
+function _returnTypeOfQueryOptionsFactory() {
+  const preTDataGetTask = (id: string) =>
+    queryOptions<Task, GetTaskError>({ queryKey: taskKeys.detail(id), queryFn: () => getTask(id) })
+  assertType<Equal<ReturnType<typeof getTaskQueryOptions>, ReturnType<typeof preTDataGetTask>>>()
+}
+
+// Pattern R3: useXxxQueries returns the default combined result, not `unknown`.
+function _returnTypeOfQueriesHooks() {
+  assertType<Equal<ReturnType<typeof useGetTaskQueries>, UseQueryResult<Task, GetTaskError>[]>>()
+  assertType<Equal<ReturnType<typeof useListTasksQueries>, UseQueryResult<TaskPage, ApiError>[]>>()
+  const count = useGetTaskQueries(['a'], undefined, (results) => results.length)
+  assertType<Equal<typeof count, number>>()
+}
+
+// Pattern R4: suspense select and explicit TData keep working.
+function _suspenseSelect() {
+  const title = useSuspenseGetTask('id', { select: (task) => task.title })
+  assertType<Equal<typeof title.data, string>>()
+  assertType<
+    Equal<
+      ReturnType<typeof useSuspenseGetTask<number>>,
+      UseSuspenseQueryResult<number, GetTaskError>
+    >
+  >()
+}
+
+// Pattern R5: opt-in mutation generics default to `unknown`, which is what ReturnType reads.
+function _returnTypeOfOptimisticMutation() {
+  assertType<
+    Equal<ReturnType<typeof useUpdateTask>, ReturnType<typeof useUpdateTask<unknown, unknown>>>
+  >()
+}
+
+void _returnTypeOfQueryHooks
+void _returnTypeOfQueryOptionsFactory
+void _returnTypeOfQueriesHooks
+void _suspenseSelect
+void _returnTypeOfOptimisticMutation
 void _useUpdateTaskOptimistic
 void _useUpdateTaskPlain
 void _useGetTaskQueriesResults

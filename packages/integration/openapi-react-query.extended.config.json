@@ -3,6 +3,7 @@
   "output": "generated-hooks-extended",
   "stale_time": 30000,
   "gc_time": 300000,
+  "suspense": true,
   "auto_invalidate": true,
   "typed_errors": true,
   "queries": true,
