@@ -2,16 +2,25 @@
 // Type-only consumer simulation — never called at runtime.
 // tsc --noEmit exercises all these patterns on every `pnpm lint` run in CI.
 
-import type { InfiniteData, UseQueryResult } from '@tanstack/react-query'
-import { useQuery } from '@tanstack/react-query'
+import type {
+  InfiniteData,
+  QueryKey,
+  UseInfiniteQueryOptions,
+  UseInfiniteQueryResult,
+  UseQueryOptions,
+  UseQueryResult,
+} from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 import type { Task, TaskPage, CreateTaskRequest } from '../generated/models.js'
-import type { ApiError } from '../generated/client.js'
+import { getTask, listTasks, type ApiError } from '../generated/client.js'
 import {
+  taskKeys,
   useListTasks,
   useListTasksInfinite,
   useGetTask,
   useCreateTask,
   getTaskQueryOptions,
+  listTasksQueryOptions,
 } from '../generated/hooks.js'
 import { createServerClient } from '../generated/server.js'
 
@@ -127,6 +136,108 @@ function _useListTasksInfiniteSelect() {
   return [flat, raw]
 }
 
+// ── ReturnType / Parameters of generated functions ───────────────────────────
+// `ReturnType<typeof f>` and `Parameters<typeof f>` read a generic function with its
+// type parameters erased to `unknown`, so `f<TData = Data>` would lose `Data` for every
+// consumer that types a wrapper as `ReturnType<typeof useX>`. The generated output keeps
+// the pre-TData (non-generic) signature last, which is the one those helpers read.
+
+// Pattern 14: ReturnType of a query hook is the pre-TData result type.
+function _returnTypeOfQueryHooks() {
+  assertType<Equal<ReturnType<typeof useGetTask>, UseQueryResult<Task, ApiError>>>()
+  assertType<Equal<ReturnType<typeof useListTasks>, UseQueryResult<TaskPage, ApiError>>>()
+  assertType<
+    Equal<
+      ReturnType<typeof useListTasksInfinite>,
+      UseInfiniteQueryResult<InfiniteData<TaskPage>, ApiError>
+    >
+  >()
+  // The typical consumer: a wrapper typed from the hook it forwards to.
+  const forward = (result: ReturnType<typeof useGetTask>) => result.data
+  assertType<Equal<ReturnType<typeof forward>, Task | undefined>>()
+}
+
+// Pattern 15: ReturnType of a queryOptions factory is what the pre-TData factory returned.
+function _returnTypeOfQueryOptionsFactories() {
+  const preTDataGetTask = (id: string) =>
+    queryOptions<Task, ApiError>({ queryKey: taskKeys.detail(id), queryFn: () => getTask(id) })
+  const preTDataListTasks = (params?: Parameters<typeof listTasks>[0]) =>
+    queryOptions<TaskPage, ApiError>({
+      queryKey: taskKeys.list(params),
+      queryFn: () => listTasks(params),
+    })
+  assertType<Equal<ReturnType<typeof getTaskQueryOptions>, ReturnType<typeof preTDataGetTask>>>()
+  assertType<
+    Equal<ReturnType<typeof listTasksQueryOptions>, ReturnType<typeof preTDataListTasks>>
+  >()
+  const forward = (options: ReturnType<typeof getTaskQueryOptions>) => useQuery(options).data
+  assertType<Equal<ReturnType<typeof forward>, Task | undefined>>()
+}
+
+// Pattern 16: Parameters<typeof f> is the whole pre-TData parameter list, options type
+// included, for every function that gained a TData generic.
+function _parametersOfGeneratedFunctions() {
+  type ListParams = Parameters<typeof listTasks>[0]
+  type TaskOptions = Omit<UseQueryOptions<Task, ApiError>, 'queryKey' | 'queryFn'>
+  type TaskPageOptions = Omit<UseQueryOptions<TaskPage, ApiError>, 'queryKey' | 'queryFn'>
+  type TaskPageInfiniteOptions = Omit<
+    UseInfiniteQueryOptions<TaskPage, ApiError, InfiniteData<TaskPage>, QueryKey, unknown>,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+  assertType<
+    Equal<Parameters<typeof useGetTask>, [id: string | null | undefined, options?: TaskOptions]>
+  >()
+  assertType<
+    Equal<Parameters<typeof useListTasks>, [params?: ListParams, options?: TaskPageOptions]>
+  >()
+  assertType<
+    Equal<
+      Parameters<typeof useListTasksInfinite>,
+      [params?: ListParams, options?: TaskPageInfiniteOptions]
+    >
+  >()
+  assertType<Equal<Parameters<typeof getTaskQueryOptions>, [id: string, options?: TaskOptions]>>()
+  assertType<
+    Equal<
+      Parameters<typeof listTasksQueryOptions>,
+      [params?: ListParams, options?: TaskPageOptions]
+    >
+  >()
+}
+
+// Pattern 17: the TData generic stays reachable: explicit type argument at a call,
+// and as an instantiation expression for the documented ReturnType<typeof useX<Foo>>.
+function _explicitTData() {
+  const result = useGetTask<string>('id', { select: (task) => task.title })
+  assertType<Equal<typeof result.data, string | undefined>>()
+  assertType<Equal<ReturnType<typeof useGetTask<number>>['data'], number | undefined>>()
+  assertType<Equal<ReturnType<typeof useListTasks<Task[]>>, UseQueryResult<Task[], ApiError>>>()
+  const length = useListTasks(undefined, { select: (page) => page.items.length })
+  assertType<Equal<typeof length.data, number | undefined>>()
+  return [result, length]
+}
+
+// Pattern 18: a result annotation that disagrees with the response type is an error, as it
+// was before the TData generic. The generic signature returns `NoInfer<TData>`, so the
+// annotation is not an inference site for `TData`: without it `data` would claim `string`
+// while the response is a Task. Each directive has an agreeing twin that compiles, so an
+// error from anything but the data type cannot satisfy it.
+function _mismatchedAnnotationIsRejected() {
+  const query: UseQueryResult<Task, ApiError> = useGetTask('id')
+  // @ts-expect-error `data` is a Task, not a string
+  const wrongQuery: UseQueryResult<string, ApiError> = useGetTask('id')
+  const list: UseQueryResult<TaskPage, ApiError> = useListTasks()
+  // @ts-expect-error `data` is a TaskPage, not a number
+  const wrongList: UseQueryResult<number, ApiError> = useListTasks()
+  const infinite: UseInfiniteQueryResult<InfiniteData<TaskPage>, ApiError> = useListTasksInfinite()
+  // @ts-expect-error `data` is InfiniteData<TaskPage>, not a number
+  const wrongInfinite: UseInfiniteQueryResult<number, ApiError> = useListTasksInfinite()
+  const factory: ReturnType<typeof getTaskQueryOptions> = getTaskQueryOptions('id')
+  // @ts-expect-error the factory carries a Task, not a string
+  const wrongFactory: ReturnType<typeof getTaskQueryOptions<string>> = getTaskQueryOptions('id')
+  return [query, wrongQuery, list, wrongList, infinite, wrongInfinite, factory, wrongFactory]
+}
+
 // Ensure all _-prefixed functions are referenced so TypeScript doesn't elide them
 void _useListTasksNoParams
 void _useListTasksWithParams
@@ -141,3 +252,8 @@ void _useGetTaskNoSelect
 void _useListTasksSelect
 void _useQueryOptionsSelect
 void _useListTasksInfiniteSelect
+void _returnTypeOfQueryHooks
+void _returnTypeOfQueryOptionsFactories
+void _parametersOfGeneratedFunctions
+void _explicitTData
+void _mismatchedAnnotationIsRejected

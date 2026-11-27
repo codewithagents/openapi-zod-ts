@@ -36,6 +36,14 @@
                 "schema": { "$ref": "#/components/schemas/TaskPage" }
               }
             }
+          },
+          "400": {
+            "description": "Invalid filter (RFC 9457)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetail" }
+              }
+            }
           }
         }
       },
@@ -93,6 +101,43 @@
           "200": {
             "description": "Attachment created",
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Task" } } }
+          }
+        }
+      }
+    },
+    "/api/v1/users/{userId}/tasks": {
+      "get": {
+        "operationId": "listUserTasks",
+        "summary": "List the tasks assigned to a user",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["pending", "in_progress", "done"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The tasks assigned to the user",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TaskPage" }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found (RFC 9457)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProblemDetail" }
+              }
+            }
           }
         }
       }

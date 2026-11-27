@@ -148,6 +148,9 @@ async function _requestForm(
   return res
 }
 
+/**
+ * @throws {ApiError<400, ProblemDetail>}
+ */
 export async function listTasks(
   params?: {
     status?: 'pending' | 'in_progress' | 'done'
@@ -163,6 +166,9 @@ export async function listTasks(
   const res = await _request('GET', '/api/v1/tasks', { searchParams }, config)
   return res.json()
 }
+
+/** Documented error responses of `listTasks`, for narrowing on `error.status`. */
+export type ListTasksError = ApiError<400, ProblemDetail>
 
 /**
  * @throws {ApiError<422, ValidationProblem>}
@@ -188,6 +194,30 @@ export async function uploadTaskAttachment(
   const res = await _requestForm('POST', '/api/v1/tasks/upload', formData, {}, config)
   return res.json()
 }
+
+/**
+ * @throws {ApiError<404, ProblemDetail>}
+ */
+export async function listUserTasks(
+  userId: string,
+  params?: {
+    status?: 'pending' | 'in_progress' | 'done'
+  },
+  config?: Partial<ClientConfig>
+): Promise<TaskPage> {
+  const searchParams = new URLSearchParams()
+  if (params?.status != null) searchParams.set('status', String(params.status))
+  const res = await _request(
+    'GET',
+    `/api/v1/users/${encodeURIComponent(userId)}/tasks`,
+    { searchParams },
+    config
+  )
+  return res.json()
+}
+
+/** Documented error responses of `listUserTasks`, for narrowing on `error.status`. */
+export type ListUserTasksError = ApiError<404, ProblemDetail>
 
 /**
  * @throws {ApiError<404, ProblemDetail>}

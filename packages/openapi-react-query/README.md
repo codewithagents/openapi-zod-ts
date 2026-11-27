@@ -26,7 +26,7 @@ npm install -D @codewithagents/openapi-react-query openapi-zod-ts
 npm install @tanstack/react-query
 ```
 
-`@tanstack/react-query ^5` is a peer dependency, and React Query v5 requires React 18 or later. `openapi-zod-ts` is a runtime dependency of this generator and must produce its client output first (see [Generate](#generate)).
+`@tanstack/react-query ^5` is a peer dependency, and React Query v5 requires React 18 or later. The generated hooks use `NoInfer`, so the project that compiles them needs TypeScript 5.4 or later. `openapi-zod-ts` is a runtime dependency of this generator and must produce its client output first (see [Generate](#generate)).
 
 ## Configure
 
@@ -99,8 +99,12 @@ export const taskKeys = {
 **queryOptions factories**: one per GET operation, for use in RSC / server-side prefetching:
 
 ```ts
-// Plain function, no hooks, safe to call in any context (RSC, loaders, tests)
-export function listTasksQueryOptions(params?, options?) {
+// Plain functions, no hooks, safe to call in any context (RSC, loaders, tests).
+// The queryOptions call sits in a private generic function. The exported factory is
+// an overload list over it, generic signature first and default signature last (see
+// "Types read from the generated functions"), and delegates to it. Parameter types
+// are elided: `options` is `Omit<UseQueryOptions<TaskPage, ApiError, TData>, 'queryKey' | 'queryFn'>`.
+function _listTasksQueryOptions<TData = TaskPage>(params?, options?) {
   return queryOptions({
     queryKey: taskKeys.list(params),
     queryFn: () => listTasks(params),
@@ -110,15 +114,14 @@ export function listTasksQueryOptions(params?, options?) {
   })
 }
 
-export function getTaskQueryOptions(id: string, options?) {
-  return queryOptions({
-    queryKey: taskKeys.detail(id),
-    queryFn: () => getTask(id),
-    staleTime: 30000,
-    gcTime: 300000,
-    ...options,
-  })
+export function listTasksQueryOptions<TData = TaskPage>(params?, options?): ReturnType<typeof _listTasksQueryOptions<NoInfer<TData>>>
+export function listTasksQueryOptions(params?, options?): ReturnType<typeof _listTasksQueryOptions<TaskPage>>
+export function listTasksQueryOptions<TData = TaskPage>(params?, options?) {
+  return _listTasksQueryOptions(params, options)
 }
+
+// getTaskQueryOptions(id: string, options?) has the same three declarations around a
+// private _getTaskQueryOptions that calls queryOptions with taskKeys.detail(id) and getTask(id)
 ```
 
 **Query hooks**: one per GET operation, consuming the factory above:
@@ -149,6 +152,8 @@ export function useGetTask(
 ```
 
 Detail hooks (those with a path parameter) automatically disable when the parameter is `null` or `undefined`. No more `enabled: !!id` at every call site.
+
+The query hook samples elide the `TData` generic and the overload signatures that precede each implementation: see [Types read from the generated functions](#types-read-from-the-generated-functions).
 
 **Mutation hooks**: one per POST/PUT/PATCH/DELETE:
 
@@ -181,7 +186,24 @@ const { data: count } = useListTasks({}, { select: (page) => page.items.length }
 useQuery(getTaskQueryOptions(id, { select: (task) => task.id }))
 ```
 
-Without `select`, `data` is still the raw response type, so existing call sites (including explicit `UseQueryResult<Task, ApiError>` annotations) keep compiling.
+Without `select`, `data` is still the raw response type, so existing call sites (including explicit `UseQueryResult<Task, ApiError>` annotations) keep compiling, and an annotation that disagrees with the response type, `const result: UseQueryResult<string, ApiError> = useGetTask(id)`, is still a type error: the generic signature returns `NoInfer<TData>`, whether or not the installed TanStack Query types `useQuery`'s own result that way, so the annotation does not choose `TData`.
+
+### Types read from the generated functions
+
+Each query hook, `useSuspense*` hook, `useXxxInfinite` hook, `useXxxQueries` hook and `queryOptions` factory is declared as two overload signatures followed by the implementation. A call resolves to the first, which is generic (`TData`, or `TCombinedResult` for `useXxxQueries`), so `select` changes the type of `data`. `ReturnType` and `Parameters` read the last, the same signature at its default type argument: `ReturnType<typeof useGetTask>` is `UseQueryResult<Task, ApiError>`, so a wrapper typed from the hook keeps `data: Task | undefined`, and `ReturnType<typeof useGetTask<string>>` gives the selected shape.
+
+Two signatures with different type parameter lists are the only way to restore that `ReturnType` while keeping a typed `select`: a single generic signature is read with `TData` erased to `unknown`. The cost comes from how TypeScript treats an overloaded function. The first four rows are code that reads a hook as one signature and so sees the last one, where `select` is typed for the default data type. The last four have other causes: an overloaded type gives a stub no contextual parameter types, `NoInfer` keeps a result annotation from choosing `TData`, and TypeScript reports a failed call, and shows a hover, per signature.
+
+| Pattern | What happens | Workaround |
+| --- | --- | --- |
+| A generic wrapper helper `(...a: A) => R`, such as `withLogging(useGetTask)('id', { select: (t) => t.title })` | `A` and `R` come from the last signature: `Type '(t: Task) => string' is not assignable to type '(data: Task) => Task'`. Hooks and factories alike. | Pass the instantiation: `withLogging(useGetTask<string>)`. |
+| `useGetTask.call(...)` or `.apply(...)` with `select` | The same error. | Call the hook directly, or `(useGetTask<string>).call(...)`. |
+| A wrapper whose options are typed `Parameters<typeof useGetTask>[1]` | The wrapper rejects `select`, with the same error. | Take a type parameter: `Parameters<typeof useGetTask<TData>>[1]`. |
+| `vi.mocked(useGetTask).mockReturnValue(result)` | `result` is checked against the default data type, so a `UseQueryResult<string, ApiError>` is rejected. | `vi.mocked(useGetTask<string>)`. |
+| A stub typed `typeof useGetTask` with untyped parameters, `const fake: typeof useGetTask = (id, options) => ...` (also a factory, or a mock helper such as `fn<typeof useGetTaskQueries>((paramsList, options, combine) => ...)`) | The parameters are not contextually typed from an overloaded type: `TS7006`, implicitly `any`. | Annotate the parameters, or type the stub as one signature: `typeof useGetTask<Task>`. |
+| A call with a mistake in it | TypeScript reports `No overload matches this call` and lists a failure for each signature it tried. A wrong positional argument, or a wrong option in a call without `select`, gives the same reason under each overload. A call that passes `select` and has another mistake in `options` is also checked against the default signature, which types `select` for the response type, so its error (`Type '(t: Task) => string' is not assignable to type '(data: Task) => Task'`) is listed beside the real one. For a wrong value of a known option, only `Overload 2 of 2` is listed, with the `select` error first. | The `select` error is not a mistake: fix the other one and it disappears. |
+| A result annotation that should type an inline `select` or `combine`, such as `const r: UseQueryResult<'ready', ApiError> = useGetTask(id, { select: () => 'ready' })`, or a tuple returned from `combine` | The annotation does not choose `TData` (or `TCombinedResult`), so the callback's return type is inferred on its own and widened (`'ready'` to `string`, a tuple to an array), and the result no longer matches the annotation. This is the cost of rejecting an annotation that disagrees with the data. | Pass the type argument, `useGetTask<'ready'>(id, { select: () => 'ready' })`, or keep the literal with `as const`. |
+| Hover in the editor | Shows `(+1 overload)`. | None needed. |
 
 ## Typed per-status errors
 

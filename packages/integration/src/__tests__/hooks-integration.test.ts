@@ -8,11 +8,13 @@
 
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { renderHook, waitFor, act } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
 import React from 'react'
 import {
+  getTaskQueryOptions,
+  listTasksQueryOptions,
   useListTasks,
   useGetTask,
   useCreateTask,
@@ -524,5 +526,43 @@ describe('query key invalidation', () => {
 
     await waitFor(() => expect(fetchCount).toBe(2))
     expect(result.current.data).toEqual(TASK)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// queryOptions factories
+// ---------------------------------------------------------------------------
+
+describe('queryOptions factories', () => {
+  it('are plain functions that keep their own name and arity', () => {
+    expect(getTaskQueryOptions.name).toBe('getTaskQueryOptions')
+    expect(getTaskQueryOptions).toHaveLength(2)
+    expect(listTasksQueryOptions.name).toBe('listTasksQueryOptions')
+    expect(listTasksQueryOptions).toHaveLength(2)
+  })
+
+  it('build the key and queryFn that useQuery runs', async () => {
+    server.use(http.get(`${BASE}/api/v1/tasks/:id`, () => HttpResponse.json(TASK)))
+
+    const options = getTaskQueryOptions('task-1')
+    expect(options.queryKey).toEqual(['tasks', 'task-1'])
+
+    const { wrapper } = makeWrapper()
+    const { result } = renderHook(() => useQuery(options), { wrapper })
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    expect(result.current.data).toEqual(TASK)
+  })
+
+  it('forward a select transform to the options', async () => {
+    server.use(http.get(`${BASE}/api/v1/tasks`, () => HttpResponse.json(TASK_PAGE)))
+
+    const options = listTasksQueryOptions(undefined, { select: (page) => page.items.length })
+
+    const { wrapper } = makeWrapper()
+    const { result } = renderHook(() => useQuery(options), { wrapper })
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    expect(result.current.data).toBe(2)
   })
 })

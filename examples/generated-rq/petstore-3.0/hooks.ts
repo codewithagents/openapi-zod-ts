@@ -4,6 +4,7 @@ import {
   queryOptions,
   useQuery,
   type UseQueryOptions,
+  type UseQueryResult,
   useMutation,
   type UseMutationOptions,
 } from '@tanstack/react-query'
@@ -56,7 +57,7 @@ export const userKeys = {
 
 // ── Query options factories ──────────────────────────────────
 
-export function findPetsByStatusQueryOptions<TData = Awaited<ReturnType<typeof findPetsByStatus>>>(
+function _findPetsByStatusQueryOptions<TData = Awaited<ReturnType<typeof findPetsByStatus>>>(
   params: Parameters<typeof findPetsByStatus>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof findPetsByStatus>>, ApiError, TData>,
@@ -72,7 +73,35 @@ export function findPetsByStatusQueryOptions<TData = Awaited<ReturnType<typeof f
   })
 }
 
-export function findPetsByTagsQueryOptions<TData = Awaited<ReturnType<typeof findPetsByTags>>>(
+export function findPetsByStatusQueryOptions<TData = Awaited<ReturnType<typeof findPetsByStatus>>>(
+  params: Parameters<typeof findPetsByStatus>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof findPetsByStatus>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _findPetsByStatusQueryOptions<NoInfer<TData>>>
+export function findPetsByStatusQueryOptions(
+  params: Parameters<typeof findPetsByStatus>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof findPetsByStatus>>,
+      ApiError,
+      Awaited<ReturnType<typeof findPetsByStatus>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _findPetsByStatusQueryOptions<Awaited<ReturnType<typeof findPetsByStatus>>>>
+export function findPetsByStatusQueryOptions<TData = Awaited<ReturnType<typeof findPetsByStatus>>>(
+  params: Parameters<typeof findPetsByStatus>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof findPetsByStatus>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _findPetsByStatusQueryOptions(params, options)
+}
+
+function _findPetsByTagsQueryOptions<TData = Awaited<ReturnType<typeof findPetsByTags>>>(
   params: Parameters<typeof findPetsByTags>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof findPetsByTags>>, ApiError, TData>,
@@ -88,7 +117,35 @@ export function findPetsByTagsQueryOptions<TData = Awaited<ReturnType<typeof fin
   })
 }
 
-export function getPetByIdQueryOptions<TData = Awaited<ReturnType<typeof getPetById>>>(
+export function findPetsByTagsQueryOptions<TData = Awaited<ReturnType<typeof findPetsByTags>>>(
+  params: Parameters<typeof findPetsByTags>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof findPetsByTags>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _findPetsByTagsQueryOptions<NoInfer<TData>>>
+export function findPetsByTagsQueryOptions(
+  params: Parameters<typeof findPetsByTags>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof findPetsByTags>>,
+      ApiError,
+      Awaited<ReturnType<typeof findPetsByTags>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _findPetsByTagsQueryOptions<Awaited<ReturnType<typeof findPetsByTags>>>>
+export function findPetsByTagsQueryOptions<TData = Awaited<ReturnType<typeof findPetsByTags>>>(
+  params: Parameters<typeof findPetsByTags>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof findPetsByTags>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _findPetsByTagsQueryOptions(params, options)
+}
+
+function _getPetByIdQueryOptions<TData = Awaited<ReturnType<typeof getPetById>>>(
   petId: Parameters<typeof getPetById>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getPetById>>, ApiError, TData>,
@@ -104,7 +161,35 @@ export function getPetByIdQueryOptions<TData = Awaited<ReturnType<typeof getPetB
   })
 }
 
-export function getInventoryQueryOptions<TData = Awaited<ReturnType<typeof getInventory>>>(
+export function getPetByIdQueryOptions<TData = Awaited<ReturnType<typeof getPetById>>>(
+  petId: Parameters<typeof getPetById>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getPetById>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getPetByIdQueryOptions<NoInfer<TData>>>
+export function getPetByIdQueryOptions(
+  petId: Parameters<typeof getPetById>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getPetById>>,
+      ApiError,
+      Awaited<ReturnType<typeof getPetById>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getPetByIdQueryOptions<Awaited<ReturnType<typeof getPetById>>>>
+export function getPetByIdQueryOptions<TData = Awaited<ReturnType<typeof getPetById>>>(
+  petId: Parameters<typeof getPetById>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getPetById>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _getPetByIdQueryOptions(petId, options)
+}
+
+function _getInventoryQueryOptions<TData = Awaited<ReturnType<typeof getInventory>>>(
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getInventory>>, ApiError, TData>,
     'queryKey' | 'queryFn'
@@ -119,7 +204,32 @@ export function getInventoryQueryOptions<TData = Awaited<ReturnType<typeof getIn
   })
 }
 
-export function getOrderByIdQueryOptions<TData = Awaited<ReturnType<typeof getOrderById>>>(
+export function getInventoryQueryOptions<TData = Awaited<ReturnType<typeof getInventory>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getInventory>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getInventoryQueryOptions<NoInfer<TData>>>
+export function getInventoryQueryOptions(
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getInventory>>,
+      ApiError,
+      Awaited<ReturnType<typeof getInventory>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getInventoryQueryOptions<Awaited<ReturnType<typeof getInventory>>>>
+export function getInventoryQueryOptions<TData = Awaited<ReturnType<typeof getInventory>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getInventory>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _getInventoryQueryOptions(options)
+}
+
+function _getOrderByIdQueryOptions<TData = Awaited<ReturnType<typeof getOrderById>>>(
   orderId: Parameters<typeof getOrderById>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getOrderById>>, ApiError, TData>,
@@ -135,7 +245,35 @@ export function getOrderByIdQueryOptions<TData = Awaited<ReturnType<typeof getOr
   })
 }
 
-export function loginUserQueryOptions<TData = Awaited<ReturnType<typeof loginUser>>>(
+export function getOrderByIdQueryOptions<TData = Awaited<ReturnType<typeof getOrderById>>>(
+  orderId: Parameters<typeof getOrderById>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getOrderById>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getOrderByIdQueryOptions<NoInfer<TData>>>
+export function getOrderByIdQueryOptions(
+  orderId: Parameters<typeof getOrderById>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getOrderById>>,
+      ApiError,
+      Awaited<ReturnType<typeof getOrderById>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getOrderByIdQueryOptions<Awaited<ReturnType<typeof getOrderById>>>>
+export function getOrderByIdQueryOptions<TData = Awaited<ReturnType<typeof getOrderById>>>(
+  orderId: Parameters<typeof getOrderById>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getOrderById>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _getOrderByIdQueryOptions(orderId, options)
+}
+
+function _loginUserQueryOptions<TData = Awaited<ReturnType<typeof loginUser>>>(
   params?: Parameters<typeof loginUser>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof loginUser>>, ApiError, TData>,
@@ -151,7 +289,35 @@ export function loginUserQueryOptions<TData = Awaited<ReturnType<typeof loginUse
   })
 }
 
-export function logoutUserQueryOptions<TData = Awaited<ReturnType<typeof logoutUser>>>(
+export function loginUserQueryOptions<TData = Awaited<ReturnType<typeof loginUser>>>(
+  params?: Parameters<typeof loginUser>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof loginUser>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _loginUserQueryOptions<NoInfer<TData>>>
+export function loginUserQueryOptions(
+  params?: Parameters<typeof loginUser>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof loginUser>>,
+      ApiError,
+      Awaited<ReturnType<typeof loginUser>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _loginUserQueryOptions<Awaited<ReturnType<typeof loginUser>>>>
+export function loginUserQueryOptions<TData = Awaited<ReturnType<typeof loginUser>>>(
+  params?: Parameters<typeof loginUser>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof loginUser>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _loginUserQueryOptions(params, options)
+}
+
+function _logoutUserQueryOptions<TData = Awaited<ReturnType<typeof logoutUser>>>(
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof logoutUser>>, ApiError, TData>,
     'queryKey' | 'queryFn'
@@ -166,7 +332,32 @@ export function logoutUserQueryOptions<TData = Awaited<ReturnType<typeof logoutU
   })
 }
 
-export function getUserByNameQueryOptions<TData = Awaited<ReturnType<typeof getUserByName>>>(
+export function logoutUserQueryOptions<TData = Awaited<ReturnType<typeof logoutUser>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof logoutUser>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _logoutUserQueryOptions<NoInfer<TData>>>
+export function logoutUserQueryOptions(
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof logoutUser>>,
+      ApiError,
+      Awaited<ReturnType<typeof logoutUser>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _logoutUserQueryOptions<Awaited<ReturnType<typeof logoutUser>>>>
+export function logoutUserQueryOptions<TData = Awaited<ReturnType<typeof logoutUser>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof logoutUser>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _logoutUserQueryOptions(options)
+}
+
+function _getUserByNameQueryOptions<TData = Awaited<ReturnType<typeof getUserByName>>>(
   username: Parameters<typeof getUserByName>[0],
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof getUserByName>>, ApiError, TData>,
@@ -182,8 +373,54 @@ export function getUserByNameQueryOptions<TData = Awaited<ReturnType<typeof getU
   })
 }
 
+export function getUserByNameQueryOptions<TData = Awaited<ReturnType<typeof getUserByName>>>(
+  username: Parameters<typeof getUserByName>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getUserByName>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getUserByNameQueryOptions<NoInfer<TData>>>
+export function getUserByNameQueryOptions(
+  username: Parameters<typeof getUserByName>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getUserByName>>,
+      ApiError,
+      Awaited<ReturnType<typeof getUserByName>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getUserByNameQueryOptions<Awaited<ReturnType<typeof getUserByName>>>>
+export function getUserByNameQueryOptions<TData = Awaited<ReturnType<typeof getUserByName>>>(
+  username: Parameters<typeof getUserByName>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getUserByName>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _getUserByNameQueryOptions(username, options)
+}
+
 // ── Queries ──────────────────────────────────────────────────
 
+export function useFindPetsByStatus<TData = Awaited<ReturnType<typeof findPetsByStatus>>>(
+  params: Parameters<typeof findPetsByStatus>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof findPetsByStatus>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<NoInfer<TData>, ApiError>
+export function useFindPetsByStatus(
+  params: Parameters<typeof findPetsByStatus>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof findPetsByStatus>>,
+      ApiError,
+      Awaited<ReturnType<typeof findPetsByStatus>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof findPetsByStatus>>, ApiError>
 export function useFindPetsByStatus<TData = Awaited<ReturnType<typeof findPetsByStatus>>>(
   params: Parameters<typeof findPetsByStatus>[0],
   options?: Omit<
@@ -206,6 +443,24 @@ export function useFindPetsByTags<TData = Awaited<ReturnType<typeof findPetsByTa
     UseQueryOptions<Awaited<ReturnType<typeof findPetsByTags>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<NoInfer<TData>, ApiError>
+export function useFindPetsByTags(
+  params: Parameters<typeof findPetsByTags>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof findPetsByTags>>,
+      ApiError,
+      Awaited<ReturnType<typeof findPetsByTags>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof findPetsByTags>>, ApiError>
+export function useFindPetsByTags<TData = Awaited<ReturnType<typeof findPetsByTags>>>(
+  params: Parameters<typeof findPetsByTags>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof findPetsByTags>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof findPetsByTags>>, ApiError, TData>({
     queryKey: petKeys.findPetsByTags(params),
@@ -216,6 +471,24 @@ export function useFindPetsByTags<TData = Awaited<ReturnType<typeof findPetsByTa
   })
 }
 
+export function useGetPetById<TData = Awaited<ReturnType<typeof getPetById>>>(
+  petId: Parameters<typeof getPetById>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getPetById>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<NoInfer<TData>, ApiError>
+export function useGetPetById(
+  petId: Parameters<typeof getPetById>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getPetById>>,
+      ApiError,
+      Awaited<ReturnType<typeof getPetById>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getPetById>>, ApiError>
 export function useGetPetById<TData = Awaited<ReturnType<typeof getPetById>>>(
   petId: Parameters<typeof getPetById>[0] | undefined | null,
   options?: Omit<
@@ -238,6 +511,22 @@ export function useGetInventory<TData = Awaited<ReturnType<typeof getInventory>>
     UseQueryOptions<Awaited<ReturnType<typeof getInventory>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<NoInfer<TData>, ApiError>
+export function useGetInventory(
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getInventory>>,
+      ApiError,
+      Awaited<ReturnType<typeof getInventory>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getInventory>>, ApiError>
+export function useGetInventory<TData = Awaited<ReturnType<typeof getInventory>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getInventory>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof getInventory>>, ApiError, TData>({
     queryKey: storeKeys.list(),
@@ -248,6 +537,24 @@ export function useGetInventory<TData = Awaited<ReturnType<typeof getInventory>>
   })
 }
 
+export function useGetOrderById<TData = Awaited<ReturnType<typeof getOrderById>>>(
+  orderId: Parameters<typeof getOrderById>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getOrderById>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<NoInfer<TData>, ApiError>
+export function useGetOrderById(
+  orderId: Parameters<typeof getOrderById>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getOrderById>>,
+      ApiError,
+      Awaited<ReturnType<typeof getOrderById>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getOrderById>>, ApiError>
 export function useGetOrderById<TData = Awaited<ReturnType<typeof getOrderById>>>(
   orderId: Parameters<typeof getOrderById>[0] | undefined | null,
   options?: Omit<
@@ -271,6 +578,24 @@ export function useLoginUser<TData = Awaited<ReturnType<typeof loginUser>>>(
     UseQueryOptions<Awaited<ReturnType<typeof loginUser>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<NoInfer<TData>, ApiError>
+export function useLoginUser(
+  params?: Parameters<typeof loginUser>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof loginUser>>,
+      ApiError,
+      Awaited<ReturnType<typeof loginUser>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof loginUser>>, ApiError>
+export function useLoginUser<TData = Awaited<ReturnType<typeof loginUser>>>(
+  params?: Parameters<typeof loginUser>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof loginUser>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof loginUser>>, ApiError, TData>({
     queryKey: userKeys.loginUser(params),
@@ -286,6 +611,22 @@ export function useLogoutUser<TData = Awaited<ReturnType<typeof logoutUser>>>(
     UseQueryOptions<Awaited<ReturnType<typeof logoutUser>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
+): UseQueryResult<NoInfer<TData>, ApiError>
+export function useLogoutUser(
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof logoutUser>>,
+      ApiError,
+      Awaited<ReturnType<typeof logoutUser>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof logoutUser>>, ApiError>
+export function useLogoutUser<TData = Awaited<ReturnType<typeof logoutUser>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof logoutUser>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery<Awaited<ReturnType<typeof logoutUser>>, ApiError, TData>({
     queryKey: userKeys.logoutUser(),
@@ -296,6 +637,24 @@ export function useLogoutUser<TData = Awaited<ReturnType<typeof logoutUser>>>(
   })
 }
 
+export function useGetUserByName<TData = Awaited<ReturnType<typeof getUserByName>>>(
+  username: Parameters<typeof getUserByName>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getUserByName>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<NoInfer<TData>, ApiError>
+export function useGetUserByName(
+  username: Parameters<typeof getUserByName>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getUserByName>>,
+      ApiError,
+      Awaited<ReturnType<typeof getUserByName>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getUserByName>>, ApiError>
 export function useGetUserByName<TData = Awaited<ReturnType<typeof getUserByName>>>(
   username: Parameters<typeof getUserByName>[0] | undefined | null,
   options?: Omit<
