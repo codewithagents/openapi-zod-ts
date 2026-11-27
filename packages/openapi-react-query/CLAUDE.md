@@ -42,7 +42,7 @@ Default: `openapi-react-query.config.json` in CWD. Fields:
 
 ## Test / build
 ```
-pnpm test    # vitest (~286 it/test blocks across 10 files)
+pnpm test    # vitest
 pnpm build   # tsc + chmod +x dist/cli.js
 ```
 
