@@ -16,9 +16,11 @@ import {
   useGetTask,
   useGetTaskQueries,
   useListTasksQueries,
+  useListUserTasksQueries,
   useUpdateTask,
   useDeleteTask,
   taskKeys,
+  userKeys,
 } from '../../generated-hooks-extended/hooks.js'
 import { configureClient } from '../../generated/client-config.js'
 import { ApiError } from '../../generated/client.js'
@@ -147,6 +149,48 @@ describe('queries: useListTasksQueries', () => {
     })
     await waitFor(() => expect(result.current.every((r) => r.isSuccess)).toBe(true))
     expect(result.current.map((r) => r.data?.page)).toEqual([1, 2])
+  })
+})
+
+describe('queries: useListUserTasksQueries', () => {
+  it('takes one [userId, params] tuple per query and keeps the entries in order', async () => {
+    const requested: string[] = []
+    server.use(
+      http.get(`${BASE}/api/v1/users/:userId/tasks`, ({ params, request }) => {
+        const userId = String(params['userId'])
+        const status = new URL(request.url).searchParams.get('status')
+        requested.push(status === null ? userId : `${userId}?status=${status}`)
+        const body: TaskPage = { items: [task(`t-${userId}`)], total: 1, page: 1, pageSize: 1 }
+        return HttpResponse.json(body)
+      })
+    )
+    const { wrapper, queryClient } = makeWrapper()
+    const { result } = renderHook(
+      () => useListUserTasksQueries([['u1', { status: 'done' }], ['u2']]),
+      { wrapper }
+    )
+
+    await waitFor(() => expect(result.current.every((r) => r.isSuccess)).toBe(true))
+    expect(result.current.map((r) => r.data?.items[0]?.id)).toEqual(['t-u1', 't-u2'])
+    expect(requested.sort()).toEqual(['u1?status=done', 'u2'])
+    expect(queryClient.getQueryData<TaskPage>(userKeys.detail('u2', undefined))?.total).toBe(1)
+  })
+
+  it('surfaces the documented 404 of one entry without failing the others', async () => {
+    server.use(
+      http.get(`${BASE}/api/v1/users/:userId/tasks`, ({ params }) =>
+        params['userId'] === 'gone'
+          ? HttpResponse.json({ title: 'User not found', status: 404 }, { status: 404 })
+          : HttpResponse.json({ items: [], total: 0, page: 1, pageSize: 1 })
+      )
+    )
+    const { wrapper } = makeWrapper()
+    const { result } = renderHook(() => useListUserTasksQueries([['gone'], ['here']]), { wrapper })
+
+    await waitFor(() => expect(result.current.every((r) => !r.isPending)).toBe(true))
+    expect(result.current[0]?.error?.status).toBe(404)
+    expect(result.current[0]?.error?.body.title).toBe('User not found')
+    expect(result.current[1]?.isSuccess).toBe(true)
   })
 })
 

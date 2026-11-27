@@ -18,6 +18,7 @@ import {
   deleteTask,
   getTask,
   listTasks,
+  listUserTasks,
   updateTask,
   uploadTaskAttachment,
   type ApiError,
@@ -29,6 +30,14 @@ export const taskKeys = {
   all: () => ['tasks'] as const,
   list: (params?: Parameters<typeof listTasks>[0]) => ['tasks', 'list', params] as const,
   detail: (id: Parameters<typeof getTask>[0]) => ['tasks', id] as const,
+}
+
+export const userKeys = {
+  all: () => ['users'] as const,
+  detail: (
+    userId: Parameters<typeof listUserTasks>[0],
+    params?: Parameters<typeof listUserTasks>[1]
+  ) => ['users', userId, params] as const,
 }
 
 // ── Query options factories ──────────────────────────────────
@@ -75,6 +84,54 @@ export function listTasksQueryOptions<TData = Awaited<ReturnType<typeof listTask
   >
 ) {
   return _listTasksQueryOptions(params, options)
+}
+
+function _listUserTasksQueryOptions<TData = Awaited<ReturnType<typeof listUserTasks>>>(
+  userId: Parameters<typeof listUserTasks>[0],
+  params?: Parameters<typeof listUserTasks>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof listUserTasks>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return queryOptions<Awaited<ReturnType<typeof listUserTasks>>, ApiError, TData>({
+    queryKey: userKeys.detail(userId, params),
+    queryFn: () => listUserTasks(userId, params),
+    staleTime: 30000,
+    gcTime: 300000,
+    ...options,
+  })
+}
+
+export function listUserTasksQueryOptions<TData = Awaited<ReturnType<typeof listUserTasks>>>(
+  userId: Parameters<typeof listUserTasks>[0],
+  params?: Parameters<typeof listUserTasks>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof listUserTasks>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _listUserTasksQueryOptions<NoInfer<TData>>>
+export function listUserTasksQueryOptions(
+  userId: Parameters<typeof listUserTasks>[0],
+  params?: Parameters<typeof listUserTasks>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listUserTasks>>,
+      ApiError,
+      Awaited<ReturnType<typeof listUserTasks>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _listUserTasksQueryOptions<Awaited<ReturnType<typeof listUserTasks>>>>
+export function listUserTasksQueryOptions<TData = Awaited<ReturnType<typeof listUserTasks>>>(
+  userId: Parameters<typeof listUserTasks>[0],
+  params?: Parameters<typeof listUserTasks>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof listUserTasks>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _listUserTasksQueryOptions(userId, params, options)
 }
 
 function _getTaskQueryOptions<TData = Awaited<ReturnType<typeof getTask>>>(
@@ -210,6 +267,44 @@ export function useListTasksInfinite<TData = InfiniteData<Awaited<ReturnType<typ
     getNextPageParam: () => undefined,
     staleTime: 30000,
     gcTime: 300000,
+    ...options,
+  })
+}
+
+export function useListUserTasks<TData = Awaited<ReturnType<typeof listUserTasks>>>(
+  userId: Parameters<typeof listUserTasks>[0] | undefined | null,
+  params?: Parameters<typeof listUserTasks>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof listUserTasks>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<NoInfer<TData>, ApiError>
+export function useListUserTasks(
+  userId: Parameters<typeof listUserTasks>[0] | undefined | null,
+  params?: Parameters<typeof listUserTasks>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listUserTasks>>,
+      ApiError,
+      Awaited<ReturnType<typeof listUserTasks>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof listUserTasks>>, ApiError>
+export function useListUserTasks<TData = Awaited<ReturnType<typeof listUserTasks>>>(
+  userId: Parameters<typeof listUserTasks>[0] | undefined | null,
+  params?: Parameters<typeof listUserTasks>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof listUserTasks>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return useQuery<Awaited<ReturnType<typeof listUserTasks>>, ApiError, TData>({
+    queryKey: userKeys.detail(userId!, params),
+    queryFn: () => listUserTasks(userId!, params),
+    staleTime: 30000,
+    gcTime: 300000,
+    enabled: userId != null && (options?.enabled ?? true),
     ...options,
   })
 }

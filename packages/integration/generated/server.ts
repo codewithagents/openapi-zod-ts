@@ -5,6 +5,7 @@ import {
   listTasks,
   createTask,
   uploadTaskAttachment,
+  listUserTasks,
   getTask,
   updateTask,
   deleteTask,
@@ -24,6 +25,10 @@ export function createServerClient(config: Partial<ClientConfig>) {
     createTask: (body: Parameters<typeof createTask>[0]) => createTask(body, config),
     uploadTaskAttachment: (body: Parameters<typeof uploadTaskAttachment>[0]) =>
       uploadTaskAttachment(body, config),
+    listUserTasks: (
+      userId: Parameters<typeof listUserTasks>[0],
+      params?: Parameters<typeof listUserTasks>[1]
+    ) => listUserTasks(userId, params, config),
     getTask: (id: Parameters<typeof getTask>[0]) => getTask(id, config),
     updateTask: (id: Parameters<typeof updateTask>[0], body: Parameters<typeof updateTask>[1]) =>
       updateTask(id, body, config),

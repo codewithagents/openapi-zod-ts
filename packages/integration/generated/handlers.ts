@@ -46,6 +46,22 @@ export const handlers = [
       createdAt: faker.date.recent().toISOString(),
     })
   ),
+  http.get('*/api/v1/users/:userId/tasks', () =>
+    HttpResponse.json({
+      items: Array.from({ length: 3 }, () => ({
+        id: faker.string.uuid(),
+        title: faker.lorem.word(),
+        description: faker.lorem.word(),
+        status: faker.helpers.arrayElement(['pending', 'in_progress', 'done']),
+        priority: faker.number.int({ min: 1, max: 1000 }),
+        assigneeEmail: faker.internet.email(),
+        createdAt: faker.date.recent().toISOString(),
+      })),
+      total: faker.number.int({ min: 1, max: 1000 }),
+      page: faker.number.int({ min: 1, max: 1000 }),
+      pageSize: faker.number.int({ min: 1, max: 1000 }),
+    })
+  ),
   http.get('*/api/v1/tasks/:id', () =>
     HttpResponse.json({
       id: faker.string.uuid(),

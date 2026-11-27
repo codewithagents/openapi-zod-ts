@@ -21,7 +21,15 @@ import type {
   UpdateTaskRequest,
   ValidationProblem,
 } from '../generated/models.js'
-import { getTask, listTasks, type ApiError, type GetTaskError } from '../generated/client.js'
+import {
+  getTask,
+  listTasks,
+  listUserTasks,
+  type ApiError,
+  type GetTaskError,
+  type ListTasksError,
+  type ListUserTasksError,
+} from '../generated/client.js'
 import {
   getTaskQueryOptions,
   taskKeys,
@@ -30,10 +38,12 @@ import {
   useListTasks,
   useListTasksInfinite,
   useListTasksQueries,
+  useListUserTasksQueries,
   useCreateTask,
   useSuspenseGetTask,
   useSuspenseListTasks,
   useUpdateTask,
+  useUploadTaskAttachment,
 } from '../generated-hooks-extended/hooks.js'
 
 type Equal<A, B> =
@@ -65,9 +75,25 @@ function _useCreateTaskTypedError() {
 }
 
 // Pattern E3: operations without documented error statuses keep bare ApiError.
-function _useListTasksPlainError() {
+function _useUploadTaskAttachmentPlainError() {
+  return useUploadTaskAttachment({
+    onError: (error) => {
+      assertType<Equal<typeof error, ApiError>>()
+    },
+  })
+}
+
+// Pattern E4: every query hook kind of an operation with a documented status takes its alias,
+// the infinite hook included.
+function _useListTasksTypedError() {
   const { error } = useListTasks()
-  assertType<Equal<typeof error, ApiError | null>>()
+  assertType<Equal<typeof error, ListTasksError | null>>()
+  const infinite = useListTasksInfinite()
+  assertType<Equal<typeof infinite.error, ListTasksError | null>>()
+  if (infinite.error) {
+    assertType<Equal<typeof infinite.error.status, 400>>()
+    assertType<Equal<typeof infinite.error.body, ProblemDetail>>()
+  }
 }
 
 // ── queries (#195) ───────────────────────────────────────────────────────────
@@ -128,17 +154,17 @@ function _useUpdateTaskPlain() {
 // Pattern R1: query hooks, suspense hooks and the infinite hook, with typed errors.
 function _returnTypeOfQueryHooks() {
   assertType<Equal<ReturnType<typeof useGetTask>, UseQueryResult<Task, GetTaskError>>>()
-  assertType<Equal<ReturnType<typeof useListTasks>, UseQueryResult<TaskPage, ApiError>>>()
+  assertType<Equal<ReturnType<typeof useListTasks>, UseQueryResult<TaskPage, ListTasksError>>>()
   assertType<
     Equal<ReturnType<typeof useSuspenseGetTask>, UseSuspenseQueryResult<Task, GetTaskError>>
   >()
   assertType<
-    Equal<ReturnType<typeof useSuspenseListTasks>, UseSuspenseQueryResult<TaskPage, ApiError>>
+    Equal<ReturnType<typeof useSuspenseListTasks>, UseSuspenseQueryResult<TaskPage, ListTasksError>>
   >()
   assertType<
     Equal<
       ReturnType<typeof useListTasksInfinite>,
-      UseInfiniteQueryResult<InfiniteData<TaskPage>, ApiError>
+      UseInfiniteQueryResult<InfiniteData<TaskPage>, ListTasksError>
     >
   >()
 }
@@ -153,9 +179,24 @@ function _returnTypeOfQueryOptionsFactory() {
 // Pattern R3: useXxxQueries returns the default combined result, not `unknown`.
 function _returnTypeOfQueriesHooks() {
   assertType<Equal<ReturnType<typeof useGetTaskQueries>, UseQueryResult<Task, GetTaskError>[]>>()
-  assertType<Equal<ReturnType<typeof useListTasksQueries>, UseQueryResult<TaskPage, ApiError>[]>>()
+  assertType<
+    Equal<ReturnType<typeof useListTasksQueries>, UseQueryResult<TaskPage, ListTasksError>[]>
+  >()
   const count = useGetTaskQueries(['a'], undefined, (results) => results.length)
   assertType<Equal<typeof count, number>>()
+  // A hook over several arguments takes one tuple per query.
+  assertType<
+    Equal<
+      ReturnType<typeof useListUserTasksQueries>,
+      UseQueryResult<TaskPage, ListUserTasksError>[]
+    >
+  >()
+  const tupleCount = useListUserTasksQueries(
+    [['user', { status: 'done' }], ['other']],
+    undefined,
+    (results) => results.length
+  )
+  assertType<Equal<typeof tupleCount, number>>()
 }
 
 // Pattern R4: suspense select and explicit TData keep working.
@@ -181,18 +222,23 @@ function _returnTypeOfOptimisticMutation() {
 // included, for the query, suspense, infinite and queries hooks and the factory.
 function _parametersOfGeneratedFunctions() {
   type ListParams = Parameters<typeof listTasks>[0]
+  type UserTasksParams = Parameters<typeof listUserTasks>[1]
   type TaskOptions = Omit<UseQueryOptions<Task, GetTaskError>, 'queryKey' | 'queryFn'>
-  type TaskPageOptions = Omit<UseQueryOptions<TaskPage, ApiError>, 'queryKey' | 'queryFn'>
+  type TaskPageOptions = Omit<UseQueryOptions<TaskPage, ListTasksError>, 'queryKey' | 'queryFn'>
+  type UserTasksOptions = Omit<
+    UseQueryOptions<TaskPage, ListUserTasksError>,
+    'queryKey' | 'queryFn'
+  >
   type SuspenseTaskOptions = Omit<
     UseSuspenseQueryOptions<Task, GetTaskError>,
     'queryKey' | 'queryFn'
   >
   type SuspenseTaskPageOptions = Omit<
-    UseSuspenseQueryOptions<TaskPage, ApiError>,
+    UseSuspenseQueryOptions<TaskPage, ListTasksError>,
     'queryKey' | 'queryFn'
   >
   type TaskPageInfiniteOptions = Omit<
-    UseInfiniteQueryOptions<TaskPage, ApiError, InfiniteData<TaskPage>, QueryKey, unknown>,
+    UseInfiniteQueryOptions<TaskPage, ListTasksError, InfiniteData<TaskPage>, QueryKey, unknown>,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
   assertType<
@@ -235,8 +281,20 @@ function _parametersOfGeneratedFunctions() {
         paramsList: ReadonlyArray<ListParams>,
         options?: TaskPageOptions,
         combine?: (
-          results: UseQueryResult<TaskPage, ApiError>[]
-        ) => UseQueryResult<TaskPage, ApiError>[],
+          results: UseQueryResult<TaskPage, ListTasksError>[]
+        ) => UseQueryResult<TaskPage, ListTasksError>[],
+      ]
+    >
+  >()
+  assertType<
+    Equal<
+      Parameters<typeof useListUserTasksQueries>,
+      [
+        paramsList: ReadonlyArray<readonly [userId: string, params?: UserTasksParams]>,
+        options?: UserTasksOptions,
+        combine?: (
+          results: UseQueryResult<TaskPage, ListUserTasksError>[]
+        ) => UseQueryResult<TaskPage, ListUserTasksError>[],
       ]
     >
   >()
@@ -254,10 +312,24 @@ function _mismatchedAnnotationIsRejected() {
   const queries: UseQueryResult<Task, GetTaskError>[] = useGetTaskQueries(['id'])
   // @ts-expect-error the results are Task queries, not a number
   const wrongQueries: number = useGetTaskQueries(['id'])
+  const tupleQueries: UseQueryResult<TaskPage, ListUserTasksError>[] = useListUserTasksQueries([
+    ['user'],
+  ])
+  // @ts-expect-error the results are TaskPage queries, not a number
+  const wrongTupleQueries: number = useListUserTasksQueries([['user']])
   const factory: ReturnType<typeof getTaskQueryOptions> = getTaskQueryOptions('id')
   // @ts-expect-error the factory carries a Task, not a string
   const wrongFactory: ReturnType<typeof getTaskQueryOptions<string>> = getTaskQueryOptions('id')
-  return [suspense, wrongSuspense, queries, wrongQueries, factory, wrongFactory]
+  return [
+    suspense,
+    wrongSuspense,
+    queries,
+    wrongQueries,
+    tupleQueries,
+    wrongTupleQueries,
+    factory,
+    wrongFactory,
+  ]
 }
 
 void _returnTypeOfQueryHooks
@@ -273,4 +345,5 @@ void _useGetTaskQueriesResults
 void _useGetTaskQueriesCombine
 void _useGetTaskTypedError
 void _useCreateTaskTypedError
-void _useListTasksPlainError
+void _useUploadTaskAttachmentPlainError
+void _useListTasksTypedError
