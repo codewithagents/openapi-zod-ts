@@ -1,6 +1,6 @@
 # openapi-react-query
 
-Published as `@codewithagents/openapi-react-query` (v3.12.1).
+Published as `@codewithagents/openapi-react-query`.
 
 Generate typed React Query v5 hooks (`useQuery`, `useMutation`, key factories) from OpenAPI 3.x specs. 3.1.x is the primary target (including 3.1.1); 3.0.x is supported in practice (8 of the 13 showcase specs are 3.0.x and all compile under `tsc --strict`).
 
@@ -34,8 +34,9 @@ Default: `openapi-react-query.config.json` in CWD. Fields:
 `--config <path>` resolves relative paths from config file's directory (same pattern as openapi-zod-ts).
 
 ## Key non-obvious decisions
-- **Every query hook / factory has a `TData` generic** defaulting to `Awaited<ReturnType<typeof fn>>` (`InfiniteData<...>` for infinite hooks), so `select` changes the `data` type. Mutations have none.
-- **A generic function must end in its non-generic default signature.** `ReturnType` / `Parameters` read the last signature with type parameters erased to `unknown`, so a lone `fn<TData = Data>` types `data` as `unknown` for every `ReturnType<typeof useX>` wrapper. Hooks (`buildDefaultedOverloads`) are overload lists, generic first, default last. Factories are a private `_xQueryOptions` plus `export const xQueryOptions: typeof _x & typeof _x<Default>` (the `queryOptions` result type cannot be named across TanStack 5.x). Guarded by `packages/integration/src/consumer-simulation*.ts`, run by `pnpm --filter @codewithagents/integration run lint`.
+- **Every query hook / factory has a `TData` generic** defaulting to `Awaited<ReturnType<typeof fn>>` (`InfiniteData<...>` for infinite hooks), so `select` changes the `data` type. Mutations have no `TData`; with `optimistic_updates` they take `<TContext, TQueryData>` instead.
+- **A generic query hook or factory must end in its non-generic default signature.** `ReturnType` / `Parameters` read the last signature with type parameters erased to `unknown`, so a lone `fn<TData = Data>` types `data` as `unknown` for every `ReturnType<typeof useX>` wrapper. Query, suspense, infinite and `useXxxQueries` hooks (`buildOverloadedHead`) are an overload list: generic first, default last, then the implementation. Factories are the same list typed `ReturnType<typeof _xQueryOptions<T>>` over a private generic `_xQueryOptions` (the `queryOptions` result type cannot be named across TanStack 5.x); keep them `export function`s, as an exported `const` changes `.name`, hits the TDZ in an ESM import cycle and routes CommonJS calls through `exports`. The generic optimistic mutation hooks (`<TContext = unknown, TQueryData = unknown>`) have one signature: `ReturnType` reads the `unknown` defaults. Guarded by `packages/integration/src/consumer-simulation*.ts`, run by `pnpm --filter @codewithagents/integration run lint`.
+- **`@deprecated` goes on every declaration of an overload list, the implementation included**: TypeScript flags a symbol (an import, a bare reference) only when all of its declarations carry the tag.
 - **Multiple detail ops produce an operation-name key segment**: when a resource has >1 GET with path params (e.g. `/items/{id}` and `/items/{id}/usage`), each key includes the operation name to prevent cache collisions: `['items', 'getItemById', id]` vs `['items', 'getItemUsage', id]`. Single detail ops keep the canonical `['resource', id]` shape.
 - **`...options` spread before `onSuccess` in auto-invalidate hooks**, so the generated `onSuccess` (which calls `queryClient.invalidateQueries`) always wins; the caller's `onSuccess` is composed inside via `options?.onSuccess?.(...args)`.
 

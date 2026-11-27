@@ -99,8 +99,12 @@ export const taskKeys = {
 **queryOptions factories**: one per GET operation, for use in RSC / server-side prefetching:
 
 ```ts
-// Plain function, no hooks, safe to call in any context (RSC, loaders, tests)
-export function listTasksQueryOptions(params?, options?) {
+// Plain functions, no hooks, safe to call in any context (RSC, loaders, tests).
+// The queryOptions call sits in a private generic function. The exported factory is
+// an overload list over it, generic signature first and default signature last (see
+// "Types read from the generated functions"), and delegates to it. Parameter types
+// are elided: `options` is `Omit<UseQueryOptions<TaskPage, ApiError, TData>, 'queryKey' | 'queryFn'>`.
+function _listTasksQueryOptions<TData = TaskPage>(params?, options?) {
   return queryOptions({
     queryKey: taskKeys.list(params),
     queryFn: () => listTasks(params),
@@ -110,15 +114,14 @@ export function listTasksQueryOptions(params?, options?) {
   })
 }
 
-export function getTaskQueryOptions(id: string, options?) {
-  return queryOptions({
-    queryKey: taskKeys.detail(id),
-    queryFn: () => getTask(id),
-    staleTime: 30000,
-    gcTime: 300000,
-    ...options,
-  })
+export function listTasksQueryOptions<TData = TaskPage>(params?, options?): ReturnType<typeof _listTasksQueryOptions<TData>>
+export function listTasksQueryOptions(params?, options?): ReturnType<typeof _listTasksQueryOptions<TaskPage>>
+export function listTasksQueryOptions<TData = TaskPage>(params?, options?) {
+  return _listTasksQueryOptions(params, options)
 }
+
+// getTaskQueryOptions(id: string, options?) has the same three declarations around a
+// private _getTaskQueryOptions that calls queryOptions with taskKeys.detail(id) and getTask(id)
 ```
 
 **Query hooks**: one per GET operation, consuming the factory above:
@@ -149,6 +152,8 @@ export function useGetTask(
 ```
 
 Detail hooks (those with a path parameter) automatically disable when the parameter is `null` or `undefined`. No more `enabled: !!id` at every call site.
+
+The query hook samples elide the `TData` generic and the overload signatures that precede each implementation: see [Types read from the generated functions](#types-read-from-the-generated-functions).
 
 **Mutation hooks**: one per POST/PUT/PATCH/DELETE:
 
@@ -183,7 +188,22 @@ useQuery(getTaskQueryOptions(id, { select: (task) => task.id }))
 
 Without `select`, `data` is still the raw response type, so existing call sites (including explicit `UseQueryResult<Task, ApiError>` annotations) keep compiling.
 
-`ReturnType<typeof useGetTask>` and `Parameters<typeof useGetTask>` still give the plain response type, because each generic hook is followed by its non-generic signature (TypeScript reads the last overload). A wrapper typed as `ReturnType<typeof useGetTask>` keeps `data: Task | undefined`; `ReturnType<typeof useGetTask<string>>` gives the selected shape.
+### Types read from the generated functions
+
+Each query hook, `useSuspense*` hook, `useXxxInfinite` hook, `useXxxQueries` hook and `queryOptions` factory is declared as two overload signatures followed by the implementation. A call resolves to the first, which is generic (`TData`, or `TCombinedResult` for `useXxxQueries`), so `select` changes the type of `data`. `ReturnType` and `Parameters` read the last, the same signature at its default type argument: `ReturnType<typeof useGetTask>` is `UseQueryResult<Task, ApiError>`, so a wrapper typed from the hook keeps `data: Task | undefined`, and `ReturnType<typeof useGetTask<string>>` gives the selected shape.
+
+Two signatures with different type parameter lists are the only way to restore that `ReturnType` while keeping a typed `select`: a single generic signature is read with `TData` erased to `unknown`. The cost is that code which reads a hook as one signature sees the last one, where `select` is typed for the default data type:
+
+| Pattern | What happens | Workaround |
+| --- | --- | --- |
+| A generic wrapper helper `(...a: A) => R`, such as `withLogging(useGetTask)('id', { select: (t) => t.title })` | `A` and `R` come from the last signature: `Type '(t: Task) => string' is not assignable to type '(data: Task) => Task'`. Hooks and factories alike. | Pass the instantiation: `withLogging(useGetTask<string>)`. |
+| `useGetTask.call(...)` or `.apply(...)` with `select` | The same error. | Call the hook directly, or `(useGetTask<string>).call(...)`. |
+| A wrapper whose options are typed `Parameters<typeof useGetTask>[1]` | The wrapper rejects `select`, with the same error. | Take a type parameter: `Parameters<typeof useGetTask<TData>>[1]`. |
+| `vi.mocked(useGetTask).mockReturnValue(result)` | `result` is checked against the default data type, so a `UseQueryResult<string, ApiError>` is rejected. | `vi.mocked(useGetTask<string>)`. |
+| A stub typed `typeof useGetTask` with untyped parameters, `const fake: typeof useGetTask = (id, options) => ...` (also a factory, or a mock helper such as `fn<typeof useGetTaskQueries>((paramsList, options, combine) => ...)`) | The parameters are not contextually typed from an overloaded type: `TS7006`, implicitly `any`. | Annotate the parameters, or type the stub as one signature: `typeof useGetTask<Task>`. |
+| `const result: UseQueryResult<string, ApiError> = useGetTask(id)`, an annotation that disagrees with the response type | It compiles. On TanStack Query 5.80.0 and 5.91.0, `useQuery` returns `UseQueryResult<NoInfer<TData>, TError>`, which the overload's `UseQueryResult<TData, ApiError>` return type does not repeat, so `TData` is inferred from the annotation. It compiles on 5.107.1 as well. | Give the type argument, `useGetTask<Task>(id)`, and the annotation is checked again. |
+| A call with a wrong argument | TypeScript reports `No overload matches this call` and lists both signatures, where one signature reports a single error. | The reason is listed under each overload, and is the same for both. |
+| Hover in the editor | Shows `(+1 overload)`. | None needed. |
 
 ## Typed per-status errors
 

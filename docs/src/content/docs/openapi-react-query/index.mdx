@@ -158,18 +158,36 @@ export const taskKeys = {
 }
 ```
 
-**Query hooks**: one per GET operation:
+**Query hooks**: one per GET operation. Each is declared as two overload signatures, the generic one first and the same signature at its default type argument second, followed by the implementation:
 
 ```ts
 // List hook: params are optional, passed directly to the query key and fetch function
+export function useListTasks<TData = Awaited<ReturnType<typeof listTasks>>>(
+  params?: Parameters<typeof listTasks>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
 export function useListTasks(
   params?: Parameters<typeof listTasks>[0],
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError>,
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listTasks>>,
+      ApiError,
+      Awaited<ReturnType<typeof listTasks>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof listTasks>>, ApiError>
+export function useListTasks<TData = Awaited<ReturnType<typeof listTasks>>>(
+  params?: Parameters<typeof listTasks>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof listTasks>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>({
     queryKey: taskKeys.list(params),
     queryFn: () => listTasks(params),
     staleTime: 30000,
@@ -179,14 +197,32 @@ export function useListTasks(
 }
 
 // Detail hook: id widened to allow undefined/null, auto-disabled until id is set
+export function useGetTask<TData = Awaited<ReturnType<typeof getTask>>>(
+  id: Parameters<typeof getTask>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
 export function useGetTask(
   id: Parameters<typeof getTask>[0] | undefined | null,
   options?: Omit<
-    UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError>,
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getTask>>,
+      ApiError,
+      Awaited<ReturnType<typeof getTask>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getTask>>, ApiError>
+export function useGetTask<TData = Awaited<ReturnType<typeof getTask>>>(
+  id: Parameters<typeof getTask>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
 ) {
-  return useQuery<Awaited<ReturnType<typeof getTask>>, ApiError>({
+  return useQuery<Awaited<ReturnType<typeof getTask>>, ApiError, TData>({
     queryKey: taskKeys.detail(id!),
     queryFn: () => getTask(id!),
     staleTime: 30000,
@@ -196,6 +232,8 @@ export function useGetTask(
   })
 }
 ```
+
+A call resolves to the generic signature, so a `select` transform changes the type of `data`. `ReturnType` and `Parameters` read the last signature, so `ReturnType<typeof useGetTask>` is the plain `UseQueryResult<Task, ApiError>`. The `useSuspense*` variants, the `useXxxInfinite` hooks, the `useXxxQueries` hooks and the `queryOptions` factories follow the same pattern.
 
 **Mutation hooks**: one per POST/PUT/PATCH/DELETE:
 
@@ -736,11 +774,47 @@ The key factories ensure that the prefetched server data matches the key that th
 
 ## Deprecated operations
 
-When your spec marks an operation as `deprecated: true`, the generated hook gets a `/** @deprecated */` JSDoc comment. TypeScript and most IDEs will show a strikethrough at the call site:
+When your spec marks an operation as `deprecated: true`, every generated function for it (the query hook, the `useSuspense*` variant, the `useXxxInfinite` and `useXxxQueries` hooks, the `queryOptions` factory) gets a `/** @deprecated */` JSDoc comment on each of its declarations, the implementation included. TypeScript reports a symbol as deprecated only when every declaration carries the tag, so the import and a bare reference are struck through as well as the call. Most IDEs show a strikethrough at those sites:
 
 ```ts
+// getLegacyTask is marked deprecated: true in the spec
 /** @deprecated */
-export function useGetLegacyTask(id: Parameters<typeof getLegacyTask>[0] | undefined | null, options?: ...) { ... }
+export function useGetLegacyTask<TData = Awaited<ReturnType<typeof getLegacyTask>>>(
+  id: Parameters<typeof getLegacyTask>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getLegacyTask>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<TData, ApiError>
+/** @deprecated */
+export function useGetLegacyTask(
+  id: Parameters<typeof getLegacyTask>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getLegacyTask>>,
+      ApiError,
+      Awaited<ReturnType<typeof getLegacyTask>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): UseQueryResult<Awaited<ReturnType<typeof getLegacyTask>>, ApiError>
+/** @deprecated */
+export function useGetLegacyTask<TData = Awaited<ReturnType<typeof getLegacyTask>>>(
+  id: Parameters<typeof getLegacyTask>[0] | undefined | null,
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getLegacyTask>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return useQuery<Awaited<ReturnType<typeof getLegacyTask>>, ApiError, TData>({
+    queryKey: legacyTaskKeys.detail(id!),
+    queryFn: () => getLegacyTask(id!),
+    staleTime: 0,
+    gcTime: 300000,
+    enabled: id != null && (options?.enabled ?? true),
+    ...options,
+  })
+}
 ```
 
 ## Works with
