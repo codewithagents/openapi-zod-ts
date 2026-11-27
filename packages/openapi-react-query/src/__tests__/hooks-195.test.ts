@@ -16,6 +16,16 @@ function block(content: string, signature: string): string {
   return content.slice(start, content.indexOf('\n}', start) + 2)
 }
 
+/** The specifiers of the generated file's `@tanstack/react-query` import statement. */
+function reactQueryImports(content: string): string[] {
+  const match = /import\s*\{([^}]*)\}\s*from\s*'@tanstack\/react-query'/.exec(content)
+  if (!match) throw new Error('missing @tanstack/react-query import')
+  return (match[1] ?? '')
+    .split(',')
+    .map((specifier) => specifier.trim())
+    .filter((specifier) => specifier !== '')
+}
+
 const paginatedSpec: OpenAPIV3_1.Document = {
   openapi: '3.1.0',
   info: { title: 'Paged', version: '1.0.0' },
@@ -104,6 +114,7 @@ describe('#195 ReturnType of generated functions: non-generic signature last', (
       `UseQueryOptions<${dataType}, ApiError, ${dataType}>, 'queryKey' | 'queryFn'>`
     )
     expect(defaulted).toContain(`): UseQueryResult<${dataType}, ApiError>\n`)
+    expect(implementation).toContain(`export function useGetTask<TData = ${dataType}>(`)
     expect(implementation).toContain('return useQuery<')
     expect(generic).not.toContain('return useQuery')
     expect(defaulted).not.toContain('return useQuery')
@@ -139,13 +150,21 @@ describe('#195 ReturnType of generated functions: non-generic signature last', (
     expect(defaulted).toContain(`combine?: (results: ${result}) => ${result},\n): ${result}\n`)
   })
 
-  it('queryOptions factory is the generic implementation typed as itself plus its default instantiation', () => {
+  it('queryOptions factory: generic overload, default overload, then an implementation delegating to the private generic function', () => {
     const { content } = generateHooks(spec, { staleTime: 0, gcTime: 0 })
-    expect(content).toContain(`function _getTaskQueryOptions<TData = ${dataType}>(`)
-    expect(content.replace(/\s+/g, ' ')).toContain(
-      `export const getTaskQueryOptions: typeof _getTaskQueryOptions & typeof _getTaskQueryOptions<${dataType}> = _getTaskQueryOptions`
+    expect(content).toContain(`\nfunction _getTaskQueryOptions<TData = ${dataType}>(`)
+    const [generic, defaulted, implementation] = declarations(content, 'getTaskQueryOptions')
+    expect(declarations(content, 'getTaskQueryOptions')).toHaveLength(3)
+    expect(generic).toContain(`export function getTaskQueryOptions<TData = ${dataType}>(`)
+    expect(generic).toContain('): ReturnType<typeof _getTaskQueryOptions<TData>>\n')
+    expect(defaulted).toContain('export function getTaskQueryOptions(\n')
+    expect(defaulted).toContain(
+      `UseQueryOptions<${dataType}, ApiError, ${dataType}>, 'queryKey' | 'queryFn'>`
     )
-    expect(content).not.toContain('export function getTaskQueryOptions')
+    expect(defaulted).toContain(`): ReturnType<typeof _getTaskQueryOptions<${dataType}>>\n`)
+    expect(implementation).toContain(`export function getTaskQueryOptions<TData = ${dataType}>(`)
+    expect(implementation).toContain('return _getTaskQueryOptions(id, options)')
+    expect(content).not.toContain('export const getTaskQueryOptions')
   })
 
   it('typed errors flow into the trailing signatures', () => {
@@ -161,17 +180,44 @@ describe('#195 ReturnType of generated functions: non-generic signature last', (
     expect(suspenseDefaulted).toContain(`): UseSuspenseQueryResult<${dataType}, GetTaskError>\n`)
   })
 
-  it('@deprecated marks both signatures a call can resolve to, and the factory const', () => {
+  // TypeScript reports a symbol as deprecated (at the import, at a bare reference) only when
+  // EVERY declaration carries the tag, so the implementation signature needs it as well.
+  describe('@deprecated on every declaration of a deprecated operation', () => {
     const deprecated = structuredClone(spec)
     deprecated.paths!['/api/v1/tasks/{id}']!.get!.deprecated = true
-    const { content } = generateHooks(deprecated, { staleTime: 0, gcTime: 0, queries: true })
-    const [generic, defaulted] = declarations(content, 'useGetTask')
-    expect(content).toContain('/** @deprecated */\nexport function useGetTask<')
-    expect(content).toContain('/** @deprecated */\nexport function useGetTask(\n')
-    expect(generic).toBeDefined()
-    expect(defaulted).toBeDefined()
-    expect(content).toContain('/** @deprecated */\nexport const getTaskQueryOptions:')
-    expect(content).not.toContain('/** @deprecated */\nfunction _getTaskQueryOptions')
+    const { content } = generateHooks(deprecated, {
+      staleTime: 0,
+      gcTime: 0,
+      suspense: true,
+      queries: true,
+    })
+    const deprecatedPaginated = structuredClone(paginatedSpec)
+    deprecatedPaginated.paths!['/items']!.get!.deprecated = true
+    const { content: paginated } = generateHooks(deprecatedPaginated, { staleTime: 0, gcTime: 0 })
+
+    function tagged(source: string, name: string): number {
+      const tag = new RegExp(`/\\*\\* @deprecated \\*/\nexport function ${name}\\b`, 'g')
+      return source.match(tag)?.length ?? 0
+    }
+
+    it.each([
+      ['useGetTask', content],
+      ['useSuspenseGetTask', content],
+      ['useGetTaskQueries', content],
+      ['getTaskQueryOptions', content],
+      ['useListItemsInfinite', paginated],
+      ['listItemsQueryOptions', paginated],
+    ])('%s: all three declarations carry the tag', (name, source) => {
+      expect(declarations(source, name)).toHaveLength(3)
+      expect(tagged(source, name)).toBe(3)
+    })
+
+    it('leaves operations that are not deprecated, and the private factory function, untagged', () => {
+      expect(declarations(content, 'useListTasks')).toHaveLength(3)
+      expect(tagged(content, 'useListTasks')).toBe(0)
+      expect(tagged(content, 'getTaskQueryOptions')).toBe(3)
+      expect(content).not.toContain('/** @deprecated */\nfunction _getTaskQueryOptions')
+    })
   })
 
   it('mutation hooks keep a single declaration', () => {
@@ -275,13 +321,14 @@ describe('#195 useXxxQueries: queries option', () => {
   it('is off by default: no useQueries import, no *Queries hooks', () => {
     const { content } = generateHooks(spec, { staleTime: 0, gcTime: 0 })
     expect(content).not.toContain('useQueries')
+    expect(reactQueryImports(content)).not.toContain('useQueries')
     expect(content).not.toMatch(/export function use\w*Queries\b/)
   })
 
   it('single-argument op: paramsList holds bare ids, mapped through the factory', () => {
     const { content } = generateHooks(spec, { staleTime: 0, gcTime: 0, queries: true })
-    expect(content).toMatch(/\buseQueries\b/)
-    expect(content).toContain('type UseQueryResult')
+    expect(reactQueryImports(content)).toContain('useQueries')
+    expect(reactQueryImports(content)).toContain('type UseQueryResult')
     const hook = block(content, 'export function useGetTaskQueries<')
     expect(hook).toContain(
       'TCombinedResult = UseQueryResult<Awaited<ReturnType<typeof getTask>>, ApiError>[]'

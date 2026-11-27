@@ -51,8 +51,26 @@ function _rootQueryOptions<TData = Awaited<ReturnType<typeof root>>>(
   })
 }
 
-export const rootQueryOptions: typeof _rootQueryOptions &
-  typeof _rootQueryOptions<Awaited<ReturnType<typeof root>>> = _rootQueryOptions
+export function rootQueryOptions<TData = Awaited<ReturnType<typeof root>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof root>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _rootQueryOptions<TData>>
+export function rootQueryOptions(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof root>>, ApiError, Awaited<ReturnType<typeof root>>>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _rootQueryOptions<Awaited<ReturnType<typeof root>>>>
+export function rootQueryOptions<TData = Awaited<ReturnType<typeof root>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof root>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _rootQueryOptions(options)
+}
 
 function _holidaysQueryOptions<TData = Awaited<ReturnType<typeof holidays>>>(
   params?: Parameters<typeof holidays>[0],
@@ -70,8 +88,33 @@ function _holidaysQueryOptions<TData = Awaited<ReturnType<typeof holidays>>>(
   })
 }
 
-export const holidaysQueryOptions: typeof _holidaysQueryOptions &
-  typeof _holidaysQueryOptions<Awaited<ReturnType<typeof holidays>>> = _holidaysQueryOptions
+export function holidaysQueryOptions<TData = Awaited<ReturnType<typeof holidays>>>(
+  params?: Parameters<typeof holidays>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof holidays>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _holidaysQueryOptions<TData>>
+export function holidaysQueryOptions(
+  params?: Parameters<typeof holidays>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof holidays>>,
+      ApiError,
+      Awaited<ReturnType<typeof holidays>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _holidaysQueryOptions<Awaited<ReturnType<typeof holidays>>>>
+export function holidaysQueryOptions<TData = Awaited<ReturnType<typeof holidays>>>(
+  params?: Parameters<typeof holidays>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof holidays>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _holidaysQueryOptions(params, options)
+}
 
 function _holidayQueryOptions<TData = Awaited<ReturnType<typeof holiday>>>(
   holidayId: Parameters<typeof holiday>[0],
@@ -90,8 +133,36 @@ function _holidayQueryOptions<TData = Awaited<ReturnType<typeof holiday>>>(
   })
 }
 
-export const holidayQueryOptions: typeof _holidayQueryOptions &
-  typeof _holidayQueryOptions<Awaited<ReturnType<typeof holiday>>> = _holidayQueryOptions
+export function holidayQueryOptions<TData = Awaited<ReturnType<typeof holiday>>>(
+  holidayId: Parameters<typeof holiday>[0],
+  params?: Parameters<typeof holiday>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof holiday>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _holidayQueryOptions<TData>>
+export function holidayQueryOptions(
+  holidayId: Parameters<typeof holiday>[0],
+  params?: Parameters<typeof holiday>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof holiday>>,
+      ApiError,
+      Awaited<ReturnType<typeof holiday>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _holidayQueryOptions<Awaited<ReturnType<typeof holiday>>>>
+export function holidayQueryOptions<TData = Awaited<ReturnType<typeof holiday>>>(
+  holidayId: Parameters<typeof holiday>[0],
+  params?: Parameters<typeof holiday>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof holiday>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _holidayQueryOptions(holidayId, params, options)
+}
 
 function _provincesQueryOptions<TData = Awaited<ReturnType<typeof provinces>>>(
   params?: Parameters<typeof provinces>[0],
@@ -109,8 +180,33 @@ function _provincesQueryOptions<TData = Awaited<ReturnType<typeof provinces>>>(
   })
 }
 
-export const provincesQueryOptions: typeof _provincesQueryOptions &
-  typeof _provincesQueryOptions<Awaited<ReturnType<typeof provinces>>> = _provincesQueryOptions
+export function provincesQueryOptions<TData = Awaited<ReturnType<typeof provinces>>>(
+  params?: Parameters<typeof provinces>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof provinces>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _provincesQueryOptions<TData>>
+export function provincesQueryOptions(
+  params?: Parameters<typeof provinces>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof provinces>>,
+      ApiError,
+      Awaited<ReturnType<typeof provinces>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _provincesQueryOptions<Awaited<ReturnType<typeof provinces>>>>
+export function provincesQueryOptions<TData = Awaited<ReturnType<typeof provinces>>>(
+  params?: Parameters<typeof provinces>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof provinces>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _provincesQueryOptions(params, options)
+}
 
 function _provinceQueryOptions<TData = Awaited<ReturnType<typeof province>>>(
   provinceId: Parameters<typeof province>[0],
@@ -129,8 +225,36 @@ function _provinceQueryOptions<TData = Awaited<ReturnType<typeof province>>>(
   })
 }
 
-export const provinceQueryOptions: typeof _provinceQueryOptions &
-  typeof _provinceQueryOptions<Awaited<ReturnType<typeof province>>> = _provinceQueryOptions
+export function provinceQueryOptions<TData = Awaited<ReturnType<typeof province>>>(
+  provinceId: Parameters<typeof province>[0],
+  params?: Parameters<typeof province>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof province>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _provinceQueryOptions<TData>>
+export function provinceQueryOptions(
+  provinceId: Parameters<typeof province>[0],
+  params?: Parameters<typeof province>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof province>>,
+      ApiError,
+      Awaited<ReturnType<typeof province>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _provinceQueryOptions<Awaited<ReturnType<typeof province>>>>
+export function provinceQueryOptions<TData = Awaited<ReturnType<typeof province>>>(
+  provinceId: Parameters<typeof province>[0],
+  params?: Parameters<typeof province>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof province>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _provinceQueryOptions(provinceId, params, options)
+}
 
 function _specQueryOptions<TData = Awaited<ReturnType<typeof spec>>>(
   options?: Omit<
@@ -147,8 +271,26 @@ function _specQueryOptions<TData = Awaited<ReturnType<typeof spec>>>(
   })
 }
 
-export const specQueryOptions: typeof _specQueryOptions &
-  typeof _specQueryOptions<Awaited<ReturnType<typeof spec>>> = _specQueryOptions
+export function specQueryOptions<TData = Awaited<ReturnType<typeof spec>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof spec>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _specQueryOptions<TData>>
+export function specQueryOptions(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof spec>>, ApiError, Awaited<ReturnType<typeof spec>>>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _specQueryOptions<Awaited<ReturnType<typeof spec>>>>
+export function specQueryOptions<TData = Awaited<ReturnType<typeof spec>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof spec>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _specQueryOptions(options)
+}
 
 // ── Queries ──────────────────────────────────────────────────
 

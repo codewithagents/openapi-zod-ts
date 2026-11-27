@@ -103,9 +103,33 @@ function _getApiActivityQueryOptions<TData = Awaited<ReturnType<typeof getApiAct
   })
 }
 
-export const getApiActivityQueryOptions: typeof _getApiActivityQueryOptions &
-  typeof _getApiActivityQueryOptions<Awaited<ReturnType<typeof getApiActivity>>> =
-  _getApiActivityQueryOptions
+export function getApiActivityQueryOptions<TData = Awaited<ReturnType<typeof getApiActivity>>>(
+  params?: Parameters<typeof getApiActivity>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getApiActivity>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getApiActivityQueryOptions<TData>>
+export function getApiActivityQueryOptions(
+  params?: Parameters<typeof getApiActivity>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getApiActivity>>,
+      ApiError,
+      Awaited<ReturnType<typeof getApiActivity>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getApiActivityQueryOptions<Awaited<ReturnType<typeof getApiActivity>>>>
+export function getApiActivityQueryOptions<TData = Awaited<ReturnType<typeof getApiActivity>>>(
+  params?: Parameters<typeof getApiActivity>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getApiActivity>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _getApiActivityQueryOptions(params, options)
+}
 
 function _getVaultsQueryOptions<TData = Awaited<ReturnType<typeof getVaults>>>(
   params?: Parameters<typeof getVaults>[0],
@@ -123,8 +147,33 @@ function _getVaultsQueryOptions<TData = Awaited<ReturnType<typeof getVaults>>>(
   })
 }
 
-export const getVaultsQueryOptions: typeof _getVaultsQueryOptions &
-  typeof _getVaultsQueryOptions<Awaited<ReturnType<typeof getVaults>>> = _getVaultsQueryOptions
+export function getVaultsQueryOptions<TData = Awaited<ReturnType<typeof getVaults>>>(
+  params?: Parameters<typeof getVaults>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getVaults>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getVaultsQueryOptions<TData>>
+export function getVaultsQueryOptions(
+  params?: Parameters<typeof getVaults>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getVaults>>,
+      ApiError,
+      Awaited<ReturnType<typeof getVaults>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getVaultsQueryOptions<Awaited<ReturnType<typeof getVaults>>>>
+export function getVaultsQueryOptions<TData = Awaited<ReturnType<typeof getVaults>>>(
+  params?: Parameters<typeof getVaults>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getVaults>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _getVaultsQueryOptions(params, options)
+}
 
 function _getVaultByIdQueryOptions<TData = Awaited<ReturnType<typeof getVaultById>>>(
   vaultUuid: Parameters<typeof getVaultById>[0],
@@ -142,9 +191,33 @@ function _getVaultByIdQueryOptions<TData = Awaited<ReturnType<typeof getVaultByI
   })
 }
 
-export const getVaultByIdQueryOptions: typeof _getVaultByIdQueryOptions &
-  typeof _getVaultByIdQueryOptions<Awaited<ReturnType<typeof getVaultById>>> =
-  _getVaultByIdQueryOptions
+export function getVaultByIdQueryOptions<TData = Awaited<ReturnType<typeof getVaultById>>>(
+  vaultUuid: Parameters<typeof getVaultById>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getVaultById>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getVaultByIdQueryOptions<TData>>
+export function getVaultByIdQueryOptions(
+  vaultUuid: Parameters<typeof getVaultById>[0],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getVaultById>>,
+      ApiError,
+      Awaited<ReturnType<typeof getVaultById>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getVaultByIdQueryOptions<Awaited<ReturnType<typeof getVaultById>>>>
+export function getVaultByIdQueryOptions<TData = Awaited<ReturnType<typeof getVaultById>>>(
+  vaultUuid: Parameters<typeof getVaultById>[0],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getVaultById>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _getVaultByIdQueryOptions(vaultUuid, options)
+}
 
 function _getVaultItemsQueryOptions<TData = Awaited<ReturnType<typeof getVaultItems>>>(
   vaultUuid: Parameters<typeof getVaultItems>[0],
@@ -163,9 +236,36 @@ function _getVaultItemsQueryOptions<TData = Awaited<ReturnType<typeof getVaultIt
   })
 }
 
-export const getVaultItemsQueryOptions: typeof _getVaultItemsQueryOptions &
-  typeof _getVaultItemsQueryOptions<Awaited<ReturnType<typeof getVaultItems>>> =
-  _getVaultItemsQueryOptions
+export function getVaultItemsQueryOptions<TData = Awaited<ReturnType<typeof getVaultItems>>>(
+  vaultUuid: Parameters<typeof getVaultItems>[0],
+  params?: Parameters<typeof getVaultItems>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getVaultItems>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getVaultItemsQueryOptions<TData>>
+export function getVaultItemsQueryOptions(
+  vaultUuid: Parameters<typeof getVaultItems>[0],
+  params?: Parameters<typeof getVaultItems>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getVaultItems>>,
+      ApiError,
+      Awaited<ReturnType<typeof getVaultItems>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getVaultItemsQueryOptions<Awaited<ReturnType<typeof getVaultItems>>>>
+export function getVaultItemsQueryOptions<TData = Awaited<ReturnType<typeof getVaultItems>>>(
+  vaultUuid: Parameters<typeof getVaultItems>[0],
+  params?: Parameters<typeof getVaultItems>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getVaultItems>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _getVaultItemsQueryOptions(vaultUuid, params, options)
+}
 
 function _getVaultItemByIdQueryOptions<TData = Awaited<ReturnType<typeof getVaultItemById>>>(
   vaultUuid: Parameters<typeof getVaultItemById>[0],
@@ -184,9 +284,36 @@ function _getVaultItemByIdQueryOptions<TData = Awaited<ReturnType<typeof getVaul
   })
 }
 
-export const getVaultItemByIdQueryOptions: typeof _getVaultItemByIdQueryOptions &
-  typeof _getVaultItemByIdQueryOptions<Awaited<ReturnType<typeof getVaultItemById>>> =
-  _getVaultItemByIdQueryOptions
+export function getVaultItemByIdQueryOptions<TData = Awaited<ReturnType<typeof getVaultItemById>>>(
+  vaultUuid: Parameters<typeof getVaultItemById>[0],
+  itemUuid: Parameters<typeof getVaultItemById>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getVaultItemById>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getVaultItemByIdQueryOptions<TData>>
+export function getVaultItemByIdQueryOptions(
+  vaultUuid: Parameters<typeof getVaultItemById>[0],
+  itemUuid: Parameters<typeof getVaultItemById>[1],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getVaultItemById>>,
+      ApiError,
+      Awaited<ReturnType<typeof getVaultItemById>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getVaultItemByIdQueryOptions<Awaited<ReturnType<typeof getVaultItemById>>>>
+export function getVaultItemByIdQueryOptions<TData = Awaited<ReturnType<typeof getVaultItemById>>>(
+  vaultUuid: Parameters<typeof getVaultItemById>[0],
+  itemUuid: Parameters<typeof getVaultItemById>[1],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getVaultItemById>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _getVaultItemByIdQueryOptions(vaultUuid, itemUuid, options)
+}
 
 function _getItemFilesQueryOptions<TData = Awaited<ReturnType<typeof getItemFiles>>>(
   vaultUuid: Parameters<typeof getItemFiles>[0],
@@ -206,9 +333,39 @@ function _getItemFilesQueryOptions<TData = Awaited<ReturnType<typeof getItemFile
   })
 }
 
-export const getItemFilesQueryOptions: typeof _getItemFilesQueryOptions &
-  typeof _getItemFilesQueryOptions<Awaited<ReturnType<typeof getItemFiles>>> =
-  _getItemFilesQueryOptions
+export function getItemFilesQueryOptions<TData = Awaited<ReturnType<typeof getItemFiles>>>(
+  vaultUuid: Parameters<typeof getItemFiles>[0],
+  itemUuid: Parameters<typeof getItemFiles>[1],
+  params?: Parameters<typeof getItemFiles>[2],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getItemFiles>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getItemFilesQueryOptions<TData>>
+export function getItemFilesQueryOptions(
+  vaultUuid: Parameters<typeof getItemFiles>[0],
+  itemUuid: Parameters<typeof getItemFiles>[1],
+  params?: Parameters<typeof getItemFiles>[2],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getItemFiles>>,
+      ApiError,
+      Awaited<ReturnType<typeof getItemFiles>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getItemFilesQueryOptions<Awaited<ReturnType<typeof getItemFiles>>>>
+export function getItemFilesQueryOptions<TData = Awaited<ReturnType<typeof getItemFiles>>>(
+  vaultUuid: Parameters<typeof getItemFiles>[0],
+  itemUuid: Parameters<typeof getItemFiles>[1],
+  params?: Parameters<typeof getItemFiles>[2],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getItemFiles>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _getItemFilesQueryOptions(vaultUuid, itemUuid, params, options)
+}
 
 function _getDetailsOfFileByIdQueryOptions<
   TData = Awaited<ReturnType<typeof getDetailsOfFileById>>,
@@ -231,9 +388,48 @@ function _getDetailsOfFileByIdQueryOptions<
   })
 }
 
-export const getDetailsOfFileByIdQueryOptions: typeof _getDetailsOfFileByIdQueryOptions &
-  typeof _getDetailsOfFileByIdQueryOptions<Awaited<ReturnType<typeof getDetailsOfFileById>>> =
-  _getDetailsOfFileByIdQueryOptions
+export function getDetailsOfFileByIdQueryOptions<
+  TData = Awaited<ReturnType<typeof getDetailsOfFileById>>,
+>(
+  vaultUuid: Parameters<typeof getDetailsOfFileById>[0],
+  itemUuid: Parameters<typeof getDetailsOfFileById>[1],
+  fileUuid: Parameters<typeof getDetailsOfFileById>[2],
+  params?: Parameters<typeof getDetailsOfFileById>[3],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getDetailsOfFileById>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getDetailsOfFileByIdQueryOptions<TData>>
+export function getDetailsOfFileByIdQueryOptions(
+  vaultUuid: Parameters<typeof getDetailsOfFileById>[0],
+  itemUuid: Parameters<typeof getDetailsOfFileById>[1],
+  fileUuid: Parameters<typeof getDetailsOfFileById>[2],
+  params?: Parameters<typeof getDetailsOfFileById>[3],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getDetailsOfFileById>>,
+      ApiError,
+      Awaited<ReturnType<typeof getDetailsOfFileById>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<
+  typeof _getDetailsOfFileByIdQueryOptions<Awaited<ReturnType<typeof getDetailsOfFileById>>>
+>
+export function getDetailsOfFileByIdQueryOptions<
+  TData = Awaited<ReturnType<typeof getDetailsOfFileById>>,
+>(
+  vaultUuid: Parameters<typeof getDetailsOfFileById>[0],
+  itemUuid: Parameters<typeof getDetailsOfFileById>[1],
+  fileUuid: Parameters<typeof getDetailsOfFileById>[2],
+  params?: Parameters<typeof getDetailsOfFileById>[3],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getDetailsOfFileById>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _getDetailsOfFileByIdQueryOptions(vaultUuid, itemUuid, fileUuid, params, options)
+}
 
 function _downloadFileByIDQueryOptions<TData = Awaited<ReturnType<typeof downloadFileByID>>>(
   vaultUuid: Parameters<typeof downloadFileByID>[0],
@@ -253,9 +449,39 @@ function _downloadFileByIDQueryOptions<TData = Awaited<ReturnType<typeof downloa
   })
 }
 
-export const downloadFileByIDQueryOptions: typeof _downloadFileByIDQueryOptions &
-  typeof _downloadFileByIDQueryOptions<Awaited<ReturnType<typeof downloadFileByID>>> =
-  _downloadFileByIDQueryOptions
+export function downloadFileByIDQueryOptions<TData = Awaited<ReturnType<typeof downloadFileByID>>>(
+  vaultUuid: Parameters<typeof downloadFileByID>[0],
+  itemUuid: Parameters<typeof downloadFileByID>[1],
+  fileUuid: Parameters<typeof downloadFileByID>[2],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof downloadFileByID>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _downloadFileByIDQueryOptions<TData>>
+export function downloadFileByIDQueryOptions(
+  vaultUuid: Parameters<typeof downloadFileByID>[0],
+  itemUuid: Parameters<typeof downloadFileByID>[1],
+  fileUuid: Parameters<typeof downloadFileByID>[2],
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof downloadFileByID>>,
+      ApiError,
+      Awaited<ReturnType<typeof downloadFileByID>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _downloadFileByIDQueryOptions<Awaited<ReturnType<typeof downloadFileByID>>>>
+export function downloadFileByIDQueryOptions<TData = Awaited<ReturnType<typeof downloadFileByID>>>(
+  vaultUuid: Parameters<typeof downloadFileByID>[0],
+  itemUuid: Parameters<typeof downloadFileByID>[1],
+  fileUuid: Parameters<typeof downloadFileByID>[2],
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof downloadFileByID>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _downloadFileByIDQueryOptions(vaultUuid, itemUuid, fileUuid, options)
+}
 
 function _getHeartbeatQueryOptions<TData = Awaited<ReturnType<typeof getHeartbeat>>>(
   options?: Omit<
@@ -272,9 +498,30 @@ function _getHeartbeatQueryOptions<TData = Awaited<ReturnType<typeof getHeartbea
   })
 }
 
-export const getHeartbeatQueryOptions: typeof _getHeartbeatQueryOptions &
-  typeof _getHeartbeatQueryOptions<Awaited<ReturnType<typeof getHeartbeat>>> =
-  _getHeartbeatQueryOptions
+export function getHeartbeatQueryOptions<TData = Awaited<ReturnType<typeof getHeartbeat>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getHeartbeat>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getHeartbeatQueryOptions<TData>>
+export function getHeartbeatQueryOptions(
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getHeartbeat>>,
+      ApiError,
+      Awaited<ReturnType<typeof getHeartbeat>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getHeartbeatQueryOptions<Awaited<ReturnType<typeof getHeartbeat>>>>
+export function getHeartbeatQueryOptions<TData = Awaited<ReturnType<typeof getHeartbeat>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getHeartbeat>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _getHeartbeatQueryOptions(options)
+}
 
 function _getServerHealthQueryOptions<TData = Awaited<ReturnType<typeof getServerHealth>>>(
   options?: Omit<
@@ -291,9 +538,30 @@ function _getServerHealthQueryOptions<TData = Awaited<ReturnType<typeof getServe
   })
 }
 
-export const getServerHealthQueryOptions: typeof _getServerHealthQueryOptions &
-  typeof _getServerHealthQueryOptions<Awaited<ReturnType<typeof getServerHealth>>> =
-  _getServerHealthQueryOptions
+export function getServerHealthQueryOptions<TData = Awaited<ReturnType<typeof getServerHealth>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getServerHealth>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getServerHealthQueryOptions<TData>>
+export function getServerHealthQueryOptions(
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getServerHealth>>,
+      ApiError,
+      Awaited<ReturnType<typeof getServerHealth>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getServerHealthQueryOptions<Awaited<ReturnType<typeof getServerHealth>>>>
+export function getServerHealthQueryOptions<TData = Awaited<ReturnType<typeof getServerHealth>>>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getServerHealth>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _getServerHealthQueryOptions(options)
+}
 
 function _getPrometheusMetricsQueryOptions<
   TData = Awaited<ReturnType<typeof getPrometheusMetrics>>,
@@ -312,9 +580,36 @@ function _getPrometheusMetricsQueryOptions<
   })
 }
 
-export const getPrometheusMetricsQueryOptions: typeof _getPrometheusMetricsQueryOptions &
-  typeof _getPrometheusMetricsQueryOptions<Awaited<ReturnType<typeof getPrometheusMetrics>>> =
-  _getPrometheusMetricsQueryOptions
+export function getPrometheusMetricsQueryOptions<
+  TData = Awaited<ReturnType<typeof getPrometheusMetrics>>,
+>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getPrometheusMetrics>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<typeof _getPrometheusMetricsQueryOptions<TData>>
+export function getPrometheusMetricsQueryOptions(
+  options?: Omit<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getPrometheusMetrics>>,
+      ApiError,
+      Awaited<ReturnType<typeof getPrometheusMetrics>>
+    >,
+    'queryKey' | 'queryFn'
+  >
+): ReturnType<
+  typeof _getPrometheusMetricsQueryOptions<Awaited<ReturnType<typeof getPrometheusMetrics>>>
+>
+export function getPrometheusMetricsQueryOptions<
+  TData = Awaited<ReturnType<typeof getPrometheusMetrics>>,
+>(
+  options?: Omit<
+    UseQueryOptions<Awaited<ReturnType<typeof getPrometheusMetrics>>, ApiError, TData>,
+    'queryKey' | 'queryFn'
+  >
+) {
+  return _getPrometheusMetricsQueryOptions(options)
+}
 
 // ── Queries ──────────────────────────────────────────────────
 

@@ -1990,12 +1990,12 @@ describe('Feature #188: queryOptions factories', () => {
 
   it('generates listTasksQueryOptions for the list GET operation', () => {
     expect(qoContent).toContain('function _listTasksQueryOptions<TData = ')
-    expect(qoContent).toContain('export const listTasksQueryOptions:')
+    expect(qoContent).toContain('export function listTasksQueryOptions<TData = ')
   })
 
   it('generates getTaskQueryOptions for the detail GET operation', () => {
     expect(qoContent).toContain('function _getTaskQueryOptions<TData = ')
-    expect(qoContent).toContain('export const getTaskQueryOptions:')
+    expect(qoContent).toContain('export function getTaskQueryOptions<TData = ')
   })
 
   it('listTasksQueryOptions uses queryOptions() call (not useQuery)', () => {
@@ -2097,14 +2097,14 @@ describe('Feature #188: queryOptions factories', () => {
       },
     }
     const { content: depContent } = generateHooks(deprecatedSpec, { staleTime: 0, gcTime: 0 })
-    const factoryIdx = depContent.indexOf('export const listLegacyQueryOptions')
+    const factoryIdx = depContent.indexOf('export function listLegacyQueryOptions')
     expect(factoryIdx).toBeGreaterThan(-1)
     const before = depContent.slice(0, factoryIdx)
     expect(before.slice(before.lastIndexOf('/**'))).toContain('@deprecated')
   })
 
   it('queryOptions factory appears before the useQuery hook in the file', () => {
-    const listFactoryIdx = qoContent.indexOf('export const listTasksQueryOptions')
+    const listFactoryIdx = qoContent.indexOf('export function listTasksQueryOptions')
     const listHookIdx = qoContent.indexOf('export function useListTasks')
     expect(listFactoryIdx).toBeGreaterThan(-1)
     expect(listHookIdx).toBeGreaterThan(-1)
