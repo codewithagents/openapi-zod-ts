@@ -26,7 +26,7 @@ npm install -D @codewithagents/openapi-react-query openapi-zod-ts
 npm install @tanstack/react-query
 ```
 
-`@tanstack/react-query ^5` is a peer dependency, and React Query v5 requires React 18 or later. `openapi-zod-ts` is a runtime dependency of this generator and must produce its client output first (see [Generate](#generate)).
+`@tanstack/react-query ^5` is a peer dependency, and React Query v5 requires React 18 or later. The generated hooks use `NoInfer`, so the project that compiles them needs TypeScript 5.4 or later. `openapi-zod-ts` is a runtime dependency of this generator and must produce its client output first (see [Generate](#generate)).
 
 ## Configure
 
