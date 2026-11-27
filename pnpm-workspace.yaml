@@ -9,7 +9,7 @@ catalog:
   '@vitest/coverage-v8': ^5.1.0
 
   # TypeScript
-  typescript: ^6.0.3
+  typescript: ^7.0.2
 
   # Node types
   '@types/node': ^26.6.6
