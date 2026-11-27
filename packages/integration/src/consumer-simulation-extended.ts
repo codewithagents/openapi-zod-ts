@@ -1,7 +1,7 @@
 // fallow-ignore-file unused-file
 // Type-only consumer simulation for the opt-in hooks in generated-hooks-extended/
-// (suspense, typed_errors, queries, optimistic_updates). Never called at runtime;
-// tsc --noEmit exercises these patterns on every `pnpm lint` run in CI.
+// (suspense, auto_invalidate, typed_errors, queries, optimistic_updates). Never called at
+// runtime; tsc --noEmit exercises these patterns on every `pnpm lint` run in CI.
 
 import type {
   InfiniteData,
