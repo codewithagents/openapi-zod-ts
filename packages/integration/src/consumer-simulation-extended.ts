@@ -1,12 +1,16 @@
 // fallow-ignore-file unused-file
 // Type-only consumer simulation for the opt-in hooks in generated-hooks-extended/
-// (typed_errors, queries, optimistic_updates). Never called at runtime;
+// (suspense, typed_errors, queries, optimistic_updates). Never called at runtime;
 // tsc --noEmit exercises these patterns on every `pnpm lint` run in CI.
 
 import type {
   InfiniteData,
+  QueryKey,
+  UseInfiniteQueryOptions,
   UseInfiniteQueryResult,
+  UseQueryOptions,
   UseQueryResult,
+  UseSuspenseQueryOptions,
   UseSuspenseQueryResult,
 } from '@tanstack/react-query'
 import { queryOptions } from '@tanstack/react-query'
@@ -17,7 +21,7 @@ import type {
   UpdateTaskRequest,
   ValidationProblem,
 } from '../generated/models.js'
-import { getTask, type ApiError, type GetTaskError } from '../generated/client.js'
+import { getTask, listTasks, type ApiError, type GetTaskError } from '../generated/client.js'
 import {
   getTaskQueryOptions,
   taskKeys,
@@ -166,17 +170,84 @@ function _suspenseSelect() {
   >()
 }
 
-// Pattern R5: opt-in mutation generics default to `unknown`, which is what ReturnType reads.
-function _returnTypeOfOptimisticMutation() {
+// Pattern R5: Parameters<typeof f> is the whole pre-TData parameter list, options type
+// included, for the query, suspense, infinite and queries hooks and the factory.
+function _parametersOfGeneratedFunctions() {
+  type ListParams = Parameters<typeof listTasks>[0]
+  type TaskOptions = Omit<UseQueryOptions<Task, GetTaskError>, 'queryKey' | 'queryFn'>
+  type TaskPageOptions = Omit<UseQueryOptions<TaskPage, ApiError>, 'queryKey' | 'queryFn'>
+  type SuspenseTaskOptions = Omit<
+    UseSuspenseQueryOptions<Task, GetTaskError>,
+    'queryKey' | 'queryFn'
+  >
+  type SuspenseTaskPageOptions = Omit<
+    UseSuspenseQueryOptions<TaskPage, ApiError>,
+    'queryKey' | 'queryFn'
+  >
+  type TaskPageInfiniteOptions = Omit<
+    UseInfiniteQueryOptions<TaskPage, ApiError, InfiniteData<TaskPage>, QueryKey, unknown>,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
   assertType<
-    Equal<ReturnType<typeof useUpdateTask>, ReturnType<typeof useUpdateTask<unknown, unknown>>>
+    Equal<Parameters<typeof useGetTask>, [id: string | null | undefined, options?: TaskOptions]>
   >()
+  assertType<
+    Equal<Parameters<typeof useListTasks>, [params?: ListParams, options?: TaskPageOptions]>
+  >()
+  assertType<
+    Equal<Parameters<typeof useSuspenseGetTask>, [id: string, options?: SuspenseTaskOptions]>
+  >()
+  assertType<
+    Equal<
+      Parameters<typeof useSuspenseListTasks>,
+      [params?: ListParams, options?: SuspenseTaskPageOptions]
+    >
+  >()
+  assertType<
+    Equal<
+      Parameters<typeof useListTasksInfinite>,
+      [params?: ListParams, options?: TaskPageInfiniteOptions]
+    >
+  >()
+  assertType<
+    Equal<
+      Parameters<typeof useGetTaskQueries>,
+      [
+        paramsList: ReadonlyArray<string>,
+        options?: TaskOptions,
+        combine?: (
+          results: UseQueryResult<Task, GetTaskError>[]
+        ) => UseQueryResult<Task, GetTaskError>[],
+      ]
+    >
+  >()
+  assertType<
+    Equal<
+      Parameters<typeof useListTasksQueries>,
+      [
+        paramsList: ReadonlyArray<ListParams>,
+        options?: TaskPageOptions,
+        combine?: (
+          results: UseQueryResult<TaskPage, ApiError>[]
+        ) => UseQueryResult<TaskPage, ApiError>[],
+      ]
+    >
+  >()
+  assertType<Equal<Parameters<typeof getTaskQueryOptions>, [id: string, options?: TaskOptions]>>()
+}
+
+// Pattern R6: the opt-in mutation generics default to `unknown`, which is what ReturnType reads,
+// and a call without options infers those same defaults: the two results must be one type.
+function _returnTypeOfOptimisticMutation() {
+  const mutation = useUpdateTask()
+  assertType<Equal<ReturnType<typeof useUpdateTask>, typeof mutation>>()
 }
 
 void _returnTypeOfQueryHooks
 void _returnTypeOfQueryOptionsFactory
 void _returnTypeOfQueriesHooks
 void _suspenseSelect
+void _parametersOfGeneratedFunctions
 void _returnTypeOfOptimisticMutation
 void _useUpdateTaskOptimistic
 void _useUpdateTaskPlain

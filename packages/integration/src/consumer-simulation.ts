@@ -4,6 +4,8 @@
 
 import type {
   InfiniteData,
+  QueryKey,
+  UseInfiniteQueryOptions,
   UseInfiniteQueryResult,
   UseQueryOptions,
   UseQueryResult,
@@ -172,12 +174,33 @@ function _returnTypeOfQueryOptionsFactories() {
   assertType<Equal<ReturnType<typeof forward>, Task | undefined>>()
 }
 
-// Pattern 16: Parameters<typeof useX> carries the pre-TData options type.
-function _parametersOfQueryHooks() {
+// Pattern 16: Parameters<typeof f> is the whole pre-TData parameter list, options type
+// included, for every function that gained a TData generic.
+function _parametersOfGeneratedFunctions() {
+  type ListParams = Parameters<typeof listTasks>[0]
+  type TaskOptions = Omit<UseQueryOptions<Task, ApiError>, 'queryKey' | 'queryFn'>
+  type TaskPageOptions = Omit<UseQueryOptions<TaskPage, ApiError>, 'queryKey' | 'queryFn'>
+  type TaskPageInfiniteOptions = Omit<
+    UseInfiniteQueryOptions<TaskPage, ApiError, InfiniteData<TaskPage>, QueryKey, unknown>,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >
+  assertType<
+    Equal<Parameters<typeof useGetTask>, [id: string | null | undefined, options?: TaskOptions]>
+  >()
+  assertType<
+    Equal<Parameters<typeof useListTasks>, [params?: ListParams, options?: TaskPageOptions]>
+  >()
   assertType<
     Equal<
-      Parameters<typeof useGetTask>[1],
-      Omit<UseQueryOptions<Task, ApiError>, 'queryKey' | 'queryFn'> | undefined
+      Parameters<typeof useListTasksInfinite>,
+      [params?: ListParams, options?: TaskPageInfiniteOptions]
+    >
+  >()
+  assertType<Equal<Parameters<typeof getTaskQueryOptions>, [id: string, options?: TaskOptions]>>()
+  assertType<
+    Equal<
+      Parameters<typeof listTasksQueryOptions>,
+      [params?: ListParams, options?: TaskPageOptions]
     >
   >()
 }
@@ -210,5 +233,5 @@ void _useQueryOptionsSelect
 void _useListTasksInfiniteSelect
 void _returnTypeOfQueryHooks
 void _returnTypeOfQueryOptionsFactories
-void _parametersOfQueryHooks
+void _parametersOfGeneratedFunctions
 void _explicitTData
