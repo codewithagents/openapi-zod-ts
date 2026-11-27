@@ -423,6 +423,13 @@ function queryDataType(funcName: string): string {
  * type argument goes last (the pre-TData shape). The implementation signature
  * follows; the caller writes its body.
  *
+ * The generic signature returns its result with the type parameter wrapped in
+ * `NoInfer`. Without it a result annotation (`const r: UseQueryResult<string, E> =
+ * useX()`) is an inference site for `TData`, so a mismatched annotation compiles
+ * and `data` is not the type it claims; 3.12 rejected it. `NoInfer` leaves `TData`
+ * to the `options` argument and its default, and evaluates to the plain type once
+ * `TData` is known. The default signature is not generic and needs none.
+ *
  * `@deprecated` goes on every declaration: TypeScript flags a symbol (an
  * import, a bare reference) only when all of its declarations carry the tag.
  */
@@ -435,7 +442,10 @@ interface OverloadedFunction {
   typeDefault: string
   /** Parameter list for a given type argument: the parameter name, or the default. */
   params: (typeArg: string) => string[]
-  /** Explicit return type for a given type argument (overload signatures need one). */
+  /**
+   * Explicit return type for a given type argument (overload signatures need one):
+   * `NoInfer<TData>` on the generic signature, the default type on the other.
+   */
   result: (typeArg: string) => string
   /** Return type annotation of the implementation signature, when it needs one. */
   implementationResult?: string
@@ -451,7 +461,7 @@ function buildOverloadedHead(fn: OverloadedFunction): string[] {
     lines.push(`  ${fn.params(typeArg).join(',\n  ')},`)
     lines.push(`)${returnType}${end}`)
   }
-  signature(generic, fn.typeParam, `: ${fn.result(fn.typeParam)}`, '')
+  signature(generic, fn.typeParam, `: ${fn.result(`NoInfer<${fn.typeParam}>`)}`, '')
   signature('', fn.typeDefault, `: ${fn.result(fn.typeDefault)}`, '')
   signature(
     generic,

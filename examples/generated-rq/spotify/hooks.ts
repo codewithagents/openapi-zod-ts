@@ -343,7 +343,7 @@ export function getAnAlbumQueryOptions<TData = Awaited<ReturnType<typeof getAnAl
     UseQueryOptions<Awaited<ReturnType<typeof getAnAlbum>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getAnAlbumQueryOptions<TData>>
+): ReturnType<typeof _getAnAlbumQueryOptions<NoInfer<TData>>>
 export function getAnAlbumQueryOptions(
   id: Parameters<typeof getAnAlbum>[0],
   params?: Parameters<typeof getAnAlbum>[1],
@@ -392,7 +392,7 @@ export function getMultipleAlbumsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getMultipleAlbums>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getMultipleAlbumsQueryOptions<TData>>
+): ReturnType<typeof _getMultipleAlbumsQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getMultipleAlbumsQueryOptions(
   params: Parameters<typeof getMultipleAlbums>[0],
@@ -444,7 +444,7 @@ export function getAnAlbumsTracksQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getAnAlbumsTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getAnAlbumsTracksQueryOptions<TData>>
+): ReturnType<typeof _getAnAlbumsTracksQueryOptions<NoInfer<TData>>>
 export function getAnAlbumsTracksQueryOptions(
   id: Parameters<typeof getAnAlbumsTracks>[0],
   params?: Parameters<typeof getAnAlbumsTracks>[1],
@@ -492,7 +492,7 @@ export function getAnArtistQueryOptions<TData = Awaited<ReturnType<typeof getAnA
     UseQueryOptions<Awaited<ReturnType<typeof getAnArtist>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getAnArtistQueryOptions<TData>>
+): ReturnType<typeof _getAnArtistQueryOptions<NoInfer<TData>>>
 export function getAnArtistQueryOptions(
   id: Parameters<typeof getAnArtist>[0],
   options?: Omit<
@@ -539,7 +539,7 @@ export function getMultipleArtistsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getMultipleArtists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getMultipleArtistsQueryOptions<TData>>
+): ReturnType<typeof _getMultipleArtistsQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getMultipleArtistsQueryOptions(
   params: Parameters<typeof getMultipleArtists>[0],
@@ -593,7 +593,7 @@ export function getAnArtistsAlbumsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getAnArtistsAlbums>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getAnArtistsAlbumsQueryOptions<TData>>
+): ReturnType<typeof _getAnArtistsAlbumsQueryOptions<NoInfer<TData>>>
 export function getAnArtistsAlbumsQueryOptions(
   id: Parameters<typeof getAnArtistsAlbums>[0],
   params?: Parameters<typeof getAnArtistsAlbums>[1],
@@ -650,7 +650,7 @@ export function getAnArtistsTopTracksQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getAnArtistsTopTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getAnArtistsTopTracksQueryOptions<TData>>
+): ReturnType<typeof _getAnArtistsTopTracksQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getAnArtistsTopTracksQueryOptions(
   id: Parameters<typeof getAnArtistsTopTracks>[0],
@@ -707,7 +707,7 @@ export function getAnArtistsRelatedArtistsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getAnArtistsRelatedArtists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getAnArtistsRelatedArtistsQueryOptions<TData>>
+): ReturnType<typeof _getAnArtistsRelatedArtistsQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getAnArtistsRelatedArtistsQueryOptions(
   id: Parameters<typeof getAnArtistsRelatedArtists>[0],
@@ -761,7 +761,7 @@ export function getAShowQueryOptions<TData = Awaited<ReturnType<typeof getAShow>
     UseQueryOptions<Awaited<ReturnType<typeof getAShow>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getAShowQueryOptions<TData>>
+): ReturnType<typeof _getAShowQueryOptions<NoInfer<TData>>>
 export function getAShowQueryOptions(
   id: Parameters<typeof getAShow>[0],
   params?: Parameters<typeof getAShow>[1],
@@ -808,7 +808,7 @@ export function getMultipleShowsQueryOptions<TData = Awaited<ReturnType<typeof g
     UseQueryOptions<Awaited<ReturnType<typeof getMultipleShows>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getMultipleShowsQueryOptions<TData>>
+): ReturnType<typeof _getMultipleShowsQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getMultipleShowsQueryOptions(
   params: Parameters<typeof getMultipleShows>[0],
@@ -858,7 +858,7 @@ export function getAShowsEpisodesQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getAShowsEpisodes>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getAShowsEpisodesQueryOptions<TData>>
+): ReturnType<typeof _getAShowsEpisodesQueryOptions<NoInfer<TData>>>
 export function getAShowsEpisodesQueryOptions(
   id: Parameters<typeof getAShowsEpisodes>[0],
   params?: Parameters<typeof getAShowsEpisodes>[1],
@@ -908,7 +908,7 @@ export function getAnEpisodeQueryOptions<TData = Awaited<ReturnType<typeof getAn
     UseQueryOptions<Awaited<ReturnType<typeof getAnEpisode>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getAnEpisodeQueryOptions<TData>>
+): ReturnType<typeof _getAnEpisodeQueryOptions<NoInfer<TData>>>
 export function getAnEpisodeQueryOptions(
   id: Parameters<typeof getAnEpisode>[0],
   params?: Parameters<typeof getAnEpisode>[1],
@@ -957,7 +957,7 @@ export function getMultipleEpisodesQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getMultipleEpisodes>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getMultipleEpisodesQueryOptions<TData>>
+): ReturnType<typeof _getMultipleEpisodesQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getMultipleEpisodesQueryOptions(
   params: Parameters<typeof getMultipleEpisodes>[0],
@@ -1009,7 +1009,7 @@ export function getAnAudiobookQueryOptions<TData = Awaited<ReturnType<typeof get
     UseQueryOptions<Awaited<ReturnType<typeof getAnAudiobook>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getAnAudiobookQueryOptions<TData>>
+): ReturnType<typeof _getAnAudiobookQueryOptions<NoInfer<TData>>>
 export function getAnAudiobookQueryOptions(
   id: Parameters<typeof getAnAudiobook>[0],
   params?: Parameters<typeof getAnAudiobook>[1],
@@ -1060,7 +1060,7 @@ export function getMultipleAudiobooksQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getMultipleAudiobooks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getMultipleAudiobooksQueryOptions<TData>>
+): ReturnType<typeof _getMultipleAudiobooksQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getMultipleAudiobooksQueryOptions(
   params: Parameters<typeof getMultipleAudiobooks>[0],
@@ -1116,7 +1116,7 @@ export function getAudiobookChaptersQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getAudiobookChapters>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getAudiobookChaptersQueryOptions<TData>>
+): ReturnType<typeof _getAudiobookChaptersQueryOptions<NoInfer<TData>>>
 export function getAudiobookChaptersQueryOptions(
   id: Parameters<typeof getAudiobookChapters>[0],
   params?: Parameters<typeof getAudiobookChapters>[1],
@@ -1170,7 +1170,7 @@ export function getUsersSavedAudiobooksQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedAudiobooks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getUsersSavedAudiobooksQueryOptions<TData>>
+): ReturnType<typeof _getUsersSavedAudiobooksQueryOptions<NoInfer<TData>>>
 export function getUsersSavedAudiobooksQueryOptions(
   params?: Parameters<typeof getUsersSavedAudiobooks>[0],
   options?: Omit<
@@ -1223,7 +1223,7 @@ export function checkUsersSavedAudiobooksQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedAudiobooks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _checkUsersSavedAudiobooksQueryOptions<TData>>
+): ReturnType<typeof _checkUsersSavedAudiobooksQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function checkUsersSavedAudiobooksQueryOptions(
   params: Parameters<typeof checkUsersSavedAudiobooks>[0],
@@ -1277,7 +1277,7 @@ export function getAChapterQueryOptions<TData = Awaited<ReturnType<typeof getACh
     UseQueryOptions<Awaited<ReturnType<typeof getAChapter>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getAChapterQueryOptions<TData>>
+): ReturnType<typeof _getAChapterQueryOptions<NoInfer<TData>>>
 export function getAChapterQueryOptions(
   id: Parameters<typeof getAChapter>[0],
   params?: Parameters<typeof getAChapter>[1],
@@ -1326,7 +1326,7 @@ export function getSeveralChaptersQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getSeveralChapters>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getSeveralChaptersQueryOptions<TData>>
+): ReturnType<typeof _getSeveralChaptersQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getSeveralChaptersQueryOptions(
   params: Parameters<typeof getSeveralChapters>[0],
@@ -1378,7 +1378,7 @@ export function getTrackQueryOptions<TData = Awaited<ReturnType<typeof getTrack>
     UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getTrackQueryOptions<TData>>
+): ReturnType<typeof _getTrackQueryOptions<NoInfer<TData>>>
 export function getTrackQueryOptions(
   id: Parameters<typeof getTrack>[0],
   params?: Parameters<typeof getTrack>[1],
@@ -1425,7 +1425,7 @@ export function getSeveralTracksQueryOptions<TData = Awaited<ReturnType<typeof g
     UseQueryOptions<Awaited<ReturnType<typeof getSeveralTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getSeveralTracksQueryOptions<TData>>
+): ReturnType<typeof _getSeveralTracksQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getSeveralTracksQueryOptions(
   params: Parameters<typeof getSeveralTracks>[0],
@@ -1471,7 +1471,7 @@ export function searchQueryOptions<TData = Awaited<ReturnType<typeof search>>>(
     UseQueryOptions<Awaited<ReturnType<typeof search>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _searchQueryOptions<TData>>
+): ReturnType<typeof _searchQueryOptions<NoInfer<TData>>>
 export function searchQueryOptions(
   params: Parameters<typeof search>[0],
   options?: Omit<
@@ -1517,7 +1517,7 @@ export function getCurrentUsersProfileQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getCurrentUsersProfile>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getCurrentUsersProfileQueryOptions<TData>>
+): ReturnType<typeof _getCurrentUsersProfileQueryOptions<NoInfer<TData>>>
 export function getCurrentUsersProfileQueryOptions(
   options?: Omit<
     UseQueryOptions<
@@ -1565,7 +1565,7 @@ export function getPlaylistQueryOptions<TData = Awaited<ReturnType<typeof getPla
     UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getPlaylistQueryOptions<TData>>
+): ReturnType<typeof _getPlaylistQueryOptions<NoInfer<TData>>>
 export function getPlaylistQueryOptions(
   playlistId: Parameters<typeof getPlaylist>[0],
   params?: Parameters<typeof getPlaylist>[1],
@@ -1616,7 +1616,7 @@ export function getPlaylistsTracksQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getPlaylistsTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getPlaylistsTracksQueryOptions<TData>>
+): ReturnType<typeof _getPlaylistsTracksQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getPlaylistsTracksQueryOptions(
   playlistId: Parameters<typeof getPlaylistsTracks>[0],
@@ -1672,7 +1672,7 @@ export function getPlaylistsItemsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getPlaylistsItems>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getPlaylistsItemsQueryOptions<TData>>
+): ReturnType<typeof _getPlaylistsItemsQueryOptions<NoInfer<TData>>>
 export function getPlaylistsItemsQueryOptions(
   playlistId: Parameters<typeof getPlaylistsItems>[0],
   params?: Parameters<typeof getPlaylistsItems>[1],
@@ -1726,7 +1726,7 @@ export function getAListOfCurrentUsersPlaylistsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getAListOfCurrentUsersPlaylists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getAListOfCurrentUsersPlaylistsQueryOptions<TData>>
+): ReturnType<typeof _getAListOfCurrentUsersPlaylistsQueryOptions<NoInfer<TData>>>
 export function getAListOfCurrentUsersPlaylistsQueryOptions(
   params?: Parameters<typeof getAListOfCurrentUsersPlaylists>[0],
   options?: Omit<
@@ -1780,7 +1780,7 @@ export function checkLibraryContainsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof checkLibraryContains>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _checkLibraryContainsQueryOptions<TData>>
+): ReturnType<typeof _checkLibraryContainsQueryOptions<NoInfer<TData>>>
 export function checkLibraryContainsQueryOptions(
   params: Parameters<typeof checkLibraryContains>[0],
   options?: Omit<
@@ -1830,7 +1830,7 @@ export function getUsersSavedAlbumsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedAlbums>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getUsersSavedAlbumsQueryOptions<TData>>
+): ReturnType<typeof _getUsersSavedAlbumsQueryOptions<NoInfer<TData>>>
 export function getUsersSavedAlbumsQueryOptions(
   params?: Parameters<typeof getUsersSavedAlbums>[0],
   options?: Omit<
@@ -1883,7 +1883,7 @@ export function checkUsersSavedAlbumsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedAlbums>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _checkUsersSavedAlbumsQueryOptions<TData>>
+): ReturnType<typeof _checkUsersSavedAlbumsQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function checkUsersSavedAlbumsQueryOptions(
   params: Parameters<typeof checkUsersSavedAlbums>[0],
@@ -1935,7 +1935,7 @@ export function getUsersSavedTracksQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getUsersSavedTracksQueryOptions<TData>>
+): ReturnType<typeof _getUsersSavedTracksQueryOptions<NoInfer<TData>>>
 export function getUsersSavedTracksQueryOptions(
   params?: Parameters<typeof getUsersSavedTracks>[0],
   options?: Omit<
@@ -1988,7 +1988,7 @@ export function checkUsersSavedTracksQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _checkUsersSavedTracksQueryOptions<TData>>
+): ReturnType<typeof _checkUsersSavedTracksQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function checkUsersSavedTracksQueryOptions(
   params: Parameters<typeof checkUsersSavedTracks>[0],
@@ -2042,7 +2042,7 @@ export function getUsersSavedEpisodesQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedEpisodes>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getUsersSavedEpisodesQueryOptions<TData>>
+): ReturnType<typeof _getUsersSavedEpisodesQueryOptions<NoInfer<TData>>>
 export function getUsersSavedEpisodesQueryOptions(
   params?: Parameters<typeof getUsersSavedEpisodes>[0],
   options?: Omit<
@@ -2095,7 +2095,7 @@ export function checkUsersSavedEpisodesQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedEpisodes>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _checkUsersSavedEpisodesQueryOptions<TData>>
+): ReturnType<typeof _checkUsersSavedEpisodesQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function checkUsersSavedEpisodesQueryOptions(
   params: Parameters<typeof checkUsersSavedEpisodes>[0],
@@ -2147,7 +2147,7 @@ export function getUsersSavedShowsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedShows>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getUsersSavedShowsQueryOptions<TData>>
+): ReturnType<typeof _getUsersSavedShowsQueryOptions<NoInfer<TData>>>
 export function getUsersSavedShowsQueryOptions(
   params?: Parameters<typeof getUsersSavedShows>[0],
   options?: Omit<
@@ -2200,7 +2200,7 @@ export function checkUsersSavedShowsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedShows>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _checkUsersSavedShowsQueryOptions<TData>>
+): ReturnType<typeof _checkUsersSavedShowsQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function checkUsersSavedShowsQueryOptions(
   params: Parameters<typeof checkUsersSavedShows>[0],
@@ -2251,7 +2251,7 @@ export function getUsersProfileQueryOptions<TData = Awaited<ReturnType<typeof ge
     UseQueryOptions<Awaited<ReturnType<typeof getUsersProfile>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getUsersProfileQueryOptions<TData>>
+): ReturnType<typeof _getUsersProfileQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getUsersProfileQueryOptions(
   userId: Parameters<typeof getUsersProfile>[0],
@@ -2304,7 +2304,7 @@ export function getListUsersPlaylistsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getListUsersPlaylists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getListUsersPlaylistsQueryOptions<TData>>
+): ReturnType<typeof _getListUsersPlaylistsQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getListUsersPlaylistsQueryOptions(
   userId: Parameters<typeof getListUsersPlaylists>[0],
@@ -2361,7 +2361,7 @@ export function getFeaturedPlaylistsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getFeaturedPlaylists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getFeaturedPlaylistsQueryOptions<TData>>
+): ReturnType<typeof _getFeaturedPlaylistsQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getFeaturedPlaylistsQueryOptions(
   params?: Parameters<typeof getFeaturedPlaylists>[0],
@@ -2412,7 +2412,7 @@ export function getCategoriesQueryOptions<TData = Awaited<ReturnType<typeof getC
     UseQueryOptions<Awaited<ReturnType<typeof getCategories>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getCategoriesQueryOptions<TData>>
+): ReturnType<typeof _getCategoriesQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getCategoriesQueryOptions(
   params?: Parameters<typeof getCategories>[0],
@@ -2461,7 +2461,7 @@ export function getACategoryQueryOptions<TData = Awaited<ReturnType<typeof getAC
     UseQueryOptions<Awaited<ReturnType<typeof getACategory>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getACategoryQueryOptions<TData>>
+): ReturnType<typeof _getACategoryQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getACategoryQueryOptions(
   categoryId: Parameters<typeof getACategory>[0],
@@ -2516,7 +2516,7 @@ export function getACategoriesPlaylistsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getACategoriesPlaylists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getACategoriesPlaylistsQueryOptions<TData>>
+): ReturnType<typeof _getACategoriesPlaylistsQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getACategoriesPlaylistsQueryOptions(
   categoryId: Parameters<typeof getACategoriesPlaylists>[0],
@@ -2568,7 +2568,7 @@ export function getPlaylistCoverQueryOptions<TData = Awaited<ReturnType<typeof g
     UseQueryOptions<Awaited<ReturnType<typeof getPlaylistCover>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getPlaylistCoverQueryOptions<TData>>
+): ReturnType<typeof _getPlaylistCoverQueryOptions<NoInfer<TData>>>
 export function getPlaylistCoverQueryOptions(
   playlistId: Parameters<typeof getPlaylistCover>[0],
   options?: Omit<
@@ -2613,7 +2613,7 @@ export function getNewReleasesQueryOptions<TData = Awaited<ReturnType<typeof get
     UseQueryOptions<Awaited<ReturnType<typeof getNewReleases>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getNewReleasesQueryOptions<TData>>
+): ReturnType<typeof _getNewReleasesQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getNewReleasesQueryOptions(
   params?: Parameters<typeof getNewReleases>[0],
@@ -2659,7 +2659,7 @@ export function getFollowedQueryOptions<TData = Awaited<ReturnType<typeof getFol
     UseQueryOptions<Awaited<ReturnType<typeof getFollowed>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getFollowedQueryOptions<TData>>
+): ReturnType<typeof _getFollowedQueryOptions<NoInfer<TData>>>
 export function getFollowedQueryOptions(
   params: Parameters<typeof getFollowed>[0],
   options?: Omit<
@@ -2708,7 +2708,7 @@ export function checkCurrentUserFollowsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof checkCurrentUserFollows>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _checkCurrentUserFollowsQueryOptions<TData>>
+): ReturnType<typeof _checkCurrentUserFollowsQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function checkCurrentUserFollowsQueryOptions(
   params: Parameters<typeof checkCurrentUserFollows>[0],
@@ -2765,7 +2765,7 @@ export function checkIfUserFollowsPlaylistQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof checkIfUserFollowsPlaylist>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _checkIfUserFollowsPlaylistQueryOptions<TData>>
+): ReturnType<typeof _checkIfUserFollowsPlaylistQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function checkIfUserFollowsPlaylistQueryOptions(
   playlistId: Parameters<typeof checkIfUserFollowsPlaylist>[0],
@@ -2824,7 +2824,7 @@ export function getSeveralAudioFeaturesQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getSeveralAudioFeatures>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getSeveralAudioFeaturesQueryOptions<TData>>
+): ReturnType<typeof _getSeveralAudioFeaturesQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getSeveralAudioFeaturesQueryOptions(
   params: Parameters<typeof getSeveralAudioFeatures>[0],
@@ -2875,7 +2875,7 @@ export function getAudioFeaturesQueryOptions<TData = Awaited<ReturnType<typeof g
     UseQueryOptions<Awaited<ReturnType<typeof getAudioFeatures>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getAudioFeaturesQueryOptions<TData>>
+): ReturnType<typeof _getAudioFeaturesQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getAudioFeaturesQueryOptions(
   id: Parameters<typeof getAudioFeatures>[0],
@@ -2922,7 +2922,7 @@ export function getAudioAnalysisQueryOptions<TData = Awaited<ReturnType<typeof g
     UseQueryOptions<Awaited<ReturnType<typeof getAudioAnalysis>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getAudioAnalysisQueryOptions<TData>>
+): ReturnType<typeof _getAudioAnalysisQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getAudioAnalysisQueryOptions(
   id: Parameters<typeof getAudioAnalysis>[0],
@@ -2971,7 +2971,7 @@ export function getRecommendationsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getRecommendations>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getRecommendationsQueryOptions<TData>>
+): ReturnType<typeof _getRecommendationsQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getRecommendationsQueryOptions(
   params?: Parameters<typeof getRecommendations>[0],
@@ -3024,7 +3024,7 @@ export function getRecommendationGenresQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getRecommendationGenres>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getRecommendationGenresQueryOptions<TData>>
+): ReturnType<typeof _getRecommendationGenresQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getRecommendationGenresQueryOptions(
   options?: Omit<
@@ -3088,7 +3088,7 @@ export function getInformationAboutTheUsersCurrentPlaybackQueryOptions<
     >,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getInformationAboutTheUsersCurrentPlaybackQueryOptions<TData>>
+): ReturnType<typeof _getInformationAboutTheUsersCurrentPlaybackQueryOptions<NoInfer<TData>>>
 export function getInformationAboutTheUsersCurrentPlaybackQueryOptions(
   params?: Parameters<typeof getInformationAboutTheUsersCurrentPlayback>[0],
   options?: Omit<
@@ -3144,7 +3144,7 @@ export function getAUsersAvailableDevicesQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getAUsersAvailableDevices>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getAUsersAvailableDevicesQueryOptions<TData>>
+): ReturnType<typeof _getAUsersAvailableDevicesQueryOptions<NoInfer<TData>>>
 export function getAUsersAvailableDevicesQueryOptions(
   options?: Omit<
     UseQueryOptions<
@@ -3200,7 +3200,7 @@ export function getTheUsersCurrentlyPlayingTrackQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getTheUsersCurrentlyPlayingTrack>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getTheUsersCurrentlyPlayingTrackQueryOptions<TData>>
+): ReturnType<typeof _getTheUsersCurrentlyPlayingTrackQueryOptions<NoInfer<TData>>>
 export function getTheUsersCurrentlyPlayingTrackQueryOptions(
   params?: Parameters<typeof getTheUsersCurrentlyPlayingTrack>[0],
   options?: Omit<
@@ -3252,7 +3252,7 @@ export function getRecentlyPlayedQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getRecentlyPlayed>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getRecentlyPlayedQueryOptions<TData>>
+): ReturnType<typeof _getRecentlyPlayedQueryOptions<NoInfer<TData>>>
 export function getRecentlyPlayedQueryOptions(
   params?: Parameters<typeof getRecentlyPlayed>[0],
   options?: Omit<
@@ -3296,7 +3296,7 @@ export function getQueueQueryOptions<TData = Awaited<ReturnType<typeof getQueue>
     UseQueryOptions<Awaited<ReturnType<typeof getQueue>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getQueueQueryOptions<TData>>
+): ReturnType<typeof _getQueueQueryOptions<NoInfer<TData>>>
 export function getQueueQueryOptions(
   options?: Omit<
     UseQueryOptions<
@@ -3339,7 +3339,7 @@ export function getAvailableMarketsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getAvailableMarkets>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getAvailableMarketsQueryOptions<TData>>
+): ReturnType<typeof _getAvailableMarketsQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getAvailableMarketsQueryOptions(
   options?: Omit<
@@ -3389,7 +3389,7 @@ export function getUsersTopArtistsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getUsersTopArtists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getUsersTopArtistsQueryOptions<TData>>
+): ReturnType<typeof _getUsersTopArtistsQueryOptions<NoInfer<TData>>>
 export function getUsersTopArtistsQueryOptions(
   params?: Parameters<typeof getUsersTopArtists>[0],
   options?: Omit<
@@ -3439,7 +3439,7 @@ export function getUsersTopTracksQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getUsersTopTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getUsersTopTracksQueryOptions<TData>>
+): ReturnType<typeof _getUsersTopTracksQueryOptions<NoInfer<TData>>>
 export function getUsersTopTracksQueryOptions(
   params?: Parameters<typeof getUsersTopTracks>[0],
   options?: Omit<
@@ -3472,7 +3472,7 @@ export function useGetAnAlbum<TData = Awaited<ReturnType<typeof getAnAlbum>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getAnAlbum>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetAnAlbum(
   id: Parameters<typeof getAnAlbum>[0] | undefined | null,
   params?: Parameters<typeof getAnAlbum>[1],
@@ -3510,7 +3510,7 @@ export function useGetMultipleAlbums<TData = Awaited<ReturnType<typeof getMultip
     UseQueryOptions<Awaited<ReturnType<typeof getMultipleAlbums>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetMultipleAlbums(
   params: Parameters<typeof getMultipleAlbums>[0],
@@ -3547,7 +3547,7 @@ export function useGetAnAlbumsTracks<TData = Awaited<ReturnType<typeof getAnAlbu
     UseQueryOptions<Awaited<ReturnType<typeof getAnAlbumsTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetAnAlbumsTracks(
   id: Parameters<typeof getAnAlbumsTracks>[0] | undefined | null,
   params?: Parameters<typeof getAnAlbumsTracks>[1],
@@ -3584,7 +3584,7 @@ export function useGetAnArtist<TData = Awaited<ReturnType<typeof getAnArtist>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getAnArtist>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetAnArtist(
   id: Parameters<typeof getAnArtist>[0] | undefined | null,
   options?: Omit<
@@ -3620,7 +3620,7 @@ export function useGetMultipleArtists<TData = Awaited<ReturnType<typeof getMulti
     UseQueryOptions<Awaited<ReturnType<typeof getMultipleArtists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetMultipleArtists(
   params: Parameters<typeof getMultipleArtists>[0],
@@ -3657,7 +3657,7 @@ export function useGetAnArtistsAlbums<TData = Awaited<ReturnType<typeof getAnArt
     UseQueryOptions<Awaited<ReturnType<typeof getAnArtistsAlbums>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetAnArtistsAlbums(
   id: Parameters<typeof getAnArtistsAlbums>[0] | undefined | null,
   params?: Parameters<typeof getAnArtistsAlbums>[1],
@@ -3696,7 +3696,7 @@ export function useGetAnArtistsTopTracks<TData = Awaited<ReturnType<typeof getAn
     UseQueryOptions<Awaited<ReturnType<typeof getAnArtistsTopTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetAnArtistsTopTracks(
   id: Parameters<typeof getAnArtistsTopTracks>[0] | undefined | null,
@@ -3738,7 +3738,7 @@ export function useGetAnArtistsRelatedArtists<
     UseQueryOptions<Awaited<ReturnType<typeof getAnArtistsRelatedArtists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetAnArtistsRelatedArtists(
   id: Parameters<typeof getAnArtistsRelatedArtists>[0] | undefined | null,
@@ -3778,7 +3778,7 @@ export function useGetAShow<TData = Awaited<ReturnType<typeof getAShow>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getAShow>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetAShow(
   id: Parameters<typeof getAShow>[0] | undefined | null,
   params?: Parameters<typeof getAShow>[1],
@@ -3816,7 +3816,7 @@ export function useGetMultipleShows<TData = Awaited<ReturnType<typeof getMultipl
     UseQueryOptions<Awaited<ReturnType<typeof getMultipleShows>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetMultipleShows(
   params: Parameters<typeof getMultipleShows>[0],
@@ -3853,7 +3853,7 @@ export function useGetAShowsEpisodes<TData = Awaited<ReturnType<typeof getAShows
     UseQueryOptions<Awaited<ReturnType<typeof getAShowsEpisodes>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetAShowsEpisodes(
   id: Parameters<typeof getAShowsEpisodes>[0] | undefined | null,
   params?: Parameters<typeof getAShowsEpisodes>[1],
@@ -3891,7 +3891,7 @@ export function useGetAnEpisode<TData = Awaited<ReturnType<typeof getAnEpisode>>
     UseQueryOptions<Awaited<ReturnType<typeof getAnEpisode>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetAnEpisode(
   id: Parameters<typeof getAnEpisode>[0] | undefined | null,
   params?: Parameters<typeof getAnEpisode>[1],
@@ -3929,7 +3929,7 @@ export function useGetMultipleEpisodes<TData = Awaited<ReturnType<typeof getMult
     UseQueryOptions<Awaited<ReturnType<typeof getMultipleEpisodes>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetMultipleEpisodes(
   params: Parameters<typeof getMultipleEpisodes>[0],
@@ -3966,7 +3966,7 @@ export function useGetAnAudiobook<TData = Awaited<ReturnType<typeof getAnAudiobo
     UseQueryOptions<Awaited<ReturnType<typeof getAnAudiobook>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetAnAudiobook(
   id: Parameters<typeof getAnAudiobook>[0] | undefined | null,
   params?: Parameters<typeof getAnAudiobook>[1],
@@ -4004,7 +4004,7 @@ export function useGetMultipleAudiobooks<TData = Awaited<ReturnType<typeof getMu
     UseQueryOptions<Awaited<ReturnType<typeof getMultipleAudiobooks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetMultipleAudiobooks(
   params: Parameters<typeof getMultipleAudiobooks>[0],
@@ -4041,7 +4041,7 @@ export function useGetAudiobookChapters<TData = Awaited<ReturnType<typeof getAud
     UseQueryOptions<Awaited<ReturnType<typeof getAudiobookChapters>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetAudiobookChapters(
   id: Parameters<typeof getAudiobookChapters>[0] | undefined | null,
   params?: Parameters<typeof getAudiobookChapters>[1],
@@ -4080,7 +4080,7 @@ export function useGetUsersSavedAudiobooks<
     UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedAudiobooks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetUsersSavedAudiobooks(
   params?: Parameters<typeof getUsersSavedAudiobooks>[0],
   options?: Omit<
@@ -4124,7 +4124,7 @@ export function useGetUsersSavedAudiobooksInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useGetUsersSavedAudiobooksInfinite(
   params?: Parameters<typeof getUsersSavedAudiobooks>[0],
   options?: Omit<
@@ -4183,7 +4183,7 @@ export function useCheckUsersSavedAudiobooks<
     UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedAudiobooks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useCheckUsersSavedAudiobooks(
   params: Parameters<typeof checkUsersSavedAudiobooks>[0],
@@ -4222,7 +4222,7 @@ export function useGetAChapter<TData = Awaited<ReturnType<typeof getAChapter>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getAChapter>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetAChapter(
   id: Parameters<typeof getAChapter>[0] | undefined | null,
   params?: Parameters<typeof getAChapter>[1],
@@ -4260,7 +4260,7 @@ export function useGetSeveralChapters<TData = Awaited<ReturnType<typeof getSever
     UseQueryOptions<Awaited<ReturnType<typeof getSeveralChapters>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetSeveralChapters(
   params: Parameters<typeof getSeveralChapters>[0],
@@ -4297,7 +4297,7 @@ export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetTrack(
   id: Parameters<typeof getTrack>[0] | undefined | null,
   params?: Parameters<typeof getTrack>[1],
@@ -4335,7 +4335,7 @@ export function useGetSeveralTracks<TData = Awaited<ReturnType<typeof getSeveral
     UseQueryOptions<Awaited<ReturnType<typeof getSeveralTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetSeveralTracks(
   params: Parameters<typeof getSeveralTracks>[0],
@@ -4371,7 +4371,7 @@ export function useSearch<TData = Awaited<ReturnType<typeof search>>>(
     UseQueryOptions<Awaited<ReturnType<typeof search>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useSearch(
   params: Parameters<typeof search>[0],
   options?: Omit<
@@ -4405,7 +4405,7 @@ export function useSearchInfinite<TData = InfiniteData<Awaited<ReturnType<typeof
     UseInfiniteQueryOptions<Awaited<ReturnType<typeof search>>, ApiError, TData, QueryKey, unknown>,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useSearchInfinite(
   params: Parameters<typeof search>[0],
   options?: Omit<
@@ -4445,7 +4445,7 @@ export function useGetCurrentUsersProfile<
     UseQueryOptions<Awaited<ReturnType<typeof getCurrentUsersProfile>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetCurrentUsersProfile(
   options?: Omit<
     UseQueryOptions<
@@ -4480,7 +4480,7 @@ export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetPlaylist(
   playlistId: Parameters<typeof getPlaylist>[0] | undefined | null,
   params?: Parameters<typeof getPlaylist>[1],
@@ -4519,7 +4519,7 @@ export function useGetPlaylistsTracks<TData = Awaited<ReturnType<typeof getPlayl
     UseQueryOptions<Awaited<ReturnType<typeof getPlaylistsTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetPlaylistsTracks(
   playlistId: Parameters<typeof getPlaylistsTracks>[0] | undefined | null,
@@ -4559,7 +4559,7 @@ export function useGetPlaylistsItems<TData = Awaited<ReturnType<typeof getPlayli
     UseQueryOptions<Awaited<ReturnType<typeof getPlaylistsItems>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetPlaylistsItems(
   playlistId: Parameters<typeof getPlaylistsItems>[0] | undefined | null,
   params?: Parameters<typeof getPlaylistsItems>[1],
@@ -4598,7 +4598,7 @@ export function useGetAListOfCurrentUsersPlaylists<
     UseQueryOptions<Awaited<ReturnType<typeof getAListOfCurrentUsersPlaylists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetAListOfCurrentUsersPlaylists(
   params?: Parameters<typeof getAListOfCurrentUsersPlaylists>[0],
   options?: Omit<
@@ -4642,7 +4642,7 @@ export function useGetAListOfCurrentUsersPlaylistsInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useGetAListOfCurrentUsersPlaylistsInfinite(
   params?: Parameters<typeof getAListOfCurrentUsersPlaylists>[0],
   options?: Omit<
@@ -4699,7 +4699,7 @@ export function useCheckLibraryContains<TData = Awaited<ReturnType<typeof checkL
     UseQueryOptions<Awaited<ReturnType<typeof checkLibraryContains>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useCheckLibraryContains(
   params: Parameters<typeof checkLibraryContains>[0],
   options?: Omit<
@@ -4733,7 +4733,7 @@ export function useGetUsersSavedAlbums<TData = Awaited<ReturnType<typeof getUser
     UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedAlbums>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetUsersSavedAlbums(
   params?: Parameters<typeof getUsersSavedAlbums>[0],
   options?: Omit<
@@ -4775,7 +4775,7 @@ export function useGetUsersSavedAlbumsInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useGetUsersSavedAlbumsInfinite(
   params?: Parameters<typeof getUsersSavedAlbums>[0],
   options?: Omit<
@@ -4829,7 +4829,7 @@ export function useCheckUsersSavedAlbums<TData = Awaited<ReturnType<typeof check
     UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedAlbums>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useCheckUsersSavedAlbums(
   params: Parameters<typeof checkUsersSavedAlbums>[0],
@@ -4865,7 +4865,7 @@ export function useGetUsersSavedTracks<TData = Awaited<ReturnType<typeof getUser
     UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetUsersSavedTracks(
   params?: Parameters<typeof getUsersSavedTracks>[0],
   options?: Omit<
@@ -4907,7 +4907,7 @@ export function useGetUsersSavedTracksInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useGetUsersSavedTracksInfinite(
   params?: Parameters<typeof getUsersSavedTracks>[0],
   options?: Omit<
@@ -4961,7 +4961,7 @@ export function useCheckUsersSavedTracks<TData = Awaited<ReturnType<typeof check
     UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useCheckUsersSavedTracks(
   params: Parameters<typeof checkUsersSavedTracks>[0],
@@ -4997,7 +4997,7 @@ export function useGetUsersSavedEpisodes<TData = Awaited<ReturnType<typeof getUs
     UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedEpisodes>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetUsersSavedEpisodes(
   params?: Parameters<typeof getUsersSavedEpisodes>[0],
   options?: Omit<
@@ -5039,7 +5039,7 @@ export function useGetUsersSavedEpisodesInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useGetUsersSavedEpisodesInfinite(
   params?: Parameters<typeof getUsersSavedEpisodes>[0],
   options?: Omit<
@@ -5095,7 +5095,7 @@ export function useCheckUsersSavedEpisodes<
     UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedEpisodes>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useCheckUsersSavedEpisodes(
   params: Parameters<typeof checkUsersSavedEpisodes>[0],
@@ -5133,7 +5133,7 @@ export function useGetUsersSavedShows<TData = Awaited<ReturnType<typeof getUsers
     UseQueryOptions<Awaited<ReturnType<typeof getUsersSavedShows>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetUsersSavedShows(
   params?: Parameters<typeof getUsersSavedShows>[0],
   options?: Omit<
@@ -5175,7 +5175,7 @@ export function useGetUsersSavedShowsInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useGetUsersSavedShowsInfinite(
   params?: Parameters<typeof getUsersSavedShows>[0],
   options?: Omit<
@@ -5229,7 +5229,7 @@ export function useCheckUsersSavedShows<TData = Awaited<ReturnType<typeof checkU
     UseQueryOptions<Awaited<ReturnType<typeof checkUsersSavedShows>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useCheckUsersSavedShows(
   params: Parameters<typeof checkUsersSavedShows>[0],
@@ -5266,7 +5266,7 @@ export function useGetUsersProfile<TData = Awaited<ReturnType<typeof getUsersPro
     UseQueryOptions<Awaited<ReturnType<typeof getUsersProfile>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetUsersProfile(
   userId: Parameters<typeof getUsersProfile>[0] | undefined | null,
@@ -5305,7 +5305,7 @@ export function useGetListUsersPlaylists<TData = Awaited<ReturnType<typeof getLi
     UseQueryOptions<Awaited<ReturnType<typeof getListUsersPlaylists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetListUsersPlaylists(
   userId: Parameters<typeof getListUsersPlaylists>[0] | undefined | null,
@@ -5345,7 +5345,7 @@ export function useGetFeaturedPlaylists<TData = Awaited<ReturnType<typeof getFea
     UseQueryOptions<Awaited<ReturnType<typeof getFeaturedPlaylists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetFeaturedPlaylists(
   params?: Parameters<typeof getFeaturedPlaylists>[0],
@@ -5390,7 +5390,7 @@ export function useGetFeaturedPlaylistsInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetFeaturedPlaylistsInfinite(
   params?: Parameters<typeof getFeaturedPlaylists>[0],
@@ -5446,7 +5446,7 @@ export function useGetCategories<TData = Awaited<ReturnType<typeof getCategories
     UseQueryOptions<Awaited<ReturnType<typeof getCategories>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetCategories(
   params?: Parameters<typeof getCategories>[0],
@@ -5491,7 +5491,7 @@ export function useGetCategoriesInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetCategoriesInfinite(
   params?: Parameters<typeof getCategories>[0],
@@ -5548,7 +5548,7 @@ export function useGetACategory<TData = Awaited<ReturnType<typeof getACategory>>
     UseQueryOptions<Awaited<ReturnType<typeof getACategory>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetACategory(
   categoryId: Parameters<typeof getACategory>[0] | undefined | null,
@@ -5591,7 +5591,7 @@ export function useGetACategoriesPlaylists<
     UseQueryOptions<Awaited<ReturnType<typeof getACategoriesPlaylists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetACategoriesPlaylists(
   categoryId: Parameters<typeof getACategoriesPlaylists>[0] | undefined | null,
@@ -5632,7 +5632,7 @@ export function useGetPlaylistCover<TData = Awaited<ReturnType<typeof getPlaylis
     UseQueryOptions<Awaited<ReturnType<typeof getPlaylistCover>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetPlaylistCover(
   playlistId: Parameters<typeof getPlaylistCover>[0] | undefined | null,
   options?: Omit<
@@ -5668,7 +5668,7 @@ export function useGetNewReleases<TData = Awaited<ReturnType<typeof getNewReleas
     UseQueryOptions<Awaited<ReturnType<typeof getNewReleases>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetNewReleases(
   params?: Parameters<typeof getNewReleases>[0],
@@ -5713,7 +5713,7 @@ export function useGetNewReleasesInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetNewReleasesInfinite(
   params?: Parameters<typeof getNewReleases>[0],
@@ -5768,7 +5768,7 @@ export function useGetFollowed<TData = Awaited<ReturnType<typeof getFollowed>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getFollowed>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetFollowed(
   params: Parameters<typeof getFollowed>[0],
   options?: Omit<
@@ -5810,7 +5810,7 @@ export function useGetFollowedInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useGetFollowedInfinite(
   params: Parameters<typeof getFollowed>[0],
   options?: Omit<
@@ -5866,7 +5866,7 @@ export function useCheckCurrentUserFollows<
     UseQueryOptions<Awaited<ReturnType<typeof checkCurrentUserFollows>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useCheckCurrentUserFollows(
   params: Parameters<typeof checkCurrentUserFollows>[0],
@@ -5908,7 +5908,7 @@ export function useCheckIfUserFollowsPlaylist<
     UseQueryOptions<Awaited<ReturnType<typeof checkIfUserFollowsPlaylist>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useCheckIfUserFollowsPlaylist(
   playlistId: Parameters<typeof checkIfUserFollowsPlaylist>[0] | undefined | null,
@@ -5952,7 +5952,7 @@ export function useGetSeveralAudioFeatures<
     UseQueryOptions<Awaited<ReturnType<typeof getSeveralAudioFeatures>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetSeveralAudioFeatures(
   params: Parameters<typeof getSeveralAudioFeatures>[0],
@@ -5991,7 +5991,7 @@ export function useGetAudioFeatures<TData = Awaited<ReturnType<typeof getAudioFe
     UseQueryOptions<Awaited<ReturnType<typeof getAudioFeatures>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetAudioFeatures(
   id: Parameters<typeof getAudioFeatures>[0] | undefined | null,
@@ -6029,7 +6029,7 @@ export function useGetAudioAnalysis<TData = Awaited<ReturnType<typeof getAudioAn
     UseQueryOptions<Awaited<ReturnType<typeof getAudioAnalysis>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetAudioAnalysis(
   id: Parameters<typeof getAudioAnalysis>[0] | undefined | null,
@@ -6067,7 +6067,7 @@ export function useGetRecommendations<TData = Awaited<ReturnType<typeof getRecom
     UseQueryOptions<Awaited<ReturnType<typeof getRecommendations>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetRecommendations(
   params?: Parameters<typeof getRecommendations>[0],
@@ -6105,7 +6105,7 @@ export function useGetRecommendationGenres<
     UseQueryOptions<Awaited<ReturnType<typeof getRecommendationGenres>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetRecommendationGenres(
   options?: Omit<
@@ -6147,7 +6147,7 @@ export function useGetInformationAboutTheUsersCurrentPlayback<
     >,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetInformationAboutTheUsersCurrentPlayback(
   params?: Parameters<typeof getInformationAboutTheUsersCurrentPlayback>[0],
   options?: Omit<
@@ -6192,7 +6192,7 @@ export function useGetAUsersAvailableDevices<
     UseQueryOptions<Awaited<ReturnType<typeof getAUsersAvailableDevices>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetAUsersAvailableDevices(
   options?: Omit<
     UseQueryOptions<
@@ -6228,7 +6228,7 @@ export function useGetTheUsersCurrentlyPlayingTrack<
     UseQueryOptions<Awaited<ReturnType<typeof getTheUsersCurrentlyPlayingTrack>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetTheUsersCurrentlyPlayingTrack(
   params?: Parameters<typeof getTheUsersCurrentlyPlayingTrack>[0],
   options?: Omit<
@@ -6264,7 +6264,7 @@ export function useGetRecentlyPlayed<TData = Awaited<ReturnType<typeof getRecent
     UseQueryOptions<Awaited<ReturnType<typeof getRecentlyPlayed>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetRecentlyPlayed(
   params?: Parameters<typeof getRecentlyPlayed>[0],
   options?: Omit<
@@ -6306,7 +6306,7 @@ export function useGetRecentlyPlayedInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useGetRecentlyPlayedInfinite(
   params?: Parameters<typeof getRecentlyPlayed>[0],
   options?: Omit<
@@ -6358,7 +6358,7 @@ export function useGetQueue<TData = Awaited<ReturnType<typeof getQueue>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getQueue>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetQueue(
   options?: Omit<
     UseQueryOptions<
@@ -6390,7 +6390,7 @@ export function useGetAvailableMarkets<TData = Awaited<ReturnType<typeof getAvai
     UseQueryOptions<Awaited<ReturnType<typeof getAvailableMarkets>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetAvailableMarkets(
   options?: Omit<
@@ -6424,7 +6424,7 @@ export function useGetUsersTopArtists<TData = Awaited<ReturnType<typeof getUsers
     UseQueryOptions<Awaited<ReturnType<typeof getUsersTopArtists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetUsersTopArtists(
   params?: Parameters<typeof getUsersTopArtists>[0],
   options?: Omit<
@@ -6466,7 +6466,7 @@ export function useGetUsersTopArtistsInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useGetUsersTopArtistsInfinite(
   params?: Parameters<typeof getUsersTopArtists>[0],
   options?: Omit<
@@ -6519,7 +6519,7 @@ export function useGetUsersTopTracks<TData = Awaited<ReturnType<typeof getUsersT
     UseQueryOptions<Awaited<ReturnType<typeof getUsersTopTracks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetUsersTopTracks(
   params?: Parameters<typeof getUsersTopTracks>[0],
   options?: Omit<
@@ -6561,7 +6561,7 @@ export function useGetUsersTopTracksInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useGetUsersTopTracksInfinite(
   params?: Parameters<typeof getUsersTopTracks>[0],
   options?: Omit<

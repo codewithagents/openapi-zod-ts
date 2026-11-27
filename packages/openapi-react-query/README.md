@@ -114,7 +114,7 @@ function _listTasksQueryOptions<TData = TaskPage>(params?, options?) {
   })
 }
 
-export function listTasksQueryOptions<TData = TaskPage>(params?, options?): ReturnType<typeof _listTasksQueryOptions<TData>>
+export function listTasksQueryOptions<TData = TaskPage>(params?, options?): ReturnType<typeof _listTasksQueryOptions<NoInfer<TData>>>
 export function listTasksQueryOptions(params?, options?): ReturnType<typeof _listTasksQueryOptions<TaskPage>>
 export function listTasksQueryOptions<TData = TaskPage>(params?, options?) {
   return _listTasksQueryOptions(params, options)
@@ -186,7 +186,7 @@ const { data: count } = useListTasks({}, { select: (page) => page.items.length }
 useQuery(getTaskQueryOptions(id, { select: (task) => task.id }))
 ```
 
-Without `select`, `data` is still the raw response type, so existing call sites (including explicit `UseQueryResult<Task, ApiError>` annotations) keep compiling.
+Without `select`, `data` is still the raw response type, so existing call sites (including explicit `UseQueryResult<Task, ApiError>` annotations) keep compiling, and an annotation that disagrees with the response type, `const result: UseQueryResult<string, ApiError> = useGetTask(id)`, is still a type error: the generic signature returns `NoInfer<TData>`, so the annotation does not choose `TData`.
 
 ### Types read from the generated functions
 
@@ -201,7 +201,6 @@ Two signatures with different type parameter lists are the only way to restore t
 | A wrapper whose options are typed `Parameters<typeof useGetTask>[1]` | The wrapper rejects `select`, with the same error. | Take a type parameter: `Parameters<typeof useGetTask<TData>>[1]`. |
 | `vi.mocked(useGetTask).mockReturnValue(result)` | `result` is checked against the default data type, so a `UseQueryResult<string, ApiError>` is rejected. | `vi.mocked(useGetTask<string>)`. |
 | A stub typed `typeof useGetTask` with untyped parameters, `const fake: typeof useGetTask = (id, options) => ...` (also a factory, or a mock helper such as `fn<typeof useGetTaskQueries>((paramsList, options, combine) => ...)`) | The parameters are not contextually typed from an overloaded type: `TS7006`, implicitly `any`. | Annotate the parameters, or type the stub as one signature: `typeof useGetTask<Task>`. |
-| `const result: UseQueryResult<string, ApiError> = useGetTask(id)`, an annotation that disagrees with the response type | It compiles. On TanStack Query 5.80.0 and 5.91.0, `useQuery` returns `UseQueryResult<NoInfer<TData>, TError>`, which the overload's `UseQueryResult<TData, ApiError>` return type does not repeat, so `TData` is inferred from the annotation. It compiles on 5.107.1 as well. | Give the type argument, `useGetTask<Task>(id)`, and the annotation is checked again. |
 | A call with a wrong argument | TypeScript reports `No overload matches this call` and lists both signatures, where one signature reports a single error. | The reason is listed under each overload, and is the same for both. |
 | Hover in the editor | Shows `(+1 overload)`. | None needed. |
 

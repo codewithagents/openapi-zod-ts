@@ -167,7 +167,7 @@ export function useFindPetsByStatus<TData = Awaited<ReturnType<typeof findPetsBy
     UseQueryOptions<Awaited<ReturnType<typeof findPetsByStatus>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useFindPetsByStatus(
   params: Parameters<typeof findPetsByStatus>[0],
   options?: Omit<
@@ -202,7 +202,7 @@ export function useGetPetById<TData = Awaited<ReturnType<typeof getPetById>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getPetById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetPetById(
   petId: Parameters<typeof getPetById>[0] | undefined | null,
   options?: Omit<

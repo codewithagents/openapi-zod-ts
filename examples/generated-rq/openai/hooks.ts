@@ -641,7 +641,7 @@ export function listAssistantsQueryOptions<TData = Awaited<ReturnType<typeof lis
     UseQueryOptions<Awaited<ReturnType<typeof listAssistants>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listAssistantsQueryOptions<TData>>
+): ReturnType<typeof _listAssistantsQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function listAssistantsQueryOptions(
   params?: Parameters<typeof listAssistants>[0],
@@ -688,7 +688,7 @@ export function getAssistantQueryOptions<TData = Awaited<ReturnType<typeof getAs
     UseQueryOptions<Awaited<ReturnType<typeof getAssistant>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getAssistantQueryOptions<TData>>
+): ReturnType<typeof _getAssistantQueryOptions<NoInfer<TData>>>
 /** @deprecated */
 export function getAssistantQueryOptions(
   assistantId: Parameters<typeof getAssistant>[0],
@@ -736,7 +736,7 @@ export function listVoiceConsentsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listVoiceConsents>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listVoiceConsentsQueryOptions<TData>>
+): ReturnType<typeof _listVoiceConsentsQueryOptions<NoInfer<TData>>>
 export function listVoiceConsentsQueryOptions(
   params?: Parameters<typeof listVoiceConsents>[0],
   options?: Omit<
@@ -782,7 +782,7 @@ export function getVoiceConsentQueryOptions<TData = Awaited<ReturnType<typeof ge
     UseQueryOptions<Awaited<ReturnType<typeof getVoiceConsent>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getVoiceConsentQueryOptions<TData>>
+): ReturnType<typeof _getVoiceConsentQueryOptions<NoInfer<TData>>>
 export function getVoiceConsentQueryOptions(
   consentId: Parameters<typeof getVoiceConsent>[0],
   options?: Omit<
@@ -826,7 +826,7 @@ export function listBatchesQueryOptions<TData = Awaited<ReturnType<typeof listBa
     UseQueryOptions<Awaited<ReturnType<typeof listBatches>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listBatchesQueryOptions<TData>>
+): ReturnType<typeof _listBatchesQueryOptions<NoInfer<TData>>>
 export function listBatchesQueryOptions(
   params?: Parameters<typeof listBatches>[0],
   options?: Omit<
@@ -870,7 +870,7 @@ export function retrieveBatchQueryOptions<TData = Awaited<ReturnType<typeof retr
     UseQueryOptions<Awaited<ReturnType<typeof retrieveBatch>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _retrieveBatchQueryOptions<TData>>
+): ReturnType<typeof _retrieveBatchQueryOptions<NoInfer<TData>>>
 export function retrieveBatchQueryOptions(
   batchId: Parameters<typeof retrieveBatch>[0],
   options?: Omit<
@@ -916,7 +916,7 @@ export function listChatCompletionsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listChatCompletions>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listChatCompletionsQueryOptions<TData>>
+): ReturnType<typeof _listChatCompletionsQueryOptions<NoInfer<TData>>>
 export function listChatCompletionsQueryOptions(
   params?: Parameters<typeof listChatCompletions>[0],
   options?: Omit<
@@ -966,7 +966,7 @@ export function getChatCompletionQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getChatCompletion>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getChatCompletionQueryOptions<TData>>
+): ReturnType<typeof _getChatCompletionQueryOptions<NoInfer<TData>>>
 export function getChatCompletionQueryOptions(
   completionId: Parameters<typeof getChatCompletion>[0],
   options?: Omit<
@@ -1018,7 +1018,7 @@ export function getChatCompletionMessagesQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getChatCompletionMessages>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getChatCompletionMessagesQueryOptions<TData>>
+): ReturnType<typeof _getChatCompletionMessagesQueryOptions<NoInfer<TData>>>
 export function getChatCompletionMessagesQueryOptions(
   completionId: Parameters<typeof getChatCompletionMessages>[0],
   params?: Parameters<typeof getChatCompletionMessages>[1],
@@ -1070,7 +1070,7 @@ export function listContainersQueryOptions<TData = Awaited<ReturnType<typeof lis
     UseQueryOptions<Awaited<ReturnType<typeof listContainers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listContainersQueryOptions<TData>>
+): ReturnType<typeof _listContainersQueryOptions<NoInfer<TData>>>
 export function listContainersQueryOptions(
   params?: Parameters<typeof listContainers>[0],
   options?: Omit<
@@ -1116,7 +1116,7 @@ export function retrieveContainerQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof retrieveContainer>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _retrieveContainerQueryOptions<TData>>
+): ReturnType<typeof _retrieveContainerQueryOptions<NoInfer<TData>>>
 export function retrieveContainerQueryOptions(
   containerId: Parameters<typeof retrieveContainer>[0],
   options?: Omit<
@@ -1166,7 +1166,7 @@ export function listContainerFilesQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listContainerFiles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listContainerFilesQueryOptions<TData>>
+): ReturnType<typeof _listContainerFilesQueryOptions<NoInfer<TData>>>
 export function listContainerFilesQueryOptions(
   containerId: Parameters<typeof listContainerFiles>[0],
   params?: Parameters<typeof listContainerFiles>[1],
@@ -1222,7 +1222,7 @@ export function retrieveContainerFileQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof retrieveContainerFile>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _retrieveContainerFileQueryOptions<TData>>
+): ReturnType<typeof _retrieveContainerFileQueryOptions<NoInfer<TData>>>
 export function retrieveContainerFileQueryOptions(
   containerId: Parameters<typeof retrieveContainerFile>[0],
   fileId: Parameters<typeof retrieveContainerFile>[1],
@@ -1278,7 +1278,7 @@ export function retrieveContainerFileContentQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof retrieveContainerFileContent>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _retrieveContainerFileContentQueryOptions<TData>>
+): ReturnType<typeof _retrieveContainerFileContentQueryOptions<NoInfer<TData>>>
 export function retrieveContainerFileContentQueryOptions(
   containerId: Parameters<typeof retrieveContainerFileContent>[0],
   fileId: Parameters<typeof retrieveContainerFileContent>[1],
@@ -1336,7 +1336,7 @@ export function listConversationItemsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listConversationItems>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listConversationItemsQueryOptions<TData>>
+): ReturnType<typeof _listConversationItemsQueryOptions<NoInfer<TData>>>
 export function listConversationItemsQueryOptions(
   conversationId: Parameters<typeof listConversationItems>[0],
   params?: Parameters<typeof listConversationItems>[1],
@@ -1392,7 +1392,7 @@ export function getConversationItemQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getConversationItem>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getConversationItemQueryOptions<TData>>
+): ReturnType<typeof _getConversationItemQueryOptions<NoInfer<TData>>>
 export function getConversationItemQueryOptions(
   conversationId: Parameters<typeof getConversationItem>[0],
   itemId: Parameters<typeof getConversationItem>[1],
@@ -1444,7 +1444,7 @@ export function listEvalsQueryOptions<TData = Awaited<ReturnType<typeof listEval
     UseQueryOptions<Awaited<ReturnType<typeof listEvals>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listEvalsQueryOptions<TData>>
+): ReturnType<typeof _listEvalsQueryOptions<NoInfer<TData>>>
 export function listEvalsQueryOptions(
   params?: Parameters<typeof listEvals>[0],
   options?: Omit<
@@ -1488,7 +1488,7 @@ export function getEvalQueryOptions<TData = Awaited<ReturnType<typeof getEval>>>
     UseQueryOptions<Awaited<ReturnType<typeof getEval>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getEvalQueryOptions<TData>>
+): ReturnType<typeof _getEvalQueryOptions<NoInfer<TData>>>
 export function getEvalQueryOptions(
   evalId: Parameters<typeof getEval>[0],
   options?: Omit<
@@ -1534,7 +1534,7 @@ export function getEvalRunsQueryOptions<TData = Awaited<ReturnType<typeof getEva
     UseQueryOptions<Awaited<ReturnType<typeof getEvalRuns>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getEvalRunsQueryOptions<TData>>
+): ReturnType<typeof _getEvalRunsQueryOptions<NoInfer<TData>>>
 export function getEvalRunsQueryOptions(
   evalId: Parameters<typeof getEvalRuns>[0],
   params?: Parameters<typeof getEvalRuns>[1],
@@ -1582,7 +1582,7 @@ export function getEvalRunQueryOptions<TData = Awaited<ReturnType<typeof getEval
     UseQueryOptions<Awaited<ReturnType<typeof getEvalRun>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getEvalRunQueryOptions<TData>>
+): ReturnType<typeof _getEvalRunQueryOptions<NoInfer<TData>>>
 export function getEvalRunQueryOptions(
   evalId: Parameters<typeof getEvalRun>[0],
   runId: Parameters<typeof getEvalRun>[1],
@@ -1636,7 +1636,7 @@ export function getEvalRunOutputItemsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getEvalRunOutputItems>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getEvalRunOutputItemsQueryOptions<TData>>
+): ReturnType<typeof _getEvalRunOutputItemsQueryOptions<NoInfer<TData>>>
 export function getEvalRunOutputItemsQueryOptions(
   evalId: Parameters<typeof getEvalRunOutputItems>[0],
   runId: Parameters<typeof getEvalRunOutputItems>[1],
@@ -1696,7 +1696,7 @@ export function getEvalRunOutputItemQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getEvalRunOutputItem>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getEvalRunOutputItemQueryOptions<TData>>
+): ReturnType<typeof _getEvalRunOutputItemQueryOptions<NoInfer<TData>>>
 export function getEvalRunOutputItemQueryOptions(
   evalId: Parameters<typeof getEvalRunOutputItem>[0],
   runId: Parameters<typeof getEvalRunOutputItem>[1],
@@ -1748,7 +1748,7 @@ export function listFilesQueryOptions<TData = Awaited<ReturnType<typeof listFile
     UseQueryOptions<Awaited<ReturnType<typeof listFiles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listFilesQueryOptions<TData>>
+): ReturnType<typeof _listFilesQueryOptions<NoInfer<TData>>>
 export function listFilesQueryOptions(
   params?: Parameters<typeof listFiles>[0],
   options?: Omit<
@@ -1792,7 +1792,7 @@ export function retrieveFileQueryOptions<TData = Awaited<ReturnType<typeof retri
     UseQueryOptions<Awaited<ReturnType<typeof retrieveFile>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _retrieveFileQueryOptions<TData>>
+): ReturnType<typeof _retrieveFileQueryOptions<NoInfer<TData>>>
 export function retrieveFileQueryOptions(
   fileId: Parameters<typeof retrieveFile>[0],
   options?: Omit<
@@ -1836,7 +1836,7 @@ export function downloadFileQueryOptions<TData = Awaited<ReturnType<typeof downl
     UseQueryOptions<Awaited<ReturnType<typeof downloadFile>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _downloadFileQueryOptions<TData>>
+): ReturnType<typeof _downloadFileQueryOptions<NoInfer<TData>>>
 export function downloadFileQueryOptions(
   fileId: Parameters<typeof downloadFile>[0],
   options?: Omit<
@@ -1898,7 +1898,7 @@ export function listFineTuningCheckpointPermissionsQueryOptions<
     >,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listFineTuningCheckpointPermissionsQueryOptions<TData>>
+): ReturnType<typeof _listFineTuningCheckpointPermissionsQueryOptions<NoInfer<TData>>>
 export function listFineTuningCheckpointPermissionsQueryOptions(
   fineTunedModelCheckpoint: Parameters<typeof listFineTuningCheckpointPermissions>[0],
   params?: Parameters<typeof listFineTuningCheckpointPermissions>[1],
@@ -1958,7 +1958,7 @@ export function listPaginatedFineTuningJobsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listPaginatedFineTuningJobs>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listPaginatedFineTuningJobsQueryOptions<TData>>
+): ReturnType<typeof _listPaginatedFineTuningJobsQueryOptions<NoInfer<TData>>>
 export function listPaginatedFineTuningJobsQueryOptions(
   params?: Parameters<typeof listPaginatedFineTuningJobs>[0],
   options?: Omit<
@@ -2012,7 +2012,7 @@ export function retrieveFineTuningJobQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof retrieveFineTuningJob>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _retrieveFineTuningJobQueryOptions<TData>>
+): ReturnType<typeof _retrieveFineTuningJobQueryOptions<NoInfer<TData>>>
 export function retrieveFineTuningJobQueryOptions(
   fineTuningJobId: Parameters<typeof retrieveFineTuningJob>[0],
   options?: Omit<
@@ -2066,7 +2066,7 @@ export function listFineTuningJobCheckpointsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listFineTuningJobCheckpoints>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listFineTuningJobCheckpointsQueryOptions<TData>>
+): ReturnType<typeof _listFineTuningJobCheckpointsQueryOptions<NoInfer<TData>>>
 export function listFineTuningJobCheckpointsQueryOptions(
   fineTuningJobId: Parameters<typeof listFineTuningJobCheckpoints>[0],
   params?: Parameters<typeof listFineTuningJobCheckpoints>[1],
@@ -2124,7 +2124,7 @@ export function listFineTuningEventsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listFineTuningEvents>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listFineTuningEventsQueryOptions<TData>>
+): ReturnType<typeof _listFineTuningEventsQueryOptions<NoInfer<TData>>>
 export function listFineTuningEventsQueryOptions(
   fineTuningJobId: Parameters<typeof listFineTuningEvents>[0],
   params?: Parameters<typeof listFineTuningEvents>[1],
@@ -2172,7 +2172,7 @@ export function listModelsQueryOptions<TData = Awaited<ReturnType<typeof listMod
     UseQueryOptions<Awaited<ReturnType<typeof listModels>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listModelsQueryOptions<TData>>
+): ReturnType<typeof _listModelsQueryOptions<NoInfer<TData>>>
 export function listModelsQueryOptions(
   options?: Omit<
     UseQueryOptions<
@@ -2214,7 +2214,7 @@ export function retrieveModelQueryOptions<TData = Awaited<ReturnType<typeof retr
     UseQueryOptions<Awaited<ReturnType<typeof retrieveModel>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _retrieveModelQueryOptions<TData>>
+): ReturnType<typeof _retrieveModelQueryOptions<NoInfer<TData>>>
 export function retrieveModelQueryOptions(
   model: Parameters<typeof retrieveModel>[0],
   options?: Omit<
@@ -2258,7 +2258,7 @@ export function adminApiKeysListQueryOptions<TData = Awaited<ReturnType<typeof a
     UseQueryOptions<Awaited<ReturnType<typeof adminApiKeysList>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _adminApiKeysListQueryOptions<TData>>
+): ReturnType<typeof _adminApiKeysListQueryOptions<NoInfer<TData>>>
 export function adminApiKeysListQueryOptions(
   params?: Parameters<typeof adminApiKeysList>[0],
   options?: Omit<
@@ -2302,7 +2302,7 @@ export function adminApiKeysGetQueryOptions<TData = Awaited<ReturnType<typeof ad
     UseQueryOptions<Awaited<ReturnType<typeof adminApiKeysGet>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _adminApiKeysGetQueryOptions<TData>>
+): ReturnType<typeof _adminApiKeysGetQueryOptions<NoInfer<TData>>>
 export function adminApiKeysGetQueryOptions(
   keyId: Parameters<typeof adminApiKeysGet>[0],
   options?: Omit<
@@ -2346,7 +2346,7 @@ export function listAuditLogsQueryOptions<TData = Awaited<ReturnType<typeof list
     UseQueryOptions<Awaited<ReturnType<typeof listAuditLogs>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listAuditLogsQueryOptions<TData>>
+): ReturnType<typeof _listAuditLogsQueryOptions<NoInfer<TData>>>
 export function listAuditLogsQueryOptions(
   params?: Parameters<typeof listAuditLogs>[0],
   options?: Omit<
@@ -2394,7 +2394,7 @@ export function listOrganizationCertificatesQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listOrganizationCertificates>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listOrganizationCertificatesQueryOptions<TData>>
+): ReturnType<typeof _listOrganizationCertificatesQueryOptions<NoInfer<TData>>>
 export function listOrganizationCertificatesQueryOptions(
   params?: Parameters<typeof listOrganizationCertificates>[0],
   options?: Omit<
@@ -2446,7 +2446,7 @@ export function getCertificateQueryOptions<TData = Awaited<ReturnType<typeof get
     UseQueryOptions<Awaited<ReturnType<typeof getCertificate>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getCertificateQueryOptions<TData>>
+): ReturnType<typeof _getCertificateQueryOptions<NoInfer<TData>>>
 export function getCertificateQueryOptions(
   certificateId: Parameters<typeof getCertificate>[0],
   params?: Parameters<typeof getCertificate>[1],
@@ -2492,7 +2492,7 @@ export function usageCostsQueryOptions<TData = Awaited<ReturnType<typeof usageCo
     UseQueryOptions<Awaited<ReturnType<typeof usageCosts>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _usageCostsQueryOptions<TData>>
+): ReturnType<typeof _usageCostsQueryOptions<NoInfer<TData>>>
 export function usageCostsQueryOptions(
   params: Parameters<typeof usageCosts>[0],
   options?: Omit<
@@ -2536,7 +2536,7 @@ export function listGroupsQueryOptions<TData = Awaited<ReturnType<typeof listGro
     UseQueryOptions<Awaited<ReturnType<typeof listGroups>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listGroupsQueryOptions<TData>>
+): ReturnType<typeof _listGroupsQueryOptions<NoInfer<TData>>>
 export function listGroupsQueryOptions(
   params?: Parameters<typeof listGroups>[0],
   options?: Omit<
@@ -2586,7 +2586,7 @@ export function listGroupRoleAssignmentsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listGroupRoleAssignments>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listGroupRoleAssignmentsQueryOptions<TData>>
+): ReturnType<typeof _listGroupRoleAssignmentsQueryOptions<NoInfer<TData>>>
 export function listGroupRoleAssignmentsQueryOptions(
   groupId: Parameters<typeof listGroupRoleAssignments>[0],
   params?: Parameters<typeof listGroupRoleAssignments>[1],
@@ -2638,7 +2638,7 @@ export function listGroupUsersQueryOptions<TData = Awaited<ReturnType<typeof lis
     UseQueryOptions<Awaited<ReturnType<typeof listGroupUsers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listGroupUsersQueryOptions<TData>>
+): ReturnType<typeof _listGroupUsersQueryOptions<NoInfer<TData>>>
 export function listGroupUsersQueryOptions(
   groupId: Parameters<typeof listGroupUsers>[0],
   params?: Parameters<typeof listGroupUsers>[1],
@@ -2684,7 +2684,7 @@ export function listInvitesQueryOptions<TData = Awaited<ReturnType<typeof listIn
     UseQueryOptions<Awaited<ReturnType<typeof listInvites>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listInvitesQueryOptions<TData>>
+): ReturnType<typeof _listInvitesQueryOptions<NoInfer<TData>>>
 export function listInvitesQueryOptions(
   params?: Parameters<typeof listInvites>[0],
   options?: Omit<
@@ -2728,7 +2728,7 @@ export function retrieveInviteQueryOptions<TData = Awaited<ReturnType<typeof ret
     UseQueryOptions<Awaited<ReturnType<typeof retrieveInvite>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _retrieveInviteQueryOptions<TData>>
+): ReturnType<typeof _retrieveInviteQueryOptions<NoInfer<TData>>>
 export function retrieveInviteQueryOptions(
   inviteId: Parameters<typeof retrieveInvite>[0],
   options?: Omit<
@@ -2772,7 +2772,7 @@ export function listProjectsQueryOptions<TData = Awaited<ReturnType<typeof listP
     UseQueryOptions<Awaited<ReturnType<typeof listProjects>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listProjectsQueryOptions<TData>>
+): ReturnType<typeof _listProjectsQueryOptions<NoInfer<TData>>>
 export function listProjectsQueryOptions(
   params?: Parameters<typeof listProjects>[0],
   options?: Omit<
@@ -2816,7 +2816,7 @@ export function retrieveProjectQueryOptions<TData = Awaited<ReturnType<typeof re
     UseQueryOptions<Awaited<ReturnType<typeof retrieveProject>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _retrieveProjectQueryOptions<TData>>
+): ReturnType<typeof _retrieveProjectQueryOptions<NoInfer<TData>>>
 export function retrieveProjectQueryOptions(
   projectId: Parameters<typeof retrieveProject>[0],
   options?: Omit<
@@ -2864,7 +2864,7 @@ export function listProjectApiKeysQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listProjectApiKeys>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listProjectApiKeysQueryOptions<TData>>
+): ReturnType<typeof _listProjectApiKeysQueryOptions<NoInfer<TData>>>
 export function listProjectApiKeysQueryOptions(
   projectId: Parameters<typeof listProjectApiKeys>[0],
   params?: Parameters<typeof listProjectApiKeys>[1],
@@ -2920,7 +2920,7 @@ export function retrieveProjectApiKeyQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof retrieveProjectApiKey>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _retrieveProjectApiKeyQueryOptions<TData>>
+): ReturnType<typeof _retrieveProjectApiKeyQueryOptions<NoInfer<TData>>>
 export function retrieveProjectApiKeyQueryOptions(
   projectId: Parameters<typeof retrieveProjectApiKey>[0],
   apiKeyId: Parameters<typeof retrieveProjectApiKey>[1],
@@ -2976,7 +2976,7 @@ export function listProjectCertificatesQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listProjectCertificates>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listProjectCertificatesQueryOptions<TData>>
+): ReturnType<typeof _listProjectCertificatesQueryOptions<NoInfer<TData>>>
 export function listProjectCertificatesQueryOptions(
   projectId: Parameters<typeof listProjectCertificates>[0],
   params?: Parameters<typeof listProjectCertificates>[1],
@@ -3030,7 +3030,7 @@ export function listProjectGroupsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listProjectGroups>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listProjectGroupsQueryOptions<TData>>
+): ReturnType<typeof _listProjectGroupsQueryOptions<NoInfer<TData>>>
 export function listProjectGroupsQueryOptions(
   projectId: Parameters<typeof listProjectGroups>[0],
   params?: Parameters<typeof listProjectGroups>[1],
@@ -3084,7 +3084,7 @@ export function listProjectRateLimitsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listProjectRateLimits>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listProjectRateLimitsQueryOptions<TData>>
+): ReturnType<typeof _listProjectRateLimitsQueryOptions<NoInfer<TData>>>
 export function listProjectRateLimitsQueryOptions(
   projectId: Parameters<typeof listProjectRateLimits>[0],
   params?: Parameters<typeof listProjectRateLimits>[1],
@@ -3140,7 +3140,7 @@ export function listProjectServiceAccountsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listProjectServiceAccounts>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listProjectServiceAccountsQueryOptions<TData>>
+): ReturnType<typeof _listProjectServiceAccountsQueryOptions<NoInfer<TData>>>
 export function listProjectServiceAccountsQueryOptions(
   projectId: Parameters<typeof listProjectServiceAccounts>[0],
   params?: Parameters<typeof listProjectServiceAccounts>[1],
@@ -3198,7 +3198,7 @@ export function retrieveProjectServiceAccountQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof retrieveProjectServiceAccount>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _retrieveProjectServiceAccountQueryOptions<TData>>
+): ReturnType<typeof _retrieveProjectServiceAccountQueryOptions<NoInfer<TData>>>
 export function retrieveProjectServiceAccountQueryOptions(
   projectId: Parameters<typeof retrieveProjectServiceAccount>[0],
   serviceAccountId: Parameters<typeof retrieveProjectServiceAccount>[1],
@@ -3252,7 +3252,7 @@ export function listProjectUsersQueryOptions<TData = Awaited<ReturnType<typeof l
     UseQueryOptions<Awaited<ReturnType<typeof listProjectUsers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listProjectUsersQueryOptions<TData>>
+): ReturnType<typeof _listProjectUsersQueryOptions<NoInfer<TData>>>
 export function listProjectUsersQueryOptions(
   projectId: Parameters<typeof listProjectUsers>[0],
   params?: Parameters<typeof listProjectUsers>[1],
@@ -3302,7 +3302,7 @@ export function retrieveProjectUserQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof retrieveProjectUser>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _retrieveProjectUserQueryOptions<TData>>
+): ReturnType<typeof _retrieveProjectUserQueryOptions<NoInfer<TData>>>
 export function retrieveProjectUserQueryOptions(
   projectId: Parameters<typeof retrieveProjectUser>[0],
   userId: Parameters<typeof retrieveProjectUser>[1],
@@ -3352,7 +3352,7 @@ export function listRolesQueryOptions<TData = Awaited<ReturnType<typeof listRole
     UseQueryOptions<Awaited<ReturnType<typeof listRoles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listRolesQueryOptions<TData>>
+): ReturnType<typeof _listRolesQueryOptions<NoInfer<TData>>>
 export function listRolesQueryOptions(
   params?: Parameters<typeof listRoles>[0],
   options?: Omit<
@@ -3398,7 +3398,7 @@ export function usageAudioSpeechesQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof usageAudioSpeeches>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _usageAudioSpeechesQueryOptions<TData>>
+): ReturnType<typeof _usageAudioSpeechesQueryOptions<NoInfer<TData>>>
 export function usageAudioSpeechesQueryOptions(
   params: Parameters<typeof usageAudioSpeeches>[0],
   options?: Omit<
@@ -3450,7 +3450,7 @@ export function usageAudioTranscriptionsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof usageAudioTranscriptions>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _usageAudioTranscriptionsQueryOptions<TData>>
+): ReturnType<typeof _usageAudioTranscriptionsQueryOptions<NoInfer<TData>>>
 export function usageAudioTranscriptionsQueryOptions(
   params: Parameters<typeof usageAudioTranscriptions>[0],
   options?: Omit<
@@ -3502,7 +3502,7 @@ export function usageCodeInterpreterSessionsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof usageCodeInterpreterSessions>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _usageCodeInterpreterSessionsQueryOptions<TData>>
+): ReturnType<typeof _usageCodeInterpreterSessionsQueryOptions<NoInfer<TData>>>
 export function usageCodeInterpreterSessionsQueryOptions(
   params: Parameters<typeof usageCodeInterpreterSessions>[0],
   options?: Omit<
@@ -3552,7 +3552,7 @@ export function usageCompletionsQueryOptions<TData = Awaited<ReturnType<typeof u
     UseQueryOptions<Awaited<ReturnType<typeof usageCompletions>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _usageCompletionsQueryOptions<TData>>
+): ReturnType<typeof _usageCompletionsQueryOptions<NoInfer<TData>>>
 export function usageCompletionsQueryOptions(
   params: Parameters<typeof usageCompletions>[0],
   options?: Omit<
@@ -3596,7 +3596,7 @@ export function usageEmbeddingsQueryOptions<TData = Awaited<ReturnType<typeof us
     UseQueryOptions<Awaited<ReturnType<typeof usageEmbeddings>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _usageEmbeddingsQueryOptions<TData>>
+): ReturnType<typeof _usageEmbeddingsQueryOptions<NoInfer<TData>>>
 export function usageEmbeddingsQueryOptions(
   params: Parameters<typeof usageEmbeddings>[0],
   options?: Omit<
@@ -3640,7 +3640,7 @@ export function usageImagesQueryOptions<TData = Awaited<ReturnType<typeof usageI
     UseQueryOptions<Awaited<ReturnType<typeof usageImages>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _usageImagesQueryOptions<TData>>
+): ReturnType<typeof _usageImagesQueryOptions<NoInfer<TData>>>
 export function usageImagesQueryOptions(
   params: Parameters<typeof usageImages>[0],
   options?: Omit<
@@ -3684,7 +3684,7 @@ export function usageModerationsQueryOptions<TData = Awaited<ReturnType<typeof u
     UseQueryOptions<Awaited<ReturnType<typeof usageModerations>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _usageModerationsQueryOptions<TData>>
+): ReturnType<typeof _usageModerationsQueryOptions<NoInfer<TData>>>
 export function usageModerationsQueryOptions(
   params: Parameters<typeof usageModerations>[0],
   options?: Omit<
@@ -3730,7 +3730,7 @@ export function usageVectorStoresQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof usageVectorStores>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _usageVectorStoresQueryOptions<TData>>
+): ReturnType<typeof _usageVectorStoresQueryOptions<NoInfer<TData>>>
 export function usageVectorStoresQueryOptions(
   params: Parameters<typeof usageVectorStores>[0],
   options?: Omit<
@@ -3776,7 +3776,7 @@ export function listUsersQueryOptions<TData = Awaited<ReturnType<typeof listUser
     UseQueryOptions<Awaited<ReturnType<typeof listUsers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listUsersQueryOptions<TData>>
+): ReturnType<typeof _listUsersQueryOptions<NoInfer<TData>>>
 export function listUsersQueryOptions(
   params?: Parameters<typeof listUsers>[0],
   options?: Omit<
@@ -3820,7 +3820,7 @@ export function retrieveUserQueryOptions<TData = Awaited<ReturnType<typeof retri
     UseQueryOptions<Awaited<ReturnType<typeof retrieveUser>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _retrieveUserQueryOptions<TData>>
+): ReturnType<typeof _retrieveUserQueryOptions<NoInfer<TData>>>
 export function retrieveUserQueryOptions(
   userId: Parameters<typeof retrieveUser>[0],
   options?: Omit<
@@ -3870,7 +3870,7 @@ export function listUserRoleAssignmentsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listUserRoleAssignments>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listUserRoleAssignmentsQueryOptions<TData>>
+): ReturnType<typeof _listUserRoleAssignmentsQueryOptions<NoInfer<TData>>>
 export function listUserRoleAssignmentsQueryOptions(
   userId: Parameters<typeof listUserRoleAssignments>[0],
   params?: Parameters<typeof listUserRoleAssignments>[1],
@@ -3930,7 +3930,7 @@ export function listProjectGroupRoleAssignmentsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listProjectGroupRoleAssignments>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listProjectGroupRoleAssignmentsQueryOptions<TData>>
+): ReturnType<typeof _listProjectGroupRoleAssignmentsQueryOptions<NoInfer<TData>>>
 export function listProjectGroupRoleAssignmentsQueryOptions(
   projectId: Parameters<typeof listProjectGroupRoleAssignments>[0],
   groupId: Parameters<typeof listProjectGroupRoleAssignments>[1],
@@ -3986,7 +3986,7 @@ export function listProjectRolesQueryOptions<TData = Awaited<ReturnType<typeof l
     UseQueryOptions<Awaited<ReturnType<typeof listProjectRoles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listProjectRolesQueryOptions<TData>>
+): ReturnType<typeof _listProjectRolesQueryOptions<NoInfer<TData>>>
 export function listProjectRolesQueryOptions(
   projectId: Parameters<typeof listProjectRoles>[0],
   params?: Parameters<typeof listProjectRoles>[1],
@@ -4040,7 +4040,7 @@ export function listProjectUserRoleAssignmentsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listProjectUserRoleAssignments>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listProjectUserRoleAssignmentsQueryOptions<TData>>
+): ReturnType<typeof _listProjectUserRoleAssignmentsQueryOptions<NoInfer<TData>>>
 export function listProjectUserRoleAssignmentsQueryOptions(
   projectId: Parameters<typeof listProjectUserRoleAssignments>[0],
   userId: Parameters<typeof listProjectUserRoleAssignments>[1],
@@ -4096,7 +4096,7 @@ export function getResponseQueryOptions<TData = Awaited<ReturnType<typeof getRes
     UseQueryOptions<Awaited<ReturnType<typeof getResponse>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getResponseQueryOptions<TData>>
+): ReturnType<typeof _getResponseQueryOptions<NoInfer<TData>>>
 export function getResponseQueryOptions(
   responseId: Parameters<typeof getResponse>[0],
   params?: Parameters<typeof getResponse>[1],
@@ -4144,7 +4144,7 @@ export function listInputItemsQueryOptions<TData = Awaited<ReturnType<typeof lis
     UseQueryOptions<Awaited<ReturnType<typeof listInputItems>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listInputItemsQueryOptions<TData>>
+): ReturnType<typeof _listInputItemsQueryOptions<NoInfer<TData>>>
 export function listInputItemsQueryOptions(
   responseId: Parameters<typeof listInputItems>[0],
   params?: Parameters<typeof listInputItems>[1],
@@ -4190,7 +4190,7 @@ export function getThreadQueryOptions<TData = Awaited<ReturnType<typeof getThrea
     UseQueryOptions<Awaited<ReturnType<typeof getThread>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getThreadQueryOptions<TData>>
+): ReturnType<typeof _getThreadQueryOptions<NoInfer<TData>>>
 export function getThreadQueryOptions(
   threadId: Parameters<typeof getThread>[0],
   options?: Omit<
@@ -4236,7 +4236,7 @@ export function listMessagesQueryOptions<TData = Awaited<ReturnType<typeof listM
     UseQueryOptions<Awaited<ReturnType<typeof listMessages>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listMessagesQueryOptions<TData>>
+): ReturnType<typeof _listMessagesQueryOptions<NoInfer<TData>>>
 export function listMessagesQueryOptions(
   threadId: Parameters<typeof listMessages>[0],
   params?: Parameters<typeof listMessages>[1],
@@ -4284,7 +4284,7 @@ export function getMessageQueryOptions<TData = Awaited<ReturnType<typeof getMess
     UseQueryOptions<Awaited<ReturnType<typeof getMessage>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getMessageQueryOptions<TData>>
+): ReturnType<typeof _getMessageQueryOptions<NoInfer<TData>>>
 export function getMessageQueryOptions(
   threadId: Parameters<typeof getMessage>[0],
   messageId: Parameters<typeof getMessage>[1],
@@ -4332,7 +4332,7 @@ export function listRunsQueryOptions<TData = Awaited<ReturnType<typeof listRuns>
     UseQueryOptions<Awaited<ReturnType<typeof listRuns>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listRunsQueryOptions<TData>>
+): ReturnType<typeof _listRunsQueryOptions<NoInfer<TData>>>
 export function listRunsQueryOptions(
   threadId: Parameters<typeof listRuns>[0],
   params?: Parameters<typeof listRuns>[1],
@@ -4380,7 +4380,7 @@ export function getRunQueryOptions<TData = Awaited<ReturnType<typeof getRun>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getRun>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getRunQueryOptions<TData>>
+): ReturnType<typeof _getRunQueryOptions<NoInfer<TData>>>
 export function getRunQueryOptions(
   threadId: Parameters<typeof getRun>[0],
   runId: Parameters<typeof getRun>[1],
@@ -4430,7 +4430,7 @@ export function listRunStepsQueryOptions<TData = Awaited<ReturnType<typeof listR
     UseQueryOptions<Awaited<ReturnType<typeof listRunSteps>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listRunStepsQueryOptions<TData>>
+): ReturnType<typeof _listRunStepsQueryOptions<NoInfer<TData>>>
 export function listRunStepsQueryOptions(
   threadId: Parameters<typeof listRunSteps>[0],
   runId: Parameters<typeof listRunSteps>[1],
@@ -4484,7 +4484,7 @@ export function getRunStepQueryOptions<TData = Awaited<ReturnType<typeof getRunS
     UseQueryOptions<Awaited<ReturnType<typeof getRunStep>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getRunStepQueryOptions<TData>>
+): ReturnType<typeof _getRunStepQueryOptions<NoInfer<TData>>>
 export function getRunStepQueryOptions(
   threadId: Parameters<typeof getRunStep>[0],
   runId: Parameters<typeof getRunStep>[1],
@@ -4534,7 +4534,7 @@ export function listVectorStoresQueryOptions<TData = Awaited<ReturnType<typeof l
     UseQueryOptions<Awaited<ReturnType<typeof listVectorStores>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listVectorStoresQueryOptions<TData>>
+): ReturnType<typeof _listVectorStoresQueryOptions<NoInfer<TData>>>
 export function listVectorStoresQueryOptions(
   params?: Parameters<typeof listVectorStores>[0],
   options?: Omit<
@@ -4578,7 +4578,7 @@ export function getVectorStoreQueryOptions<TData = Awaited<ReturnType<typeof get
     UseQueryOptions<Awaited<ReturnType<typeof getVectorStore>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getVectorStoreQueryOptions<TData>>
+): ReturnType<typeof _getVectorStoreQueryOptions<NoInfer<TData>>>
 export function getVectorStoreQueryOptions(
   vectorStoreId: Parameters<typeof getVectorStore>[0],
   options?: Omit<
@@ -4628,7 +4628,7 @@ export function getVectorStoreFileBatchQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getVectorStoreFileBatch>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getVectorStoreFileBatchQueryOptions<TData>>
+): ReturnType<typeof _getVectorStoreFileBatchQueryOptions<NoInfer<TData>>>
 export function getVectorStoreFileBatchQueryOptions(
   vectorStoreId: Parameters<typeof getVectorStoreFileBatch>[0],
   batchId: Parameters<typeof getVectorStoreFileBatch>[1],
@@ -4686,7 +4686,7 @@ export function listFilesInVectorStoreBatchQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listFilesInVectorStoreBatch>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listFilesInVectorStoreBatchQueryOptions<TData>>
+): ReturnType<typeof _listFilesInVectorStoreBatchQueryOptions<NoInfer<TData>>>
 export function listFilesInVectorStoreBatchQueryOptions(
   vectorStoreId: Parameters<typeof listFilesInVectorStoreBatch>[0],
   batchId: Parameters<typeof listFilesInVectorStoreBatch>[1],
@@ -4746,7 +4746,7 @@ export function listVectorStoreFilesQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listVectorStoreFiles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listVectorStoreFilesQueryOptions<TData>>
+): ReturnType<typeof _listVectorStoreFilesQueryOptions<NoInfer<TData>>>
 export function listVectorStoreFilesQueryOptions(
   vectorStoreId: Parameters<typeof listVectorStoreFiles>[0],
   params?: Parameters<typeof listVectorStoreFiles>[1],
@@ -4800,7 +4800,7 @@ export function getVectorStoreFileQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getVectorStoreFile>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getVectorStoreFileQueryOptions<TData>>
+): ReturnType<typeof _getVectorStoreFileQueryOptions<NoInfer<TData>>>
 export function getVectorStoreFileQueryOptions(
   vectorStoreId: Parameters<typeof getVectorStoreFile>[0],
   fileId: Parameters<typeof getVectorStoreFile>[1],
@@ -4856,7 +4856,7 @@ export function retrieveVectorStoreFileContentQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof retrieveVectorStoreFileContent>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _retrieveVectorStoreFileContentQueryOptions<TData>>
+): ReturnType<typeof _retrieveVectorStoreFileContentQueryOptions<NoInfer<TData>>>
 export function retrieveVectorStoreFileContentQueryOptions(
   vectorStoreId: Parameters<typeof retrieveVectorStoreFileContent>[0],
   fileId: Parameters<typeof retrieveVectorStoreFileContent>[1],
@@ -4908,7 +4908,7 @@ export function getConversationQueryOptions<TData = Awaited<ReturnType<typeof ge
     UseQueryOptions<Awaited<ReturnType<typeof getConversation>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getConversationQueryOptions<TData>>
+): ReturnType<typeof _getConversationQueryOptions<NoInfer<TData>>>
 export function getConversationQueryOptions(
   conversationId: Parameters<typeof getConversation>[0],
   options?: Omit<
@@ -4952,7 +4952,7 @@ export function listVideosQueryOptions<TData = Awaited<ReturnType<typeof listVid
     UseQueryOptions<Awaited<ReturnType<typeof listVideos>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listVideosQueryOptions<TData>>
+): ReturnType<typeof _listVideosQueryOptions<NoInfer<TData>>>
 export function listVideosQueryOptions(
   params?: Parameters<typeof listVideos>[0],
   options?: Omit<
@@ -4998,7 +4998,7 @@ export function getVideoCharacterQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getVideoCharacter>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getVideoCharacterQueryOptions<TData>>
+): ReturnType<typeof _getVideoCharacterQueryOptions<NoInfer<TData>>>
 export function getVideoCharacterQueryOptions(
   characterId: Parameters<typeof getVideoCharacter>[0],
   options?: Omit<
@@ -5044,7 +5044,7 @@ export function getVideoQueryOptions<TData = Awaited<ReturnType<typeof getVideo>
     UseQueryOptions<Awaited<ReturnType<typeof getVideo>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getVideoQueryOptions<TData>>
+): ReturnType<typeof _getVideoQueryOptions<NoInfer<TData>>>
 export function getVideoQueryOptions(
   videoId: Parameters<typeof getVideo>[0],
   options?: Omit<
@@ -5094,7 +5094,7 @@ export function retrieveVideoContentQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof retrieveVideoContent>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _retrieveVideoContentQueryOptions<TData>>
+): ReturnType<typeof _retrieveVideoContentQueryOptions<NoInfer<TData>>>
 export function retrieveVideoContentQueryOptions(
   videoId: Parameters<typeof retrieveVideoContent>[0],
   params?: Parameters<typeof retrieveVideoContent>[1],
@@ -5144,7 +5144,7 @@ export function listSkillsQueryOptions<TData = Awaited<ReturnType<typeof listSki
     UseQueryOptions<Awaited<ReturnType<typeof listSkills>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listSkillsQueryOptions<TData>>
+): ReturnType<typeof _listSkillsQueryOptions<NoInfer<TData>>>
 export function listSkillsQueryOptions(
   params?: Parameters<typeof listSkills>[0],
   options?: Omit<
@@ -5188,7 +5188,7 @@ export function getSkillQueryOptions<TData = Awaited<ReturnType<typeof getSkill>
     UseQueryOptions<Awaited<ReturnType<typeof getSkill>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getSkillQueryOptions<TData>>
+): ReturnType<typeof _getSkillQueryOptions<NoInfer<TData>>>
 export function getSkillQueryOptions(
   skillId: Parameters<typeof getSkill>[0],
   options?: Omit<
@@ -5232,7 +5232,7 @@ export function getSkillContentQueryOptions<TData = Awaited<ReturnType<typeof ge
     UseQueryOptions<Awaited<ReturnType<typeof getSkillContent>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getSkillContentQueryOptions<TData>>
+): ReturnType<typeof _getSkillContentQueryOptions<NoInfer<TData>>>
 export function getSkillContentQueryOptions(
   skillId: Parameters<typeof getSkillContent>[0],
   options?: Omit<
@@ -5280,7 +5280,7 @@ export function listSkillVersionsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listSkillVersions>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listSkillVersionsQueryOptions<TData>>
+): ReturnType<typeof _listSkillVersionsQueryOptions<NoInfer<TData>>>
 export function listSkillVersionsQueryOptions(
   skillId: Parameters<typeof listSkillVersions>[0],
   params?: Parameters<typeof listSkillVersions>[1],
@@ -5330,7 +5330,7 @@ export function getSkillVersionQueryOptions<TData = Awaited<ReturnType<typeof ge
     UseQueryOptions<Awaited<ReturnType<typeof getSkillVersion>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getSkillVersionQueryOptions<TData>>
+): ReturnType<typeof _getSkillVersionQueryOptions<NoInfer<TData>>>
 export function getSkillVersionQueryOptions(
   skillId: Parameters<typeof getSkillVersion>[0],
   version: Parameters<typeof getSkillVersion>[1],
@@ -5382,7 +5382,7 @@ export function getSkillVersionContentQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getSkillVersionContent>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getSkillVersionContentQueryOptions<TData>>
+): ReturnType<typeof _getSkillVersionContentQueryOptions<NoInfer<TData>>>
 export function getSkillVersionContentQueryOptions(
   skillId: Parameters<typeof getSkillVersionContent>[0],
   version: Parameters<typeof getSkillVersionContent>[1],
@@ -5438,7 +5438,7 @@ export function listThreadItemsMethodQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listThreadItemsMethod>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listThreadItemsMethodQueryOptions<TData>>
+): ReturnType<typeof _listThreadItemsMethodQueryOptions<NoInfer<TData>>>
 export function listThreadItemsMethodQueryOptions(
   threadId: Parameters<typeof listThreadItemsMethod>[0],
   params?: Parameters<typeof listThreadItemsMethod>[1],
@@ -5488,7 +5488,7 @@ export function getThreadMethodQueryOptions<TData = Awaited<ReturnType<typeof ge
     UseQueryOptions<Awaited<ReturnType<typeof getThreadMethod>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getThreadMethodQueryOptions<TData>>
+): ReturnType<typeof _getThreadMethodQueryOptions<NoInfer<TData>>>
 export function getThreadMethodQueryOptions(
   threadId: Parameters<typeof getThreadMethod>[0],
   options?: Omit<
@@ -5534,7 +5534,7 @@ export function listThreadsMethodQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listThreadsMethod>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listThreadsMethodQueryOptions<TData>>
+): ReturnType<typeof _listThreadsMethodQueryOptions<NoInfer<TData>>>
 export function listThreadsMethodQueryOptions(
   params?: Parameters<typeof listThreadsMethod>[0],
   options?: Omit<
@@ -5567,7 +5567,7 @@ export function useListAssistants<TData = Awaited<ReturnType<typeof listAssistan
     UseQueryOptions<Awaited<ReturnType<typeof listAssistants>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useListAssistants(
   params?: Parameters<typeof listAssistants>[0],
@@ -5612,7 +5612,7 @@ export function useListAssistantsInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useListAssistantsInfinite(
   params?: Parameters<typeof listAssistants>[0],
@@ -5668,7 +5668,7 @@ export function useGetAssistant<TData = Awaited<ReturnType<typeof getAssistant>>
     UseQueryOptions<Awaited<ReturnType<typeof getAssistant>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 /** @deprecated */
 export function useGetAssistant(
   assistantId: Parameters<typeof getAssistant>[0] | undefined | null,
@@ -5705,7 +5705,7 @@ export function useListVoiceConsents<TData = Awaited<ReturnType<typeof listVoice
     UseQueryOptions<Awaited<ReturnType<typeof listVoiceConsents>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListVoiceConsents(
   params?: Parameters<typeof listVoiceConsents>[0],
   options?: Omit<
@@ -5747,7 +5747,7 @@ export function useListVoiceConsentsInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListVoiceConsentsInfinite(
   params?: Parameters<typeof listVoiceConsents>[0],
   options?: Omit<
@@ -5800,7 +5800,7 @@ export function useGetVoiceConsent<TData = Awaited<ReturnType<typeof getVoiceCon
     UseQueryOptions<Awaited<ReturnType<typeof getVoiceConsent>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetVoiceConsent(
   consentId: Parameters<typeof getVoiceConsent>[0] | undefined | null,
   options?: Omit<
@@ -5835,7 +5835,7 @@ export function useListBatches<TData = Awaited<ReturnType<typeof listBatches>>>(
     UseQueryOptions<Awaited<ReturnType<typeof listBatches>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListBatches(
   params?: Parameters<typeof listBatches>[0],
   options?: Omit<
@@ -5877,7 +5877,7 @@ export function useListBatchesInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListBatchesInfinite(
   params?: Parameters<typeof listBatches>[0],
   options?: Omit<
@@ -5930,7 +5930,7 @@ export function useRetrieveBatch<TData = Awaited<ReturnType<typeof retrieveBatch
     UseQueryOptions<Awaited<ReturnType<typeof retrieveBatch>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useRetrieveBatch(
   batchId: Parameters<typeof retrieveBatch>[0] | undefined | null,
   options?: Omit<
@@ -5965,7 +5965,7 @@ export function useListChatCompletions<TData = Awaited<ReturnType<typeof listCha
     UseQueryOptions<Awaited<ReturnType<typeof listChatCompletions>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListChatCompletions(
   params?: Parameters<typeof listChatCompletions>[0],
   options?: Omit<
@@ -6007,7 +6007,7 @@ export function useListChatCompletionsInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListChatCompletionsInfinite(
   params?: Parameters<typeof listChatCompletions>[0],
   options?: Omit<
@@ -6060,7 +6060,7 @@ export function useGetChatCompletion<TData = Awaited<ReturnType<typeof getChatCo
     UseQueryOptions<Awaited<ReturnType<typeof getChatCompletion>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetChatCompletion(
   completionId: Parameters<typeof getChatCompletion>[0] | undefined | null,
   options?: Omit<
@@ -6098,7 +6098,7 @@ export function useGetChatCompletionMessages<
     UseQueryOptions<Awaited<ReturnType<typeof getChatCompletionMessages>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetChatCompletionMessages(
   completionId: Parameters<typeof getChatCompletionMessages>[0] | undefined | null,
   params?: Parameters<typeof getChatCompletionMessages>[1],
@@ -6137,7 +6137,7 @@ export function useListContainers<TData = Awaited<ReturnType<typeof listContaine
     UseQueryOptions<Awaited<ReturnType<typeof listContainers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListContainers(
   params?: Parameters<typeof listContainers>[0],
   options?: Omit<
@@ -6179,7 +6179,7 @@ export function useListContainersInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListContainersInfinite(
   params?: Parameters<typeof listContainers>[0],
   options?: Omit<
@@ -6232,7 +6232,7 @@ export function useRetrieveContainer<TData = Awaited<ReturnType<typeof retrieveC
     UseQueryOptions<Awaited<ReturnType<typeof retrieveContainer>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useRetrieveContainer(
   containerId: Parameters<typeof retrieveContainer>[0] | undefined | null,
   options?: Omit<
@@ -6268,7 +6268,7 @@ export function useListContainerFiles<TData = Awaited<ReturnType<typeof listCont
     UseQueryOptions<Awaited<ReturnType<typeof listContainerFiles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListContainerFiles(
   containerId: Parameters<typeof listContainerFiles>[0] | undefined | null,
   params?: Parameters<typeof listContainerFiles>[1],
@@ -6306,7 +6306,7 @@ export function useRetrieveContainerFile<TData = Awaited<ReturnType<typeof retri
     UseQueryOptions<Awaited<ReturnType<typeof retrieveContainerFile>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useRetrieveContainerFile(
   containerId: Parameters<typeof retrieveContainerFile>[0] | undefined | null,
   fileId: Parameters<typeof retrieveContainerFile>[1] | undefined | null,
@@ -6346,7 +6346,7 @@ export function useRetrieveContainerFileContent<
     UseQueryOptions<Awaited<ReturnType<typeof retrieveContainerFileContent>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useRetrieveContainerFileContent(
   containerId: Parameters<typeof retrieveContainerFileContent>[0] | undefined | null,
   fileId: Parameters<typeof retrieveContainerFileContent>[1] | undefined | null,
@@ -6386,7 +6386,7 @@ export function useListConversationItems<TData = Awaited<ReturnType<typeof listC
     UseQueryOptions<Awaited<ReturnType<typeof listConversationItems>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListConversationItems(
   conversationId: Parameters<typeof listConversationItems>[0] | undefined | null,
   params?: Parameters<typeof listConversationItems>[1],
@@ -6425,7 +6425,7 @@ export function useGetConversationItem<TData = Awaited<ReturnType<typeof getConv
     UseQueryOptions<Awaited<ReturnType<typeof getConversationItem>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetConversationItem(
   conversationId: Parameters<typeof getConversationItem>[0] | undefined | null,
   itemId: Parameters<typeof getConversationItem>[1] | undefined | null,
@@ -6464,7 +6464,7 @@ export function useListEvals<TData = Awaited<ReturnType<typeof listEvals>>>(
     UseQueryOptions<Awaited<ReturnType<typeof listEvals>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListEvals(
   params?: Parameters<typeof listEvals>[0],
   options?: Omit<
@@ -6504,7 +6504,7 @@ export function useListEvalsInfinite<TData = InfiniteData<Awaited<ReturnType<typ
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListEvalsInfinite(
   params?: Parameters<typeof listEvals>[0],
   options?: Omit<
@@ -6555,7 +6555,7 @@ export function useGetEval<TData = Awaited<ReturnType<typeof getEval>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getEval>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetEval(
   evalId: Parameters<typeof getEval>[0] | undefined | null,
   options?: Omit<
@@ -6591,7 +6591,7 @@ export function useGetEvalRuns<TData = Awaited<ReturnType<typeof getEvalRuns>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getEvalRuns>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetEvalRuns(
   evalId: Parameters<typeof getEvalRuns>[0] | undefined | null,
   params?: Parameters<typeof getEvalRuns>[1],
@@ -6629,7 +6629,7 @@ export function useGetEvalRun<TData = Awaited<ReturnType<typeof getEvalRun>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getEvalRun>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetEvalRun(
   evalId: Parameters<typeof getEvalRun>[0] | undefined | null,
   runId: Parameters<typeof getEvalRun>[1] | undefined | null,
@@ -6668,7 +6668,7 @@ export function useGetEvalRunOutputItems<TData = Awaited<ReturnType<typeof getEv
     UseQueryOptions<Awaited<ReturnType<typeof getEvalRunOutputItems>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetEvalRunOutputItems(
   evalId: Parameters<typeof getEvalRunOutputItems>[0] | undefined | null,
   runId: Parameters<typeof getEvalRunOutputItems>[1] | undefined | null,
@@ -6709,7 +6709,7 @@ export function useGetEvalRunOutputItem<TData = Awaited<ReturnType<typeof getEva
     UseQueryOptions<Awaited<ReturnType<typeof getEvalRunOutputItem>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetEvalRunOutputItem(
   evalId: Parameters<typeof getEvalRunOutputItem>[0] | undefined | null,
   runId: Parameters<typeof getEvalRunOutputItem>[1] | undefined | null,
@@ -6748,7 +6748,7 @@ export function useListFiles<TData = Awaited<ReturnType<typeof listFiles>>>(
     UseQueryOptions<Awaited<ReturnType<typeof listFiles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListFiles(
   params?: Parameters<typeof listFiles>[0],
   options?: Omit<
@@ -6788,7 +6788,7 @@ export function useListFilesInfinite<TData = InfiniteData<Awaited<ReturnType<typ
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListFilesInfinite(
   params?: Parameters<typeof listFiles>[0],
   options?: Omit<
@@ -6839,7 +6839,7 @@ export function useRetrieveFile<TData = Awaited<ReturnType<typeof retrieveFile>>
     UseQueryOptions<Awaited<ReturnType<typeof retrieveFile>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useRetrieveFile(
   fileId: Parameters<typeof retrieveFile>[0] | undefined | null,
   options?: Omit<
@@ -6874,7 +6874,7 @@ export function useDownloadFile<TData = Awaited<ReturnType<typeof downloadFile>>
     UseQueryOptions<Awaited<ReturnType<typeof downloadFile>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useDownloadFile(
   fileId: Parameters<typeof downloadFile>[0] | undefined | null,
   options?: Omit<
@@ -6917,7 +6917,7 @@ export function useListFineTuningCheckpointPermissions<
     >,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListFineTuningCheckpointPermissions(
   fineTunedModelCheckpoint:
     Parameters<typeof listFineTuningCheckpointPermissions>[0] | undefined | null,
@@ -6969,7 +6969,7 @@ export function useListPaginatedFineTuningJobs<
     UseQueryOptions<Awaited<ReturnType<typeof listPaginatedFineTuningJobs>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListPaginatedFineTuningJobs(
   params?: Parameters<typeof listPaginatedFineTuningJobs>[0],
   options?: Omit<
@@ -7013,7 +7013,7 @@ export function useListPaginatedFineTuningJobsInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListPaginatedFineTuningJobsInfinite(
   params?: Parameters<typeof listPaginatedFineTuningJobs>[0],
   options?: Omit<
@@ -7070,7 +7070,7 @@ export function useRetrieveFineTuningJob<TData = Awaited<ReturnType<typeof retri
     UseQueryOptions<Awaited<ReturnType<typeof retrieveFineTuningJob>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useRetrieveFineTuningJob(
   fineTuningJobId: Parameters<typeof retrieveFineTuningJob>[0] | undefined | null,
   options?: Omit<
@@ -7108,7 +7108,7 @@ export function useListFineTuningJobCheckpoints<
     UseQueryOptions<Awaited<ReturnType<typeof listFineTuningJobCheckpoints>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListFineTuningJobCheckpoints(
   fineTuningJobId: Parameters<typeof listFineTuningJobCheckpoints>[0] | undefined | null,
   params?: Parameters<typeof listFineTuningJobCheckpoints>[1],
@@ -7148,7 +7148,7 @@ export function useListFineTuningEvents<TData = Awaited<ReturnType<typeof listFi
     UseQueryOptions<Awaited<ReturnType<typeof listFineTuningEvents>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListFineTuningEvents(
   fineTuningJobId: Parameters<typeof listFineTuningEvents>[0] | undefined | null,
   params?: Parameters<typeof listFineTuningEvents>[1],
@@ -7184,7 +7184,7 @@ export function useListModels<TData = Awaited<ReturnType<typeof listModels>>>(
     UseQueryOptions<Awaited<ReturnType<typeof listModels>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListModels(
   options?: Omit<
     UseQueryOptions<
@@ -7216,7 +7216,7 @@ export function useRetrieveModel<TData = Awaited<ReturnType<typeof retrieveModel
     UseQueryOptions<Awaited<ReturnType<typeof retrieveModel>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useRetrieveModel(
   model: Parameters<typeof retrieveModel>[0] | undefined | null,
   options?: Omit<
@@ -7251,7 +7251,7 @@ export function useAdminApiKeysList<TData = Awaited<ReturnType<typeof adminApiKe
     UseQueryOptions<Awaited<ReturnType<typeof adminApiKeysList>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useAdminApiKeysList(
   params?: Parameters<typeof adminApiKeysList>[0],
   options?: Omit<
@@ -7293,7 +7293,7 @@ export function useAdminApiKeysListInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useAdminApiKeysListInfinite(
   params?: Parameters<typeof adminApiKeysList>[0],
   options?: Omit<
@@ -7346,7 +7346,7 @@ export function useAdminApiKeysGet<TData = Awaited<ReturnType<typeof adminApiKey
     UseQueryOptions<Awaited<ReturnType<typeof adminApiKeysGet>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useAdminApiKeysGet(
   keyId: Parameters<typeof adminApiKeysGet>[0] | undefined | null,
   options?: Omit<
@@ -7381,7 +7381,7 @@ export function useListAuditLogs<TData = Awaited<ReturnType<typeof listAuditLogs
     UseQueryOptions<Awaited<ReturnType<typeof listAuditLogs>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListAuditLogs(
   params?: Parameters<typeof listAuditLogs>[0],
   options?: Omit<
@@ -7423,7 +7423,7 @@ export function useListAuditLogsInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListAuditLogsInfinite(
   params?: Parameters<typeof listAuditLogs>[0],
   options?: Omit<
@@ -7478,7 +7478,7 @@ export function useListOrganizationCertificates<
     UseQueryOptions<Awaited<ReturnType<typeof listOrganizationCertificates>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListOrganizationCertificates(
   params?: Parameters<typeof listOrganizationCertificates>[0],
   options?: Omit<
@@ -7522,7 +7522,7 @@ export function useListOrganizationCertificatesInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListOrganizationCertificatesInfinite(
   params?: Parameters<typeof listOrganizationCertificates>[0],
   options?: Omit<
@@ -7580,7 +7580,7 @@ export function useGetCertificate<TData = Awaited<ReturnType<typeof getCertifica
     UseQueryOptions<Awaited<ReturnType<typeof getCertificate>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetCertificate(
   certificateId: Parameters<typeof getCertificate>[0] | undefined | null,
   params?: Parameters<typeof getCertificate>[1],
@@ -7617,7 +7617,7 @@ export function useUsageCosts<TData = Awaited<ReturnType<typeof usageCosts>>>(
     UseQueryOptions<Awaited<ReturnType<typeof usageCosts>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useUsageCosts(
   params: Parameters<typeof usageCosts>[0],
   options?: Omit<
@@ -7657,7 +7657,7 @@ export function useUsageCostsInfinite<TData = InfiniteData<Awaited<ReturnType<ty
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useUsageCostsInfinite(
   params: Parameters<typeof usageCosts>[0],
   options?: Omit<
@@ -7708,7 +7708,7 @@ export function useListGroups<TData = Awaited<ReturnType<typeof listGroups>>>(
     UseQueryOptions<Awaited<ReturnType<typeof listGroups>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListGroups(
   params?: Parameters<typeof listGroups>[0],
   options?: Omit<
@@ -7748,7 +7748,7 @@ export function useListGroupsInfinite<TData = InfiniteData<Awaited<ReturnType<ty
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListGroupsInfinite(
   params?: Parameters<typeof listGroups>[0],
   options?: Omit<
@@ -7802,7 +7802,7 @@ export function useListGroupRoleAssignments<
     UseQueryOptions<Awaited<ReturnType<typeof listGroupRoleAssignments>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListGroupRoleAssignments(
   groupId: Parameters<typeof listGroupRoleAssignments>[0] | undefined | null,
   params?: Parameters<typeof listGroupRoleAssignments>[1],
@@ -7842,7 +7842,7 @@ export function useListGroupUsers<TData = Awaited<ReturnType<typeof listGroupUse
     UseQueryOptions<Awaited<ReturnType<typeof listGroupUsers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListGroupUsers(
   groupId: Parameters<typeof listGroupUsers>[0] | undefined | null,
   params?: Parameters<typeof listGroupUsers>[1],
@@ -7879,7 +7879,7 @@ export function useListInvites<TData = Awaited<ReturnType<typeof listInvites>>>(
     UseQueryOptions<Awaited<ReturnType<typeof listInvites>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListInvites(
   params?: Parameters<typeof listInvites>[0],
   options?: Omit<
@@ -7921,7 +7921,7 @@ export function useListInvitesInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListInvitesInfinite(
   params?: Parameters<typeof listInvites>[0],
   options?: Omit<
@@ -7974,7 +7974,7 @@ export function useRetrieveInvite<TData = Awaited<ReturnType<typeof retrieveInvi
     UseQueryOptions<Awaited<ReturnType<typeof retrieveInvite>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useRetrieveInvite(
   inviteId: Parameters<typeof retrieveInvite>[0] | undefined | null,
   options?: Omit<
@@ -8009,7 +8009,7 @@ export function useListProjects<TData = Awaited<ReturnType<typeof listProjects>>
     UseQueryOptions<Awaited<ReturnType<typeof listProjects>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListProjects(
   params?: Parameters<typeof listProjects>[0],
   options?: Omit<
@@ -8051,7 +8051,7 @@ export function useListProjectsInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListProjectsInfinite(
   params?: Parameters<typeof listProjects>[0],
   options?: Omit<
@@ -8104,7 +8104,7 @@ export function useRetrieveProject<TData = Awaited<ReturnType<typeof retrievePro
     UseQueryOptions<Awaited<ReturnType<typeof retrieveProject>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useRetrieveProject(
   projectId: Parameters<typeof retrieveProject>[0] | undefined | null,
   options?: Omit<
@@ -8140,7 +8140,7 @@ export function useListProjectApiKeys<TData = Awaited<ReturnType<typeof listProj
     UseQueryOptions<Awaited<ReturnType<typeof listProjectApiKeys>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListProjectApiKeys(
   projectId: Parameters<typeof listProjectApiKeys>[0] | undefined | null,
   params?: Parameters<typeof listProjectApiKeys>[1],
@@ -8178,7 +8178,7 @@ export function useRetrieveProjectApiKey<TData = Awaited<ReturnType<typeof retri
     UseQueryOptions<Awaited<ReturnType<typeof retrieveProjectApiKey>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useRetrieveProjectApiKey(
   projectId: Parameters<typeof retrieveProjectApiKey>[0] | undefined | null,
   apiKeyId: Parameters<typeof retrieveProjectApiKey>[1] | undefined | null,
@@ -8218,7 +8218,7 @@ export function useListProjectCertificates<
     UseQueryOptions<Awaited<ReturnType<typeof listProjectCertificates>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListProjectCertificates(
   projectId: Parameters<typeof listProjectCertificates>[0] | undefined | null,
   params?: Parameters<typeof listProjectCertificates>[1],
@@ -8258,7 +8258,7 @@ export function useListProjectGroups<TData = Awaited<ReturnType<typeof listProje
     UseQueryOptions<Awaited<ReturnType<typeof listProjectGroups>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListProjectGroups(
   projectId: Parameters<typeof listProjectGroups>[0] | undefined | null,
   params?: Parameters<typeof listProjectGroups>[1],
@@ -8296,7 +8296,7 @@ export function useListProjectRateLimits<TData = Awaited<ReturnType<typeof listP
     UseQueryOptions<Awaited<ReturnType<typeof listProjectRateLimits>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListProjectRateLimits(
   projectId: Parameters<typeof listProjectRateLimits>[0] | undefined | null,
   params?: Parameters<typeof listProjectRateLimits>[1],
@@ -8336,7 +8336,7 @@ export function useListProjectServiceAccounts<
     UseQueryOptions<Awaited<ReturnType<typeof listProjectServiceAccounts>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListProjectServiceAccounts(
   projectId: Parameters<typeof listProjectServiceAccounts>[0] | undefined | null,
   params?: Parameters<typeof listProjectServiceAccounts>[1],
@@ -8378,7 +8378,7 @@ export function useRetrieveProjectServiceAccount<
     UseQueryOptions<Awaited<ReturnType<typeof retrieveProjectServiceAccount>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useRetrieveProjectServiceAccount(
   projectId: Parameters<typeof retrieveProjectServiceAccount>[0] | undefined | null,
   serviceAccountId: Parameters<typeof retrieveProjectServiceAccount>[1] | undefined | null,
@@ -8418,7 +8418,7 @@ export function useListProjectUsers<TData = Awaited<ReturnType<typeof listProjec
     UseQueryOptions<Awaited<ReturnType<typeof listProjectUsers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListProjectUsers(
   projectId: Parameters<typeof listProjectUsers>[0] | undefined | null,
   params?: Parameters<typeof listProjectUsers>[1],
@@ -8456,7 +8456,7 @@ export function useRetrieveProjectUser<TData = Awaited<ReturnType<typeof retriev
     UseQueryOptions<Awaited<ReturnType<typeof retrieveProjectUser>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useRetrieveProjectUser(
   projectId: Parameters<typeof retrieveProjectUser>[0] | undefined | null,
   userId: Parameters<typeof retrieveProjectUser>[1] | undefined | null,
@@ -8493,7 +8493,7 @@ export function useListRoles<TData = Awaited<ReturnType<typeof listRoles>>>(
     UseQueryOptions<Awaited<ReturnType<typeof listRoles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListRoles(
   params?: Parameters<typeof listRoles>[0],
   options?: Omit<
@@ -8533,7 +8533,7 @@ export function useListRolesInfinite<TData = InfiniteData<Awaited<ReturnType<typ
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListRolesInfinite(
   params?: Parameters<typeof listRoles>[0],
   options?: Omit<
@@ -8584,7 +8584,7 @@ export function useUsageAudioSpeeches<TData = Awaited<ReturnType<typeof usageAud
     UseQueryOptions<Awaited<ReturnType<typeof usageAudioSpeeches>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useUsageAudioSpeeches(
   params: Parameters<typeof usageAudioSpeeches>[0],
   options?: Omit<
@@ -8626,7 +8626,7 @@ export function useUsageAudioSpeechesInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useUsageAudioSpeechesInfinite(
   params: Parameters<typeof usageAudioSpeeches>[0],
   options?: Omit<
@@ -8681,7 +8681,7 @@ export function useUsageAudioTranscriptions<
     UseQueryOptions<Awaited<ReturnType<typeof usageAudioTranscriptions>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useUsageAudioTranscriptions(
   params: Parameters<typeof usageAudioTranscriptions>[0],
   options?: Omit<
@@ -8725,7 +8725,7 @@ export function useUsageAudioTranscriptionsInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useUsageAudioTranscriptionsInfinite(
   params: Parameters<typeof usageAudioTranscriptions>[0],
   options?: Omit<
@@ -8783,7 +8783,7 @@ export function useUsageCodeInterpreterSessions<
     UseQueryOptions<Awaited<ReturnType<typeof usageCodeInterpreterSessions>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useUsageCodeInterpreterSessions(
   params: Parameters<typeof usageCodeInterpreterSessions>[0],
   options?: Omit<
@@ -8827,7 +8827,7 @@ export function useUsageCodeInterpreterSessionsInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useUsageCodeInterpreterSessionsInfinite(
   params: Parameters<typeof usageCodeInterpreterSessions>[0],
   options?: Omit<
@@ -8884,7 +8884,7 @@ export function useUsageCompletions<TData = Awaited<ReturnType<typeof usageCompl
     UseQueryOptions<Awaited<ReturnType<typeof usageCompletions>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useUsageCompletions(
   params: Parameters<typeof usageCompletions>[0],
   options?: Omit<
@@ -8926,7 +8926,7 @@ export function useUsageCompletionsInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useUsageCompletionsInfinite(
   params: Parameters<typeof usageCompletions>[0],
   options?: Omit<
@@ -8979,7 +8979,7 @@ export function useUsageEmbeddings<TData = Awaited<ReturnType<typeof usageEmbedd
     UseQueryOptions<Awaited<ReturnType<typeof usageEmbeddings>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useUsageEmbeddings(
   params: Parameters<typeof usageEmbeddings>[0],
   options?: Omit<
@@ -9021,7 +9021,7 @@ export function useUsageEmbeddingsInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useUsageEmbeddingsInfinite(
   params: Parameters<typeof usageEmbeddings>[0],
   options?: Omit<
@@ -9074,7 +9074,7 @@ export function useUsageImages<TData = Awaited<ReturnType<typeof usageImages>>>(
     UseQueryOptions<Awaited<ReturnType<typeof usageImages>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useUsageImages(
   params: Parameters<typeof usageImages>[0],
   options?: Omit<
@@ -9116,7 +9116,7 @@ export function useUsageImagesInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useUsageImagesInfinite(
   params: Parameters<typeof usageImages>[0],
   options?: Omit<
@@ -9169,7 +9169,7 @@ export function useUsageModerations<TData = Awaited<ReturnType<typeof usageModer
     UseQueryOptions<Awaited<ReturnType<typeof usageModerations>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useUsageModerations(
   params: Parameters<typeof usageModerations>[0],
   options?: Omit<
@@ -9211,7 +9211,7 @@ export function useUsageModerationsInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useUsageModerationsInfinite(
   params: Parameters<typeof usageModerations>[0],
   options?: Omit<
@@ -9264,7 +9264,7 @@ export function useUsageVectorStores<TData = Awaited<ReturnType<typeof usageVect
     UseQueryOptions<Awaited<ReturnType<typeof usageVectorStores>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useUsageVectorStores(
   params: Parameters<typeof usageVectorStores>[0],
   options?: Omit<
@@ -9306,7 +9306,7 @@ export function useUsageVectorStoresInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useUsageVectorStoresInfinite(
   params: Parameters<typeof usageVectorStores>[0],
   options?: Omit<
@@ -9359,7 +9359,7 @@ export function useListUsers<TData = Awaited<ReturnType<typeof listUsers>>>(
     UseQueryOptions<Awaited<ReturnType<typeof listUsers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListUsers(
   params?: Parameters<typeof listUsers>[0],
   options?: Omit<
@@ -9399,7 +9399,7 @@ export function useListUsersInfinite<TData = InfiniteData<Awaited<ReturnType<typ
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListUsersInfinite(
   params?: Parameters<typeof listUsers>[0],
   options?: Omit<
@@ -9450,7 +9450,7 @@ export function useRetrieveUser<TData = Awaited<ReturnType<typeof retrieveUser>>
     UseQueryOptions<Awaited<ReturnType<typeof retrieveUser>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useRetrieveUser(
   userId: Parameters<typeof retrieveUser>[0] | undefined | null,
   options?: Omit<
@@ -9488,7 +9488,7 @@ export function useListUserRoleAssignments<
     UseQueryOptions<Awaited<ReturnType<typeof listUserRoleAssignments>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListUserRoleAssignments(
   userId: Parameters<typeof listUserRoleAssignments>[0] | undefined | null,
   params?: Parameters<typeof listUserRoleAssignments>[1],
@@ -9531,7 +9531,7 @@ export function useListProjectGroupRoleAssignments<
     UseQueryOptions<Awaited<ReturnType<typeof listProjectGroupRoleAssignments>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListProjectGroupRoleAssignments(
   projectId: Parameters<typeof listProjectGroupRoleAssignments>[0] | undefined | null,
   groupId: Parameters<typeof listProjectGroupRoleAssignments>[1] | undefined | null,
@@ -9573,7 +9573,7 @@ export function useListProjectRoles<TData = Awaited<ReturnType<typeof listProjec
     UseQueryOptions<Awaited<ReturnType<typeof listProjectRoles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListProjectRoles(
   projectId: Parameters<typeof listProjectRoles>[0] | undefined | null,
   params?: Parameters<typeof listProjectRoles>[1],
@@ -9614,7 +9614,7 @@ export function useListProjectUserRoleAssignments<
     UseQueryOptions<Awaited<ReturnType<typeof listProjectUserRoleAssignments>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListProjectUserRoleAssignments(
   projectId: Parameters<typeof listProjectUserRoleAssignments>[0] | undefined | null,
   userId: Parameters<typeof listProjectUserRoleAssignments>[1] | undefined | null,
@@ -9656,7 +9656,7 @@ export function useGetResponse<TData = Awaited<ReturnType<typeof getResponse>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getResponse>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetResponse(
   responseId: Parameters<typeof getResponse>[0] | undefined | null,
   params?: Parameters<typeof getResponse>[1],
@@ -9694,7 +9694,7 @@ export function useListInputItems<TData = Awaited<ReturnType<typeof listInputIte
     UseQueryOptions<Awaited<ReturnType<typeof listInputItems>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListInputItems(
   responseId: Parameters<typeof listInputItems>[0] | undefined | null,
   params?: Parameters<typeof listInputItems>[1],
@@ -9731,7 +9731,7 @@ export function useGetThread<TData = Awaited<ReturnType<typeof getThread>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getThread>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetThread(
   threadId: Parameters<typeof getThread>[0] | undefined | null,
   options?: Omit<
@@ -9767,7 +9767,7 @@ export function useListMessages<TData = Awaited<ReturnType<typeof listMessages>>
     UseQueryOptions<Awaited<ReturnType<typeof listMessages>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListMessages(
   threadId: Parameters<typeof listMessages>[0] | undefined | null,
   params?: Parameters<typeof listMessages>[1],
@@ -9805,7 +9805,7 @@ export function useGetMessage<TData = Awaited<ReturnType<typeof getMessage>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getMessage>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetMessage(
   threadId: Parameters<typeof getMessage>[0] | undefined | null,
   messageId: Parameters<typeof getMessage>[1] | undefined | null,
@@ -9843,7 +9843,7 @@ export function useListRuns<TData = Awaited<ReturnType<typeof listRuns>>>(
     UseQueryOptions<Awaited<ReturnType<typeof listRuns>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListRuns(
   threadId: Parameters<typeof listRuns>[0] | undefined | null,
   params?: Parameters<typeof listRuns>[1],
@@ -9881,7 +9881,7 @@ export function useGetRun<TData = Awaited<ReturnType<typeof getRun>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getRun>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetRun(
   threadId: Parameters<typeof getRun>[0] | undefined | null,
   runId: Parameters<typeof getRun>[1] | undefined | null,
@@ -9920,7 +9920,7 @@ export function useListRunSteps<TData = Awaited<ReturnType<typeof listRunSteps>>
     UseQueryOptions<Awaited<ReturnType<typeof listRunSteps>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListRunSteps(
   threadId: Parameters<typeof listRunSteps>[0] | undefined | null,
   runId: Parameters<typeof listRunSteps>[1] | undefined | null,
@@ -9962,7 +9962,7 @@ export function useGetRunStep<TData = Awaited<ReturnType<typeof getRunStep>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getRunStep>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetRunStep(
   threadId: Parameters<typeof getRunStep>[0] | undefined | null,
   runId: Parameters<typeof getRunStep>[1] | undefined | null,
@@ -10003,7 +10003,7 @@ export function useListVectorStores<TData = Awaited<ReturnType<typeof listVector
     UseQueryOptions<Awaited<ReturnType<typeof listVectorStores>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListVectorStores(
   params?: Parameters<typeof listVectorStores>[0],
   options?: Omit<
@@ -10045,7 +10045,7 @@ export function useListVectorStoresInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListVectorStoresInfinite(
   params?: Parameters<typeof listVectorStores>[0],
   options?: Omit<
@@ -10098,7 +10098,7 @@ export function useGetVectorStore<TData = Awaited<ReturnType<typeof getVectorSto
     UseQueryOptions<Awaited<ReturnType<typeof getVectorStore>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetVectorStore(
   vectorStoreId: Parameters<typeof getVectorStore>[0] | undefined | null,
   options?: Omit<
@@ -10136,7 +10136,7 @@ export function useGetVectorStoreFileBatch<
     UseQueryOptions<Awaited<ReturnType<typeof getVectorStoreFileBatch>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetVectorStoreFileBatch(
   vectorStoreId: Parameters<typeof getVectorStoreFileBatch>[0] | undefined | null,
   batchId: Parameters<typeof getVectorStoreFileBatch>[1] | undefined | null,
@@ -10179,7 +10179,7 @@ export function useListFilesInVectorStoreBatch<
     UseQueryOptions<Awaited<ReturnType<typeof listFilesInVectorStoreBatch>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListFilesInVectorStoreBatch(
   vectorStoreId: Parameters<typeof listFilesInVectorStoreBatch>[0] | undefined | null,
   batchId: Parameters<typeof listFilesInVectorStoreBatch>[1] | undefined | null,
@@ -10221,7 +10221,7 @@ export function useListVectorStoreFiles<TData = Awaited<ReturnType<typeof listVe
     UseQueryOptions<Awaited<ReturnType<typeof listVectorStoreFiles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListVectorStoreFiles(
   vectorStoreId: Parameters<typeof listVectorStoreFiles>[0] | undefined | null,
   params?: Parameters<typeof listVectorStoreFiles>[1],
@@ -10259,7 +10259,7 @@ export function useGetVectorStoreFile<TData = Awaited<ReturnType<typeof getVecto
     UseQueryOptions<Awaited<ReturnType<typeof getVectorStoreFile>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetVectorStoreFile(
   vectorStoreId: Parameters<typeof getVectorStoreFile>[0] | undefined | null,
   fileId: Parameters<typeof getVectorStoreFile>[1] | undefined | null,
@@ -10299,7 +10299,7 @@ export function useRetrieveVectorStoreFileContent<
     UseQueryOptions<Awaited<ReturnType<typeof retrieveVectorStoreFileContent>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useRetrieveVectorStoreFileContent(
   vectorStoreId: Parameters<typeof retrieveVectorStoreFileContent>[0] | undefined | null,
   fileId: Parameters<typeof retrieveVectorStoreFileContent>[1] | undefined | null,
@@ -10338,7 +10338,7 @@ export function useGetConversation<TData = Awaited<ReturnType<typeof getConversa
     UseQueryOptions<Awaited<ReturnType<typeof getConversation>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetConversation(
   conversationId: Parameters<typeof getConversation>[0] | undefined | null,
   options?: Omit<
@@ -10373,7 +10373,7 @@ export function useListVideos<TData = Awaited<ReturnType<typeof listVideos>>>(
     UseQueryOptions<Awaited<ReturnType<typeof listVideos>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListVideos(
   params?: Parameters<typeof listVideos>[0],
   options?: Omit<
@@ -10413,7 +10413,7 @@ export function useListVideosInfinite<TData = InfiniteData<Awaited<ReturnType<ty
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListVideosInfinite(
   params?: Parameters<typeof listVideos>[0],
   options?: Omit<
@@ -10464,7 +10464,7 @@ export function useGetVideoCharacter<TData = Awaited<ReturnType<typeof getVideoC
     UseQueryOptions<Awaited<ReturnType<typeof getVideoCharacter>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetVideoCharacter(
   characterId: Parameters<typeof getVideoCharacter>[0] | undefined | null,
   options?: Omit<
@@ -10499,7 +10499,7 @@ export function useGetVideo<TData = Awaited<ReturnType<typeof getVideo>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getVideo>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetVideo(
   videoId: Parameters<typeof getVideo>[0] | undefined | null,
   options?: Omit<
@@ -10535,7 +10535,7 @@ export function useRetrieveVideoContent<TData = Awaited<ReturnType<typeof retrie
     UseQueryOptions<Awaited<ReturnType<typeof retrieveVideoContent>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useRetrieveVideoContent(
   videoId: Parameters<typeof retrieveVideoContent>[0] | undefined | null,
   params?: Parameters<typeof retrieveVideoContent>[1],
@@ -10572,7 +10572,7 @@ export function useListSkills<TData = Awaited<ReturnType<typeof listSkills>>>(
     UseQueryOptions<Awaited<ReturnType<typeof listSkills>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListSkills(
   params?: Parameters<typeof listSkills>[0],
   options?: Omit<
@@ -10612,7 +10612,7 @@ export function useListSkillsInfinite<TData = InfiniteData<Awaited<ReturnType<ty
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListSkillsInfinite(
   params?: Parameters<typeof listSkills>[0],
   options?: Omit<
@@ -10663,7 +10663,7 @@ export function useGetSkill<TData = Awaited<ReturnType<typeof getSkill>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getSkill>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetSkill(
   skillId: Parameters<typeof getSkill>[0] | undefined | null,
   options?: Omit<
@@ -10698,7 +10698,7 @@ export function useGetSkillContent<TData = Awaited<ReturnType<typeof getSkillCon
     UseQueryOptions<Awaited<ReturnType<typeof getSkillContent>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetSkillContent(
   skillId: Parameters<typeof getSkillContent>[0] | undefined | null,
   options?: Omit<
@@ -10734,7 +10734,7 @@ export function useListSkillVersions<TData = Awaited<ReturnType<typeof listSkill
     UseQueryOptions<Awaited<ReturnType<typeof listSkillVersions>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListSkillVersions(
   skillId: Parameters<typeof listSkillVersions>[0] | undefined | null,
   params?: Parameters<typeof listSkillVersions>[1],
@@ -10772,7 +10772,7 @@ export function useGetSkillVersion<TData = Awaited<ReturnType<typeof getSkillVer
     UseQueryOptions<Awaited<ReturnType<typeof getSkillVersion>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetSkillVersion(
   skillId: Parameters<typeof getSkillVersion>[0] | undefined | null,
   version: Parameters<typeof getSkillVersion>[1] | undefined | null,
@@ -10812,7 +10812,7 @@ export function useGetSkillVersionContent<
     UseQueryOptions<Awaited<ReturnType<typeof getSkillVersionContent>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetSkillVersionContent(
   skillId: Parameters<typeof getSkillVersionContent>[0] | undefined | null,
   version: Parameters<typeof getSkillVersionContent>[1] | undefined | null,
@@ -10852,7 +10852,7 @@ export function useListThreadItemsMethod<TData = Awaited<ReturnType<typeof listT
     UseQueryOptions<Awaited<ReturnType<typeof listThreadItemsMethod>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListThreadItemsMethod(
   threadId: Parameters<typeof listThreadItemsMethod>[0] | undefined | null,
   params?: Parameters<typeof listThreadItemsMethod>[1],
@@ -10889,7 +10889,7 @@ export function useGetThreadMethod<TData = Awaited<ReturnType<typeof getThreadMe
     UseQueryOptions<Awaited<ReturnType<typeof getThreadMethod>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetThreadMethod(
   threadId: Parameters<typeof getThreadMethod>[0] | undefined | null,
   options?: Omit<
@@ -10924,7 +10924,7 @@ export function useListThreadsMethod<TData = Awaited<ReturnType<typeof listThrea
     UseQueryOptions<Awaited<ReturnType<typeof listThreadsMethod>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListThreadsMethod(
   params?: Parameters<typeof listThreadsMethod>[0],
   options?: Omit<
@@ -10966,7 +10966,7 @@ export function useListThreadsMethodInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListThreadsMethodInfinite(
   params?: Parameters<typeof listThreadsMethod>[0],
   options?: Omit<

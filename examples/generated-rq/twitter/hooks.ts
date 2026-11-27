@@ -281,7 +281,7 @@ export function listBatchComplianceJobsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listBatchComplianceJobs>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listBatchComplianceJobsQueryOptions<TData>>
+): ReturnType<typeof _listBatchComplianceJobsQueryOptions<NoInfer<TData>>>
 export function listBatchComplianceJobsQueryOptions(
   params: Parameters<typeof listBatchComplianceJobs>[0],
   options?: Omit<
@@ -335,7 +335,7 @@ export function getBatchComplianceJobQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getBatchComplianceJob>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getBatchComplianceJobQueryOptions<TData>>
+): ReturnType<typeof _getBatchComplianceJobQueryOptions<NoInfer<TData>>>
 export function getBatchComplianceJobQueryOptions(
   id: Parameters<typeof getBatchComplianceJob>[0],
   params?: Parameters<typeof getBatchComplianceJob>[1],
@@ -403,7 +403,7 @@ export function getDmConversationsWithParticipantIdDmEventsQueryOptions<
     >,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getDmConversationsWithParticipantIdDmEventsQueryOptions<TData>>
+): ReturnType<typeof _getDmConversationsWithParticipantIdDmEventsQueryOptions<NoInfer<TData>>>
 export function getDmConversationsWithParticipantIdDmEventsQueryOptions(
   participantId: Parameters<typeof getDmConversationsWithParticipantIdDmEvents>[0],
   params?: Parameters<typeof getDmConversationsWithParticipantIdDmEvents>[1],
@@ -465,7 +465,7 @@ export function getDmConversationsIdDmEventsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getDmConversationsIdDmEvents>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getDmConversationsIdDmEventsQueryOptions<TData>>
+): ReturnType<typeof _getDmConversationsIdDmEventsQueryOptions<NoInfer<TData>>>
 export function getDmConversationsIdDmEventsQueryOptions(
   id: Parameters<typeof getDmConversationsIdDmEvents>[0],
   params?: Parameters<typeof getDmConversationsIdDmEvents>[1],
@@ -517,7 +517,7 @@ export function getDmEventsQueryOptions<TData = Awaited<ReturnType<typeof getDmE
     UseQueryOptions<Awaited<ReturnType<typeof getDmEvents>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getDmEventsQueryOptions<TData>>
+): ReturnType<typeof _getDmEventsQueryOptions<NoInfer<TData>>>
 export function getDmEventsQueryOptions(
   params?: Parameters<typeof getDmEvents>[0],
   options?: Omit<
@@ -563,7 +563,7 @@ export function listIdGetQueryOptions<TData = Awaited<ReturnType<typeof listIdGe
     UseQueryOptions<Awaited<ReturnType<typeof listIdGet>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listIdGetQueryOptions<TData>>
+): ReturnType<typeof _listIdGetQueryOptions<NoInfer<TData>>>
 export function listIdGetQueryOptions(
   id: Parameters<typeof listIdGet>[0],
   params?: Parameters<typeof listIdGet>[1],
@@ -611,7 +611,7 @@ export function listGetFollowersQueryOptions<TData = Awaited<ReturnType<typeof l
     UseQueryOptions<Awaited<ReturnType<typeof listGetFollowers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listGetFollowersQueryOptions<TData>>
+): ReturnType<typeof _listGetFollowersQueryOptions<NoInfer<TData>>>
 export function listGetFollowersQueryOptions(
   id: Parameters<typeof listGetFollowers>[0],
   params?: Parameters<typeof listGetFollowers>[1],
@@ -659,7 +659,7 @@ export function listGetMembersQueryOptions<TData = Awaited<ReturnType<typeof lis
     UseQueryOptions<Awaited<ReturnType<typeof listGetMembers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listGetMembersQueryOptions<TData>>
+): ReturnType<typeof _listGetMembersQueryOptions<NoInfer<TData>>>
 export function listGetMembersQueryOptions(
   id: Parameters<typeof listGetMembers>[0],
   params?: Parameters<typeof listGetMembers>[1],
@@ -707,7 +707,7 @@ export function listsIdTweetsQueryOptions<TData = Awaited<ReturnType<typeof list
     UseQueryOptions<Awaited<ReturnType<typeof listsIdTweets>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listsIdTweetsQueryOptions<TData>>
+): ReturnType<typeof _listsIdTweetsQueryOptions<NoInfer<TData>>>
 export function listsIdTweetsQueryOptions(
   id: Parameters<typeof listsIdTweets>[0],
   params?: Parameters<typeof listsIdTweets>[1],
@@ -751,7 +751,7 @@ export function getOpenApiSpecQueryOptions<TData = Awaited<ReturnType<typeof get
     UseQueryOptions<Awaited<ReturnType<typeof getOpenApiSpec>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getOpenApiSpecQueryOptions<TData>>
+): ReturnType<typeof _getOpenApiSpecQueryOptions<NoInfer<TData>>>
 export function getOpenApiSpecQueryOptions(
   options?: Omit<
     UseQueryOptions<
@@ -793,7 +793,7 @@ export function findSpacesByIdsQueryOptions<TData = Awaited<ReturnType<typeof fi
     UseQueryOptions<Awaited<ReturnType<typeof findSpacesByIds>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _findSpacesByIdsQueryOptions<TData>>
+): ReturnType<typeof _findSpacesByIdsQueryOptions<NoInfer<TData>>>
 export function findSpacesByIdsQueryOptions(
   params: Parameters<typeof findSpacesByIds>[0],
   options?: Omit<
@@ -841,7 +841,7 @@ export function findSpacesByCreatorIdsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof findSpacesByCreatorIds>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _findSpacesByCreatorIdsQueryOptions<TData>>
+): ReturnType<typeof _findSpacesByCreatorIdsQueryOptions<NoInfer<TData>>>
 export function findSpacesByCreatorIdsQueryOptions(
   params: Parameters<typeof findSpacesByCreatorIds>[0],
   options?: Omit<
@@ -889,7 +889,7 @@ export function searchSpacesQueryOptions<TData = Awaited<ReturnType<typeof searc
     UseQueryOptions<Awaited<ReturnType<typeof searchSpaces>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _searchSpacesQueryOptions<TData>>
+): ReturnType<typeof _searchSpacesQueryOptions<NoInfer<TData>>>
 export function searchSpacesQueryOptions(
   params: Parameters<typeof searchSpaces>[0],
   options?: Omit<
@@ -935,7 +935,7 @@ export function findSpaceByIdQueryOptions<TData = Awaited<ReturnType<typeof find
     UseQueryOptions<Awaited<ReturnType<typeof findSpaceById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _findSpaceByIdQueryOptions<TData>>
+): ReturnType<typeof _findSpaceByIdQueryOptions<NoInfer<TData>>>
 export function findSpaceByIdQueryOptions(
   id: Parameters<typeof findSpaceById>[0],
   params?: Parameters<typeof findSpaceById>[1],
@@ -983,7 +983,7 @@ export function spaceBuyersQueryOptions<TData = Awaited<ReturnType<typeof spaceB
     UseQueryOptions<Awaited<ReturnType<typeof spaceBuyers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _spaceBuyersQueryOptions<TData>>
+): ReturnType<typeof _spaceBuyersQueryOptions<NoInfer<TData>>>
 export function spaceBuyersQueryOptions(
   id: Parameters<typeof spaceBuyers>[0],
   params?: Parameters<typeof spaceBuyers>[1],
@@ -1031,7 +1031,7 @@ export function spaceTweetsQueryOptions<TData = Awaited<ReturnType<typeof spaceT
     UseQueryOptions<Awaited<ReturnType<typeof spaceTweets>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _spaceTweetsQueryOptions<TData>>
+): ReturnType<typeof _spaceTweetsQueryOptions<NoInfer<TData>>>
 export function spaceTweetsQueryOptions(
   id: Parameters<typeof spaceTweets>[0],
   params?: Parameters<typeof spaceTweets>[1],
@@ -1077,7 +1077,7 @@ export function findTweetsByIdQueryOptions<TData = Awaited<ReturnType<typeof fin
     UseQueryOptions<Awaited<ReturnType<typeof findTweetsById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _findTweetsByIdQueryOptions<TData>>
+): ReturnType<typeof _findTweetsByIdQueryOptions<NoInfer<TData>>>
 export function findTweetsByIdQueryOptions(
   params: Parameters<typeof findTweetsById>[0],
   options?: Omit<
@@ -1125,7 +1125,7 @@ export function getTweetsComplianceStreamQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getTweetsComplianceStream>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getTweetsComplianceStreamQueryOptions<TData>>
+): ReturnType<typeof _getTweetsComplianceStreamQueryOptions<NoInfer<TData>>>
 export function getTweetsComplianceStreamQueryOptions(
   params: Parameters<typeof getTweetsComplianceStream>[0],
   options?: Omit<
@@ -1179,7 +1179,7 @@ export function tweetCountsFullArchiveSearchQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof tweetCountsFullArchiveSearch>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _tweetCountsFullArchiveSearchQueryOptions<TData>>
+): ReturnType<typeof _tweetCountsFullArchiveSearchQueryOptions<NoInfer<TData>>>
 export function tweetCountsFullArchiveSearchQueryOptions(
   params: Parameters<typeof tweetCountsFullArchiveSearch>[0],
   options?: Omit<
@@ -1233,7 +1233,7 @@ export function tweetCountsRecentSearchQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof tweetCountsRecentSearch>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _tweetCountsRecentSearchQueryOptions<TData>>
+): ReturnType<typeof _tweetCountsRecentSearchQueryOptions<NoInfer<TData>>>
 export function tweetCountsRecentSearchQueryOptions(
   params: Parameters<typeof tweetCountsRecentSearch>[0],
   options?: Omit<
@@ -1285,7 +1285,7 @@ export function getTweetsFirehoseStreamQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getTweetsFirehoseStream>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getTweetsFirehoseStreamQueryOptions<TData>>
+): ReturnType<typeof _getTweetsFirehoseStreamQueryOptions<NoInfer<TData>>>
 export function getTweetsFirehoseStreamQueryOptions(
   params: Parameters<typeof getTweetsFirehoseStream>[0],
   options?: Omit<
@@ -1337,7 +1337,7 @@ export function getTweetsLabelStreamQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getTweetsLabelStream>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getTweetsLabelStreamQueryOptions<TData>>
+): ReturnType<typeof _getTweetsLabelStreamQueryOptions<NoInfer<TData>>>
 export function getTweetsLabelStreamQueryOptions(
   params?: Parameters<typeof getTweetsLabelStream>[0],
   options?: Omit<
@@ -1385,7 +1385,7 @@ export function sampleStreamQueryOptions<TData = Awaited<ReturnType<typeof sampl
     UseQueryOptions<Awaited<ReturnType<typeof sampleStream>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _sampleStreamQueryOptions<TData>>
+): ReturnType<typeof _sampleStreamQueryOptions<NoInfer<TData>>>
 export function sampleStreamQueryOptions(
   params?: Parameters<typeof sampleStream>[0],
   options?: Omit<
@@ -1433,7 +1433,7 @@ export function getTweetsSample10StreamQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getTweetsSample10Stream>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getTweetsSample10StreamQueryOptions<TData>>
+): ReturnType<typeof _getTweetsSample10StreamQueryOptions<NoInfer<TData>>>
 export function getTweetsSample10StreamQueryOptions(
   params: Parameters<typeof getTweetsSample10Stream>[0],
   options?: Omit<
@@ -1485,7 +1485,7 @@ export function tweetsFullarchiveSearchQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof tweetsFullarchiveSearch>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _tweetsFullarchiveSearchQueryOptions<TData>>
+): ReturnType<typeof _tweetsFullarchiveSearchQueryOptions<NoInfer<TData>>>
 export function tweetsFullarchiveSearchQueryOptions(
   params: Parameters<typeof tweetsFullarchiveSearch>[0],
   options?: Omit<
@@ -1535,7 +1535,7 @@ export function tweetsRecentSearchQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof tweetsRecentSearch>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _tweetsRecentSearchQueryOptions<TData>>
+): ReturnType<typeof _tweetsRecentSearchQueryOptions<NoInfer<TData>>>
 export function tweetsRecentSearchQueryOptions(
   params: Parameters<typeof tweetsRecentSearch>[0],
   options?: Omit<
@@ -1583,7 +1583,7 @@ export function searchStreamQueryOptions<TData = Awaited<ReturnType<typeof searc
     UseQueryOptions<Awaited<ReturnType<typeof searchStream>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _searchStreamQueryOptions<TData>>
+): ReturnType<typeof _searchStreamQueryOptions<NoInfer<TData>>>
 export function searchStreamQueryOptions(
   params?: Parameters<typeof searchStream>[0],
   options?: Omit<
@@ -1627,7 +1627,7 @@ export function getRulesQueryOptions<TData = Awaited<ReturnType<typeof getRules>
     UseQueryOptions<Awaited<ReturnType<typeof getRules>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getRulesQueryOptions<TData>>
+): ReturnType<typeof _getRulesQueryOptions<NoInfer<TData>>>
 export function getRulesQueryOptions(
   params?: Parameters<typeof getRules>[0],
   options?: Omit<
@@ -1673,7 +1673,7 @@ export function findTweetByIdQueryOptions<TData = Awaited<ReturnType<typeof find
     UseQueryOptions<Awaited<ReturnType<typeof findTweetById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _findTweetByIdQueryOptions<TData>>
+): ReturnType<typeof _findTweetByIdQueryOptions<NoInfer<TData>>>
 export function findTweetByIdQueryOptions(
   id: Parameters<typeof findTweetById>[0],
   params?: Parameters<typeof findTweetById>[1],
@@ -1723,7 +1723,7 @@ export function tweetsIdLikingUsersQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof tweetsIdLikingUsers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _tweetsIdLikingUsersQueryOptions<TData>>
+): ReturnType<typeof _tweetsIdLikingUsersQueryOptions<NoInfer<TData>>>
 export function tweetsIdLikingUsersQueryOptions(
   id: Parameters<typeof tweetsIdLikingUsers>[0],
   params?: Parameters<typeof tweetsIdLikingUsers>[1],
@@ -1779,7 +1779,7 @@ export function findTweetsThatQuoteATweetQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof findTweetsThatQuoteATweet>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _findTweetsThatQuoteATweetQueryOptions<TData>>
+): ReturnType<typeof _findTweetsThatQuoteATweetQueryOptions<NoInfer<TData>>>
 export function findTweetsThatQuoteATweetQueryOptions(
   id: Parameters<typeof findTweetsThatQuoteATweet>[0],
   params?: Parameters<typeof findTweetsThatQuoteATweet>[1],
@@ -1837,7 +1837,7 @@ export function tweetsIdRetweetingUsersQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof tweetsIdRetweetingUsers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _tweetsIdRetweetingUsersQueryOptions<TData>>
+): ReturnType<typeof _tweetsIdRetweetingUsersQueryOptions<NoInfer<TData>>>
 export function tweetsIdRetweetingUsersQueryOptions(
   id: Parameters<typeof tweetsIdRetweetingUsers>[0],
   params?: Parameters<typeof tweetsIdRetweetingUsers>[1],
@@ -1887,7 +1887,7 @@ export function findUsersByIdQueryOptions<TData = Awaited<ReturnType<typeof find
     UseQueryOptions<Awaited<ReturnType<typeof findUsersById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _findUsersByIdQueryOptions<TData>>
+): ReturnType<typeof _findUsersByIdQueryOptions<NoInfer<TData>>>
 export function findUsersByIdQueryOptions(
   params: Parameters<typeof findUsersById>[0],
   options?: Omit<
@@ -1933,7 +1933,7 @@ export function findUsersByUsernameQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof findUsersByUsername>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _findUsersByUsernameQueryOptions<TData>>
+): ReturnType<typeof _findUsersByUsernameQueryOptions<NoInfer<TData>>>
 export function findUsersByUsernameQueryOptions(
   params: Parameters<typeof findUsersByUsername>[0],
   options?: Omit<
@@ -1985,7 +1985,7 @@ export function findUserByUsernameQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof findUserByUsername>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _findUserByUsernameQueryOptions<TData>>
+): ReturnType<typeof _findUserByUsernameQueryOptions<NoInfer<TData>>>
 export function findUserByUsernameQueryOptions(
   username: Parameters<typeof findUserByUsername>[0],
   params?: Parameters<typeof findUserByUsername>[1],
@@ -2039,7 +2039,7 @@ export function getUsersComplianceStreamQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getUsersComplianceStream>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getUsersComplianceStreamQueryOptions<TData>>
+): ReturnType<typeof _getUsersComplianceStreamQueryOptions<NoInfer<TData>>>
 export function getUsersComplianceStreamQueryOptions(
   params: Parameters<typeof getUsersComplianceStream>[0],
   options?: Omit<
@@ -2087,7 +2087,7 @@ export function findMyUserQueryOptions<TData = Awaited<ReturnType<typeof findMyU
     UseQueryOptions<Awaited<ReturnType<typeof findMyUser>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _findMyUserQueryOptions<TData>>
+): ReturnType<typeof _findMyUserQueryOptions<NoInfer<TData>>>
 export function findMyUserQueryOptions(
   params?: Parameters<typeof findMyUser>[0],
   options?: Omit<
@@ -2133,7 +2133,7 @@ export function findUserByIdQueryOptions<TData = Awaited<ReturnType<typeof findU
     UseQueryOptions<Awaited<ReturnType<typeof findUserById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _findUserByIdQueryOptions<TData>>
+): ReturnType<typeof _findUserByIdQueryOptions<NoInfer<TData>>>
 export function findUserByIdQueryOptions(
   id: Parameters<typeof findUserById>[0],
   params?: Parameters<typeof findUserById>[1],
@@ -2181,7 +2181,7 @@ export function usersIdBlockingQueryOptions<TData = Awaited<ReturnType<typeof us
     UseQueryOptions<Awaited<ReturnType<typeof usersIdBlocking>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _usersIdBlockingQueryOptions<TData>>
+): ReturnType<typeof _usersIdBlockingQueryOptions<NoInfer<TData>>>
 export function usersIdBlockingQueryOptions(
   id: Parameters<typeof usersIdBlocking>[0],
   params?: Parameters<typeof usersIdBlocking>[1],
@@ -2231,7 +2231,7 @@ export function getUsersIdBookmarksQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getUsersIdBookmarks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getUsersIdBookmarksQueryOptions<TData>>
+): ReturnType<typeof _getUsersIdBookmarksQueryOptions<NoInfer<TData>>>
 export function getUsersIdBookmarksQueryOptions(
   id: Parameters<typeof getUsersIdBookmarks>[0],
   params?: Parameters<typeof getUsersIdBookmarks>[1],
@@ -2285,7 +2285,7 @@ export function userFollowedListsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof userFollowedLists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _userFollowedListsQueryOptions<TData>>
+): ReturnType<typeof _userFollowedListsQueryOptions<NoInfer<TData>>>
 export function userFollowedListsQueryOptions(
   id: Parameters<typeof userFollowedLists>[0],
   params?: Parameters<typeof userFollowedLists>[1],
@@ -2335,7 +2335,7 @@ export function usersIdFollowersQueryOptions<TData = Awaited<ReturnType<typeof u
     UseQueryOptions<Awaited<ReturnType<typeof usersIdFollowers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _usersIdFollowersQueryOptions<TData>>
+): ReturnType<typeof _usersIdFollowersQueryOptions<NoInfer<TData>>>
 export function usersIdFollowersQueryOptions(
   id: Parameters<typeof usersIdFollowers>[0],
   params?: Parameters<typeof usersIdFollowers>[1],
@@ -2383,7 +2383,7 @@ export function usersIdFollowingQueryOptions<TData = Awaited<ReturnType<typeof u
     UseQueryOptions<Awaited<ReturnType<typeof usersIdFollowing>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _usersIdFollowingQueryOptions<TData>>
+): ReturnType<typeof _usersIdFollowingQueryOptions<NoInfer<TData>>>
 export function usersIdFollowingQueryOptions(
   id: Parameters<typeof usersIdFollowing>[0],
   params?: Parameters<typeof usersIdFollowing>[1],
@@ -2433,7 +2433,7 @@ export function usersIdLikedTweetsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof usersIdLikedTweets>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _usersIdLikedTweetsQueryOptions<TData>>
+): ReturnType<typeof _usersIdLikedTweetsQueryOptions<NoInfer<TData>>>
 export function usersIdLikedTweetsQueryOptions(
   id: Parameters<typeof usersIdLikedTweets>[0],
   params?: Parameters<typeof usersIdLikedTweets>[1],
@@ -2489,7 +2489,7 @@ export function getUserListMembershipsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getUserListMemberships>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getUserListMembershipsQueryOptions<TData>>
+): ReturnType<typeof _getUserListMembershipsQueryOptions<NoInfer<TData>>>
 export function getUserListMembershipsQueryOptions(
   id: Parameters<typeof getUserListMemberships>[0],
   params?: Parameters<typeof getUserListMemberships>[1],
@@ -2541,7 +2541,7 @@ export function usersIdMentionsQueryOptions<TData = Awaited<ReturnType<typeof us
     UseQueryOptions<Awaited<ReturnType<typeof usersIdMentions>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _usersIdMentionsQueryOptions<TData>>
+): ReturnType<typeof _usersIdMentionsQueryOptions<NoInfer<TData>>>
 export function usersIdMentionsQueryOptions(
   id: Parameters<typeof usersIdMentions>[0],
   params?: Parameters<typeof usersIdMentions>[1],
@@ -2589,7 +2589,7 @@ export function usersIdMutingQueryOptions<TData = Awaited<ReturnType<typeof user
     UseQueryOptions<Awaited<ReturnType<typeof usersIdMuting>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _usersIdMutingQueryOptions<TData>>
+): ReturnType<typeof _usersIdMutingQueryOptions<NoInfer<TData>>>
 export function usersIdMutingQueryOptions(
   id: Parameters<typeof usersIdMuting>[0],
   params?: Parameters<typeof usersIdMuting>[1],
@@ -2639,7 +2639,7 @@ export function listUserOwnedListsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listUserOwnedLists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listUserOwnedListsQueryOptions<TData>>
+): ReturnType<typeof _listUserOwnedListsQueryOptions<NoInfer<TData>>>
 export function listUserOwnedListsQueryOptions(
   id: Parameters<typeof listUserOwnedLists>[0],
   params?: Parameters<typeof listUserOwnedLists>[1],
@@ -2693,7 +2693,7 @@ export function listUserPinnedListsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listUserPinnedLists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listUserPinnedListsQueryOptions<TData>>
+): ReturnType<typeof _listUserPinnedListsQueryOptions<NoInfer<TData>>>
 export function listUserPinnedListsQueryOptions(
   id: Parameters<typeof listUserPinnedLists>[0],
   params?: Parameters<typeof listUserPinnedLists>[1],
@@ -2745,7 +2745,7 @@ export function usersIdTimelineQueryOptions<TData = Awaited<ReturnType<typeof us
     UseQueryOptions<Awaited<ReturnType<typeof usersIdTimeline>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _usersIdTimelineQueryOptions<TData>>
+): ReturnType<typeof _usersIdTimelineQueryOptions<NoInfer<TData>>>
 export function usersIdTimelineQueryOptions(
   id: Parameters<typeof usersIdTimeline>[0],
   params?: Parameters<typeof usersIdTimeline>[1],
@@ -2793,7 +2793,7 @@ export function usersIdTweetsQueryOptions<TData = Awaited<ReturnType<typeof user
     UseQueryOptions<Awaited<ReturnType<typeof usersIdTweets>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _usersIdTweetsQueryOptions<TData>>
+): ReturnType<typeof _usersIdTweetsQueryOptions<NoInfer<TData>>>
 export function usersIdTweetsQueryOptions(
   id: Parameters<typeof usersIdTweets>[0],
   params?: Parameters<typeof usersIdTweets>[1],
@@ -2827,7 +2827,7 @@ export function useListBatchComplianceJobs<
     UseQueryOptions<Awaited<ReturnType<typeof listBatchComplianceJobs>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListBatchComplianceJobs(
   params: Parameters<typeof listBatchComplianceJobs>[0],
   options?: Omit<
@@ -2864,7 +2864,7 @@ export function useGetBatchComplianceJob<TData = Awaited<ReturnType<typeof getBa
     UseQueryOptions<Awaited<ReturnType<typeof getBatchComplianceJob>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetBatchComplianceJob(
   id: Parameters<typeof getBatchComplianceJob>[0] | undefined | null,
   params?: Parameters<typeof getBatchComplianceJob>[1],
@@ -2909,7 +2909,7 @@ export function useGetDmConversationsWithParticipantIdDmEvents<
     >,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetDmConversationsWithParticipantIdDmEvents(
   participantId:
     Parameters<typeof getDmConversationsWithParticipantIdDmEvents>[0] | undefined | null,
@@ -2961,7 +2961,7 @@ export function useGetDmConversationsIdDmEvents<
     UseQueryOptions<Awaited<ReturnType<typeof getDmConversationsIdDmEvents>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetDmConversationsIdDmEvents(
   id: Parameters<typeof getDmConversationsIdDmEvents>[0] | undefined | null,
   params?: Parameters<typeof getDmConversationsIdDmEvents>[1],
@@ -3000,7 +3000,7 @@ export function useGetDmEvents<TData = Awaited<ReturnType<typeof getDmEvents>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getDmEvents>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetDmEvents(
   params?: Parameters<typeof getDmEvents>[0],
   options?: Omit<
@@ -3035,7 +3035,7 @@ export function useListIdGet<TData = Awaited<ReturnType<typeof listIdGet>>>(
     UseQueryOptions<Awaited<ReturnType<typeof listIdGet>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListIdGet(
   id: Parameters<typeof listIdGet>[0] | undefined | null,
   params?: Parameters<typeof listIdGet>[1],
@@ -3073,7 +3073,7 @@ export function useListGetFollowers<TData = Awaited<ReturnType<typeof listGetFol
     UseQueryOptions<Awaited<ReturnType<typeof listGetFollowers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListGetFollowers(
   id: Parameters<typeof listGetFollowers>[0] | undefined | null,
   params?: Parameters<typeof listGetFollowers>[1],
@@ -3111,7 +3111,7 @@ export function useListGetMembers<TData = Awaited<ReturnType<typeof listGetMembe
     UseQueryOptions<Awaited<ReturnType<typeof listGetMembers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListGetMembers(
   id: Parameters<typeof listGetMembers>[0] | undefined | null,
   params?: Parameters<typeof listGetMembers>[1],
@@ -3149,7 +3149,7 @@ export function useListsIdTweets<TData = Awaited<ReturnType<typeof listsIdTweets
     UseQueryOptions<Awaited<ReturnType<typeof listsIdTweets>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListsIdTweets(
   id: Parameters<typeof listsIdTweets>[0] | undefined | null,
   params?: Parameters<typeof listsIdTweets>[1],
@@ -3185,7 +3185,7 @@ export function useGetOpenApiSpec<TData = Awaited<ReturnType<typeof getOpenApiSp
     UseQueryOptions<Awaited<ReturnType<typeof getOpenApiSpec>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetOpenApiSpec(
   options?: Omit<
     UseQueryOptions<
@@ -3217,7 +3217,7 @@ export function useFindSpacesByIds<TData = Awaited<ReturnType<typeof findSpacesB
     UseQueryOptions<Awaited<ReturnType<typeof findSpacesByIds>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useFindSpacesByIds(
   params: Parameters<typeof findSpacesByIds>[0],
   options?: Omit<
@@ -3253,7 +3253,7 @@ export function useFindSpacesByCreatorIds<
     UseQueryOptions<Awaited<ReturnType<typeof findSpacesByCreatorIds>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useFindSpacesByCreatorIds(
   params: Parameters<typeof findSpacesByCreatorIds>[0],
   options?: Omit<
@@ -3289,7 +3289,7 @@ export function useSearchSpaces<TData = Awaited<ReturnType<typeof searchSpaces>>
     UseQueryOptions<Awaited<ReturnType<typeof searchSpaces>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useSearchSpaces(
   params: Parameters<typeof searchSpaces>[0],
   options?: Omit<
@@ -3324,7 +3324,7 @@ export function useFindSpaceById<TData = Awaited<ReturnType<typeof findSpaceById
     UseQueryOptions<Awaited<ReturnType<typeof findSpaceById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useFindSpaceById(
   id: Parameters<typeof findSpaceById>[0] | undefined | null,
   params?: Parameters<typeof findSpaceById>[1],
@@ -3362,7 +3362,7 @@ export function useSpaceBuyers<TData = Awaited<ReturnType<typeof spaceBuyers>>>(
     UseQueryOptions<Awaited<ReturnType<typeof spaceBuyers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useSpaceBuyers(
   id: Parameters<typeof spaceBuyers>[0] | undefined | null,
   params?: Parameters<typeof spaceBuyers>[1],
@@ -3400,7 +3400,7 @@ export function useSpaceTweets<TData = Awaited<ReturnType<typeof spaceTweets>>>(
     UseQueryOptions<Awaited<ReturnType<typeof spaceTweets>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useSpaceTweets(
   id: Parameters<typeof spaceTweets>[0] | undefined | null,
   params?: Parameters<typeof spaceTweets>[1],
@@ -3437,7 +3437,7 @@ export function useFindTweetsById<TData = Awaited<ReturnType<typeof findTweetsBy
     UseQueryOptions<Awaited<ReturnType<typeof findTweetsById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useFindTweetsById(
   params: Parameters<typeof findTweetsById>[0],
   options?: Omit<
@@ -3473,7 +3473,7 @@ export function useGetTweetsComplianceStream<
     UseQueryOptions<Awaited<ReturnType<typeof getTweetsComplianceStream>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetTweetsComplianceStream(
   params: Parameters<typeof getTweetsComplianceStream>[0],
   options?: Omit<
@@ -3511,7 +3511,7 @@ export function useTweetCountsFullArchiveSearch<
     UseQueryOptions<Awaited<ReturnType<typeof tweetCountsFullArchiveSearch>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useTweetCountsFullArchiveSearch(
   params: Parameters<typeof tweetCountsFullArchiveSearch>[0],
   options?: Omit<
@@ -3549,7 +3549,7 @@ export function useTweetCountsRecentSearch<
     UseQueryOptions<Awaited<ReturnType<typeof tweetCountsRecentSearch>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useTweetCountsRecentSearch(
   params: Parameters<typeof tweetCountsRecentSearch>[0],
   options?: Omit<
@@ -3587,7 +3587,7 @@ export function useGetTweetsFirehoseStream<
     UseQueryOptions<Awaited<ReturnType<typeof getTweetsFirehoseStream>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetTweetsFirehoseStream(
   params: Parameters<typeof getTweetsFirehoseStream>[0],
   options?: Omit<
@@ -3623,7 +3623,7 @@ export function useGetTweetsLabelStream<TData = Awaited<ReturnType<typeof getTwe
     UseQueryOptions<Awaited<ReturnType<typeof getTweetsLabelStream>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetTweetsLabelStream(
   params?: Parameters<typeof getTweetsLabelStream>[0],
   options?: Omit<
@@ -3657,7 +3657,7 @@ export function useSampleStream<TData = Awaited<ReturnType<typeof sampleStream>>
     UseQueryOptions<Awaited<ReturnType<typeof sampleStream>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useSampleStream(
   params?: Parameters<typeof sampleStream>[0],
   options?: Omit<
@@ -3693,7 +3693,7 @@ export function useGetTweetsSample10Stream<
     UseQueryOptions<Awaited<ReturnType<typeof getTweetsSample10Stream>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetTweetsSample10Stream(
   params: Parameters<typeof getTweetsSample10Stream>[0],
   options?: Omit<
@@ -3731,7 +3731,7 @@ export function useTweetsFullarchiveSearch<
     UseQueryOptions<Awaited<ReturnType<typeof tweetsFullarchiveSearch>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useTweetsFullarchiveSearch(
   params: Parameters<typeof tweetsFullarchiveSearch>[0],
   options?: Omit<
@@ -3767,7 +3767,7 @@ export function useTweetsRecentSearch<TData = Awaited<ReturnType<typeof tweetsRe
     UseQueryOptions<Awaited<ReturnType<typeof tweetsRecentSearch>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useTweetsRecentSearch(
   params: Parameters<typeof tweetsRecentSearch>[0],
   options?: Omit<
@@ -3801,7 +3801,7 @@ export function useSearchStream<TData = Awaited<ReturnType<typeof searchStream>>
     UseQueryOptions<Awaited<ReturnType<typeof searchStream>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useSearchStream(
   params?: Parameters<typeof searchStream>[0],
   options?: Omit<
@@ -3835,7 +3835,7 @@ export function useGetRules<TData = Awaited<ReturnType<typeof getRules>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getRules>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetRules(
   params?: Parameters<typeof getRules>[0],
   options?: Omit<
@@ -3870,7 +3870,7 @@ export function useFindTweetById<TData = Awaited<ReturnType<typeof findTweetById
     UseQueryOptions<Awaited<ReturnType<typeof findTweetById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useFindTweetById(
   id: Parameters<typeof findTweetById>[0] | undefined | null,
   params?: Parameters<typeof findTweetById>[1],
@@ -3908,7 +3908,7 @@ export function useTweetsIdLikingUsers<TData = Awaited<ReturnType<typeof tweetsI
     UseQueryOptions<Awaited<ReturnType<typeof tweetsIdLikingUsers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useTweetsIdLikingUsers(
   id: Parameters<typeof tweetsIdLikingUsers>[0] | undefined | null,
   params?: Parameters<typeof tweetsIdLikingUsers>[1],
@@ -3948,7 +3948,7 @@ export function useFindTweetsThatQuoteATweet<
     UseQueryOptions<Awaited<ReturnType<typeof findTweetsThatQuoteATweet>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useFindTweetsThatQuoteATweet(
   id: Parameters<typeof findTweetsThatQuoteATweet>[0] | undefined | null,
   params?: Parameters<typeof findTweetsThatQuoteATweet>[1],
@@ -3990,7 +3990,7 @@ export function useTweetsIdRetweetingUsers<
     UseQueryOptions<Awaited<ReturnType<typeof tweetsIdRetweetingUsers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useTweetsIdRetweetingUsers(
   id: Parameters<typeof tweetsIdRetweetingUsers>[0] | undefined | null,
   params?: Parameters<typeof tweetsIdRetweetingUsers>[1],
@@ -4029,7 +4029,7 @@ export function useFindUsersById<TData = Awaited<ReturnType<typeof findUsersById
     UseQueryOptions<Awaited<ReturnType<typeof findUsersById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useFindUsersById(
   params: Parameters<typeof findUsersById>[0],
   options?: Omit<
@@ -4063,7 +4063,7 @@ export function useFindUsersByUsername<TData = Awaited<ReturnType<typeof findUse
     UseQueryOptions<Awaited<ReturnType<typeof findUsersByUsername>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useFindUsersByUsername(
   params: Parameters<typeof findUsersByUsername>[0],
   options?: Omit<
@@ -4098,7 +4098,7 @@ export function useFindUserByUsername<TData = Awaited<ReturnType<typeof findUser
     UseQueryOptions<Awaited<ReturnType<typeof findUserByUsername>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useFindUserByUsername(
   username: Parameters<typeof findUserByUsername>[0] | undefined | null,
   params?: Parameters<typeof findUserByUsername>[1],
@@ -4137,7 +4137,7 @@ export function useGetUsersComplianceStream<
     UseQueryOptions<Awaited<ReturnType<typeof getUsersComplianceStream>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetUsersComplianceStream(
   params: Parameters<typeof getUsersComplianceStream>[0],
   options?: Omit<
@@ -4173,7 +4173,7 @@ export function useFindMyUser<TData = Awaited<ReturnType<typeof findMyUser>>>(
     UseQueryOptions<Awaited<ReturnType<typeof findMyUser>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useFindMyUser(
   params?: Parameters<typeof findMyUser>[0],
   options?: Omit<
@@ -4208,7 +4208,7 @@ export function useFindUserById<TData = Awaited<ReturnType<typeof findUserById>>
     UseQueryOptions<Awaited<ReturnType<typeof findUserById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useFindUserById(
   id: Parameters<typeof findUserById>[0] | undefined | null,
   params?: Parameters<typeof findUserById>[1],
@@ -4246,7 +4246,7 @@ export function useUsersIdBlocking<TData = Awaited<ReturnType<typeof usersIdBloc
     UseQueryOptions<Awaited<ReturnType<typeof usersIdBlocking>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useUsersIdBlocking(
   id: Parameters<typeof usersIdBlocking>[0] | undefined | null,
   params?: Parameters<typeof usersIdBlocking>[1],
@@ -4284,7 +4284,7 @@ export function useGetUsersIdBookmarks<TData = Awaited<ReturnType<typeof getUser
     UseQueryOptions<Awaited<ReturnType<typeof getUsersIdBookmarks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetUsersIdBookmarks(
   id: Parameters<typeof getUsersIdBookmarks>[0] | undefined | null,
   params?: Parameters<typeof getUsersIdBookmarks>[1],
@@ -4322,7 +4322,7 @@ export function useUserFollowedLists<TData = Awaited<ReturnType<typeof userFollo
     UseQueryOptions<Awaited<ReturnType<typeof userFollowedLists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useUserFollowedLists(
   id: Parameters<typeof userFollowedLists>[0] | undefined | null,
   params?: Parameters<typeof userFollowedLists>[1],
@@ -4360,7 +4360,7 @@ export function useUsersIdFollowers<TData = Awaited<ReturnType<typeof usersIdFol
     UseQueryOptions<Awaited<ReturnType<typeof usersIdFollowers>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useUsersIdFollowers(
   id: Parameters<typeof usersIdFollowers>[0] | undefined | null,
   params?: Parameters<typeof usersIdFollowers>[1],
@@ -4398,7 +4398,7 @@ export function useUsersIdFollowing<TData = Awaited<ReturnType<typeof usersIdFol
     UseQueryOptions<Awaited<ReturnType<typeof usersIdFollowing>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useUsersIdFollowing(
   id: Parameters<typeof usersIdFollowing>[0] | undefined | null,
   params?: Parameters<typeof usersIdFollowing>[1],
@@ -4436,7 +4436,7 @@ export function useUsersIdLikedTweets<TData = Awaited<ReturnType<typeof usersIdL
     UseQueryOptions<Awaited<ReturnType<typeof usersIdLikedTweets>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useUsersIdLikedTweets(
   id: Parameters<typeof usersIdLikedTweets>[0] | undefined | null,
   params?: Parameters<typeof usersIdLikedTweets>[1],
@@ -4476,7 +4476,7 @@ export function useGetUserListMemberships<
     UseQueryOptions<Awaited<ReturnType<typeof getUserListMemberships>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetUserListMemberships(
   id: Parameters<typeof getUserListMemberships>[0] | undefined | null,
   params?: Parameters<typeof getUserListMemberships>[1],
@@ -4516,7 +4516,7 @@ export function useUsersIdMentions<TData = Awaited<ReturnType<typeof usersIdMent
     UseQueryOptions<Awaited<ReturnType<typeof usersIdMentions>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useUsersIdMentions(
   id: Parameters<typeof usersIdMentions>[0] | undefined | null,
   params?: Parameters<typeof usersIdMentions>[1],
@@ -4554,7 +4554,7 @@ export function useUsersIdMuting<TData = Awaited<ReturnType<typeof usersIdMuting
     UseQueryOptions<Awaited<ReturnType<typeof usersIdMuting>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useUsersIdMuting(
   id: Parameters<typeof usersIdMuting>[0] | undefined | null,
   params?: Parameters<typeof usersIdMuting>[1],
@@ -4592,7 +4592,7 @@ export function useListUserOwnedLists<TData = Awaited<ReturnType<typeof listUser
     UseQueryOptions<Awaited<ReturnType<typeof listUserOwnedLists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListUserOwnedLists(
   id: Parameters<typeof listUserOwnedLists>[0] | undefined | null,
   params?: Parameters<typeof listUserOwnedLists>[1],
@@ -4630,7 +4630,7 @@ export function useListUserPinnedLists<TData = Awaited<ReturnType<typeof listUse
     UseQueryOptions<Awaited<ReturnType<typeof listUserPinnedLists>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListUserPinnedLists(
   id: Parameters<typeof listUserPinnedLists>[0] | undefined | null,
   params?: Parameters<typeof listUserPinnedLists>[1],
@@ -4668,7 +4668,7 @@ export function useUsersIdTimeline<TData = Awaited<ReturnType<typeof usersIdTime
     UseQueryOptions<Awaited<ReturnType<typeof usersIdTimeline>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useUsersIdTimeline(
   id: Parameters<typeof usersIdTimeline>[0] | undefined | null,
   params?: Parameters<typeof usersIdTimeline>[1],
@@ -4706,7 +4706,7 @@ export function useUsersIdTweets<TData = Awaited<ReturnType<typeof usersIdTweets
     UseQueryOptions<Awaited<ReturnType<typeof usersIdTweets>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useUsersIdTweets(
   id: Parameters<typeof usersIdTweets>[0] | undefined | null,
   params?: Parameters<typeof usersIdTweets>[1],

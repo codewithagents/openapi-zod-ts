@@ -243,11 +243,29 @@ function _parametersOfGeneratedFunctions() {
   assertType<Equal<Parameters<typeof getTaskQueryOptions>, [id: string, options?: TaskOptions]>>()
 }
 
+// Pattern R7: a result annotation that disagrees with the response type is an error for the
+// suspense hook, the queries hook and the factory too (the generic signatures return
+// `NoInfer<TData>` / `NoInfer<TCombinedResult>`), with the typed error alias. Each directive
+// has an agreeing twin that compiles, so an unrelated error cannot satisfy it.
+function _mismatchedAnnotationIsRejected() {
+  const suspense: UseSuspenseQueryResult<Task, GetTaskError> = useSuspenseGetTask('id')
+  // @ts-expect-error `data` is a Task, not a string
+  const wrongSuspense: UseSuspenseQueryResult<string, GetTaskError> = useSuspenseGetTask('id')
+  const queries: UseQueryResult<Task, GetTaskError>[] = useGetTaskQueries(['id'])
+  // @ts-expect-error the results are Task queries, not a number
+  const wrongQueries: number = useGetTaskQueries(['id'])
+  const factory: ReturnType<typeof getTaskQueryOptions> = getTaskQueryOptions('id')
+  // @ts-expect-error the factory carries a Task, not a string
+  const wrongFactory: ReturnType<typeof getTaskQueryOptions<string>> = getTaskQueryOptions('id')
+  return [suspense, wrongSuspense, queries, wrongQueries, factory, wrongFactory]
+}
+
 void _returnTypeOfQueryHooks
 void _returnTypeOfQueryOptionsFactory
 void _returnTypeOfQueriesHooks
 void _suspenseSelect
 void _parametersOfGeneratedFunctions
+void _mismatchedAnnotationIsRejected
 void _returnTypeOfOptimisticMutation
 void _useUpdateTaskOptimistic
 void _useUpdateTaskPlain

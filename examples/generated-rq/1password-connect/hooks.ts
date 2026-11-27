@@ -109,7 +109,7 @@ export function getApiActivityQueryOptions<TData = Awaited<ReturnType<typeof get
     UseQueryOptions<Awaited<ReturnType<typeof getApiActivity>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getApiActivityQueryOptions<TData>>
+): ReturnType<typeof _getApiActivityQueryOptions<NoInfer<TData>>>
 export function getApiActivityQueryOptions(
   params?: Parameters<typeof getApiActivity>[0],
   options?: Omit<
@@ -153,7 +153,7 @@ export function getVaultsQueryOptions<TData = Awaited<ReturnType<typeof getVault
     UseQueryOptions<Awaited<ReturnType<typeof getVaults>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getVaultsQueryOptions<TData>>
+): ReturnType<typeof _getVaultsQueryOptions<NoInfer<TData>>>
 export function getVaultsQueryOptions(
   params?: Parameters<typeof getVaults>[0],
   options?: Omit<
@@ -197,7 +197,7 @@ export function getVaultByIdQueryOptions<TData = Awaited<ReturnType<typeof getVa
     UseQueryOptions<Awaited<ReturnType<typeof getVaultById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getVaultByIdQueryOptions<TData>>
+): ReturnType<typeof _getVaultByIdQueryOptions<NoInfer<TData>>>
 export function getVaultByIdQueryOptions(
   vaultUuid: Parameters<typeof getVaultById>[0],
   options?: Omit<
@@ -243,7 +243,7 @@ export function getVaultItemsQueryOptions<TData = Awaited<ReturnType<typeof getV
     UseQueryOptions<Awaited<ReturnType<typeof getVaultItems>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getVaultItemsQueryOptions<TData>>
+): ReturnType<typeof _getVaultItemsQueryOptions<NoInfer<TData>>>
 export function getVaultItemsQueryOptions(
   vaultUuid: Parameters<typeof getVaultItems>[0],
   params?: Parameters<typeof getVaultItems>[1],
@@ -291,7 +291,7 @@ export function getVaultItemByIdQueryOptions<TData = Awaited<ReturnType<typeof g
     UseQueryOptions<Awaited<ReturnType<typeof getVaultItemById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getVaultItemByIdQueryOptions<TData>>
+): ReturnType<typeof _getVaultItemByIdQueryOptions<NoInfer<TData>>>
 export function getVaultItemByIdQueryOptions(
   vaultUuid: Parameters<typeof getVaultItemById>[0],
   itemUuid: Parameters<typeof getVaultItemById>[1],
@@ -341,7 +341,7 @@ export function getItemFilesQueryOptions<TData = Awaited<ReturnType<typeof getIt
     UseQueryOptions<Awaited<ReturnType<typeof getItemFiles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getItemFilesQueryOptions<TData>>
+): ReturnType<typeof _getItemFilesQueryOptions<NoInfer<TData>>>
 export function getItemFilesQueryOptions(
   vaultUuid: Parameters<typeof getItemFiles>[0],
   itemUuid: Parameters<typeof getItemFiles>[1],
@@ -399,7 +399,7 @@ export function getDetailsOfFileByIdQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getDetailsOfFileById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getDetailsOfFileByIdQueryOptions<TData>>
+): ReturnType<typeof _getDetailsOfFileByIdQueryOptions<NoInfer<TData>>>
 export function getDetailsOfFileByIdQueryOptions(
   vaultUuid: Parameters<typeof getDetailsOfFileById>[0],
   itemUuid: Parameters<typeof getDetailsOfFileById>[1],
@@ -457,7 +457,7 @@ export function downloadFileByIDQueryOptions<TData = Awaited<ReturnType<typeof d
     UseQueryOptions<Awaited<ReturnType<typeof downloadFileByID>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _downloadFileByIDQueryOptions<TData>>
+): ReturnType<typeof _downloadFileByIDQueryOptions<NoInfer<TData>>>
 export function downloadFileByIDQueryOptions(
   vaultUuid: Parameters<typeof downloadFileByID>[0],
   itemUuid: Parameters<typeof downloadFileByID>[1],
@@ -503,7 +503,7 @@ export function getHeartbeatQueryOptions<TData = Awaited<ReturnType<typeof getHe
     UseQueryOptions<Awaited<ReturnType<typeof getHeartbeat>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getHeartbeatQueryOptions<TData>>
+): ReturnType<typeof _getHeartbeatQueryOptions<NoInfer<TData>>>
 export function getHeartbeatQueryOptions(
   options?: Omit<
     UseQueryOptions<
@@ -543,7 +543,7 @@ export function getServerHealthQueryOptions<TData = Awaited<ReturnType<typeof ge
     UseQueryOptions<Awaited<ReturnType<typeof getServerHealth>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getServerHealthQueryOptions<TData>>
+): ReturnType<typeof _getServerHealthQueryOptions<NoInfer<TData>>>
 export function getServerHealthQueryOptions(
   options?: Omit<
     UseQueryOptions<
@@ -587,7 +587,7 @@ export function getPrometheusMetricsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getPrometheusMetrics>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getPrometheusMetricsQueryOptions<TData>>
+): ReturnType<typeof _getPrometheusMetricsQueryOptions<NoInfer<TData>>>
 export function getPrometheusMetricsQueryOptions(
   options?: Omit<
     UseQueryOptions<
@@ -619,7 +619,7 @@ export function useGetApiActivity<TData = Awaited<ReturnType<typeof getApiActivi
     UseQueryOptions<Awaited<ReturnType<typeof getApiActivity>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetApiActivity(
   params?: Parameters<typeof getApiActivity>[0],
   options?: Omit<
@@ -661,7 +661,7 @@ export function useGetApiActivityInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useGetApiActivityInfinite(
   params?: Parameters<typeof getApiActivity>[0],
   options?: Omit<
@@ -714,7 +714,7 @@ export function useGetVaults<TData = Awaited<ReturnType<typeof getVaults>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getVaults>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetVaults(
   params?: Parameters<typeof getVaults>[0],
   options?: Omit<
@@ -748,7 +748,7 @@ export function useGetVaultById<TData = Awaited<ReturnType<typeof getVaultById>>
     UseQueryOptions<Awaited<ReturnType<typeof getVaultById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetVaultById(
   vaultUuid: Parameters<typeof getVaultById>[0] | undefined | null,
   options?: Omit<
@@ -784,7 +784,7 @@ export function useGetVaultItems<TData = Awaited<ReturnType<typeof getVaultItems
     UseQueryOptions<Awaited<ReturnType<typeof getVaultItems>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetVaultItems(
   vaultUuid: Parameters<typeof getVaultItems>[0] | undefined | null,
   params?: Parameters<typeof getVaultItems>[1],
@@ -822,7 +822,7 @@ export function useGetVaultItemById<TData = Awaited<ReturnType<typeof getVaultIt
     UseQueryOptions<Awaited<ReturnType<typeof getVaultItemById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetVaultItemById(
   vaultUuid: Parameters<typeof getVaultItemById>[0] | undefined | null,
   itemUuid: Parameters<typeof getVaultItemById>[1] | undefined | null,
@@ -861,7 +861,7 @@ export function useGetItemFiles<TData = Awaited<ReturnType<typeof getItemFiles>>
     UseQueryOptions<Awaited<ReturnType<typeof getItemFiles>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetItemFiles(
   vaultUuid: Parameters<typeof getItemFiles>[0] | undefined | null,
   itemUuid: Parameters<typeof getItemFiles>[1] | undefined | null,
@@ -903,7 +903,7 @@ export function useGetDetailsOfFileById<TData = Awaited<ReturnType<typeof getDet
     UseQueryOptions<Awaited<ReturnType<typeof getDetailsOfFileById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetDetailsOfFileById(
   vaultUuid: Parameters<typeof getDetailsOfFileById>[0] | undefined | null,
   itemUuid: Parameters<typeof getDetailsOfFileById>[1] | undefined | null,
@@ -947,7 +947,7 @@ export function useDownloadFileByID<TData = Awaited<ReturnType<typeof downloadFi
     UseQueryOptions<Awaited<ReturnType<typeof downloadFileByID>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useDownloadFileByID(
   vaultUuid: Parameters<typeof downloadFileByID>[0] | undefined | null,
   itemUuid: Parameters<typeof downloadFileByID>[1] | undefined | null,
@@ -986,7 +986,7 @@ export function useGetHeartbeat<TData = Awaited<ReturnType<typeof getHeartbeat>>
     UseQueryOptions<Awaited<ReturnType<typeof getHeartbeat>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetHeartbeat(
   options?: Omit<
     UseQueryOptions<
@@ -1017,7 +1017,7 @@ export function useGetServerHealth<TData = Awaited<ReturnType<typeof getServerHe
     UseQueryOptions<Awaited<ReturnType<typeof getServerHealth>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetServerHealth(
   options?: Omit<
     UseQueryOptions<
@@ -1048,7 +1048,7 @@ export function useGetPrometheusMetrics<TData = Awaited<ReturnType<typeof getPro
     UseQueryOptions<Awaited<ReturnType<typeof getPrometheusMetrics>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetPrometheusMetrics(
   options?: Omit<
     UseQueryOptions<

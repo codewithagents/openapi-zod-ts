@@ -39,7 +39,7 @@ export function getV1ForecastQueryOptions<TData = Awaited<ReturnType<typeof getV
     UseQueryOptions<Awaited<ReturnType<typeof getV1Forecast>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getV1ForecastQueryOptions<TData>>
+): ReturnType<typeof _getV1ForecastQueryOptions<NoInfer<TData>>>
 export function getV1ForecastQueryOptions(
   params: Parameters<typeof getV1Forecast>[0],
   options?: Omit<
@@ -69,7 +69,7 @@ export function useGetV1Forecast<TData = Awaited<ReturnType<typeof getV1Forecast
     UseQueryOptions<Awaited<ReturnType<typeof getV1Forecast>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetV1Forecast(
   params: Parameters<typeof getV1Forecast>[0],
   options?: Omit<

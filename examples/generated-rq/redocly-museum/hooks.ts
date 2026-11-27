@@ -69,7 +69,7 @@ export function getMuseumHoursQueryOptions<TData = Awaited<ReturnType<typeof get
     UseQueryOptions<Awaited<ReturnType<typeof getMuseumHours>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getMuseumHoursQueryOptions<TData>>
+): ReturnType<typeof _getMuseumHoursQueryOptions<NoInfer<TData>>>
 export function getMuseumHoursQueryOptions(
   params?: Parameters<typeof getMuseumHours>[0],
   options?: Omit<
@@ -115,7 +115,7 @@ export function listSpecialEventsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof listSpecialEvents>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listSpecialEventsQueryOptions<TData>>
+): ReturnType<typeof _listSpecialEventsQueryOptions<NoInfer<TData>>>
 export function listSpecialEventsQueryOptions(
   params?: Parameters<typeof listSpecialEvents>[0],
   options?: Omit<
@@ -161,7 +161,7 @@ export function getSpecialEventQueryOptions<TData = Awaited<ReturnType<typeof ge
     UseQueryOptions<Awaited<ReturnType<typeof getSpecialEvent>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getSpecialEventQueryOptions<TData>>
+): ReturnType<typeof _getSpecialEventQueryOptions<NoInfer<TData>>>
 export function getSpecialEventQueryOptions(
   eventId: Parameters<typeof getSpecialEvent>[0],
   options?: Omit<
@@ -205,7 +205,7 @@ export function getTicketCodeQueryOptions<TData = Awaited<ReturnType<typeof getT
     UseQueryOptions<Awaited<ReturnType<typeof getTicketCode>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getTicketCodeQueryOptions<TData>>
+): ReturnType<typeof _getTicketCodeQueryOptions<NoInfer<TData>>>
 export function getTicketCodeQueryOptions(
   ticketId: Parameters<typeof getTicketCode>[0],
   options?: Omit<
@@ -235,7 +235,7 @@ export function useGetMuseumHours<TData = Awaited<ReturnType<typeof getMuseumHou
     UseQueryOptions<Awaited<ReturnType<typeof getMuseumHours>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetMuseumHours(
   params?: Parameters<typeof getMuseumHours>[0],
   options?: Omit<
@@ -277,7 +277,7 @@ export function useGetMuseumHoursInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useGetMuseumHoursInfinite(
   params?: Parameters<typeof getMuseumHours>[0],
   options?: Omit<
@@ -330,7 +330,7 @@ export function useListSpecialEvents<TData = Awaited<ReturnType<typeof listSpeci
     UseQueryOptions<Awaited<ReturnType<typeof listSpecialEvents>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListSpecialEvents(
   params?: Parameters<typeof listSpecialEvents>[0],
   options?: Omit<
@@ -372,7 +372,7 @@ export function useListSpecialEventsInfinite<
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListSpecialEventsInfinite(
   params?: Parameters<typeof listSpecialEvents>[0],
   options?: Omit<
@@ -425,7 +425,7 @@ export function useGetSpecialEvent<TData = Awaited<ReturnType<typeof getSpecialE
     UseQueryOptions<Awaited<ReturnType<typeof getSpecialEvent>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetSpecialEvent(
   eventId: Parameters<typeof getSpecialEvent>[0] | undefined | null,
   options?: Omit<
@@ -460,7 +460,7 @@ export function useGetTicketCode<TData = Awaited<ReturnType<typeof getTicketCode
     UseQueryOptions<Awaited<ReturnType<typeof getTicketCode>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetTicketCode(
   ticketId: Parameters<typeof getTicketCode>[0] | undefined | null,
   options?: Omit<

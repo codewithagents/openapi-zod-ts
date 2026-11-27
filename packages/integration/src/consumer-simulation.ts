@@ -217,6 +217,27 @@ function _explicitTData() {
   return [result, length]
 }
 
+// Pattern 18: a result annotation that disagrees with the response type is an error, as it
+// was before the TData generic. The generic signature returns `NoInfer<TData>`, so the
+// annotation is not an inference site for `TData`: without it `data` would claim `string`
+// while the response is a Task. Each directive has an agreeing twin that compiles, so an
+// error from anything but the data type cannot satisfy it.
+function _mismatchedAnnotationIsRejected() {
+  const query: UseQueryResult<Task, ApiError> = useGetTask('id')
+  // @ts-expect-error `data` is a Task, not a string
+  const wrongQuery: UseQueryResult<string, ApiError> = useGetTask('id')
+  const list: UseQueryResult<TaskPage, ApiError> = useListTasks()
+  // @ts-expect-error `data` is a TaskPage, not a number
+  const wrongList: UseQueryResult<number, ApiError> = useListTasks()
+  const infinite: UseInfiniteQueryResult<InfiniteData<TaskPage>, ApiError> = useListTasksInfinite()
+  // @ts-expect-error `data` is InfiniteData<TaskPage>, not a number
+  const wrongInfinite: UseInfiniteQueryResult<number, ApiError> = useListTasksInfinite()
+  const factory: ReturnType<typeof getTaskQueryOptions> = getTaskQueryOptions('id')
+  // @ts-expect-error the factory carries a Task, not a string
+  const wrongFactory: ReturnType<typeof getTaskQueryOptions<string>> = getTaskQueryOptions('id')
+  return [query, wrongQuery, list, wrongList, infinite, wrongInfinite, factory, wrongFactory]
+}
+
 // Ensure all _-prefixed functions are referenced so TypeScript doesn't elide them
 void _useListTasksNoParams
 void _useListTasksWithParams
@@ -235,3 +256,4 @@ void _returnTypeOfQueryHooks
 void _returnTypeOfQueryOptionsFactories
 void _parametersOfGeneratedFunctions
 void _explicitTData
+void _mismatchedAnnotationIsRejected

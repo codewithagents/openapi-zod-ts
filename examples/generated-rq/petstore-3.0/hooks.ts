@@ -79,7 +79,7 @@ export function findPetsByStatusQueryOptions<TData = Awaited<ReturnType<typeof f
     UseQueryOptions<Awaited<ReturnType<typeof findPetsByStatus>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _findPetsByStatusQueryOptions<TData>>
+): ReturnType<typeof _findPetsByStatusQueryOptions<NoInfer<TData>>>
 export function findPetsByStatusQueryOptions(
   params: Parameters<typeof findPetsByStatus>[0],
   options?: Omit<
@@ -123,7 +123,7 @@ export function findPetsByTagsQueryOptions<TData = Awaited<ReturnType<typeof fin
     UseQueryOptions<Awaited<ReturnType<typeof findPetsByTags>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _findPetsByTagsQueryOptions<TData>>
+): ReturnType<typeof _findPetsByTagsQueryOptions<NoInfer<TData>>>
 export function findPetsByTagsQueryOptions(
   params: Parameters<typeof findPetsByTags>[0],
   options?: Omit<
@@ -167,7 +167,7 @@ export function getPetByIdQueryOptions<TData = Awaited<ReturnType<typeof getPetB
     UseQueryOptions<Awaited<ReturnType<typeof getPetById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getPetByIdQueryOptions<TData>>
+): ReturnType<typeof _getPetByIdQueryOptions<NoInfer<TData>>>
 export function getPetByIdQueryOptions(
   petId: Parameters<typeof getPetById>[0],
   options?: Omit<
@@ -209,7 +209,7 @@ export function getInventoryQueryOptions<TData = Awaited<ReturnType<typeof getIn
     UseQueryOptions<Awaited<ReturnType<typeof getInventory>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getInventoryQueryOptions<TData>>
+): ReturnType<typeof _getInventoryQueryOptions<NoInfer<TData>>>
 export function getInventoryQueryOptions(
   options?: Omit<
     UseQueryOptions<
@@ -251,7 +251,7 @@ export function getOrderByIdQueryOptions<TData = Awaited<ReturnType<typeof getOr
     UseQueryOptions<Awaited<ReturnType<typeof getOrderById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getOrderByIdQueryOptions<TData>>
+): ReturnType<typeof _getOrderByIdQueryOptions<NoInfer<TData>>>
 export function getOrderByIdQueryOptions(
   orderId: Parameters<typeof getOrderById>[0],
   options?: Omit<
@@ -295,7 +295,7 @@ export function loginUserQueryOptions<TData = Awaited<ReturnType<typeof loginUse
     UseQueryOptions<Awaited<ReturnType<typeof loginUser>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _loginUserQueryOptions<TData>>
+): ReturnType<typeof _loginUserQueryOptions<NoInfer<TData>>>
 export function loginUserQueryOptions(
   params?: Parameters<typeof loginUser>[0],
   options?: Omit<
@@ -337,7 +337,7 @@ export function logoutUserQueryOptions<TData = Awaited<ReturnType<typeof logoutU
     UseQueryOptions<Awaited<ReturnType<typeof logoutUser>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _logoutUserQueryOptions<TData>>
+): ReturnType<typeof _logoutUserQueryOptions<NoInfer<TData>>>
 export function logoutUserQueryOptions(
   options?: Omit<
     UseQueryOptions<
@@ -379,7 +379,7 @@ export function getUserByNameQueryOptions<TData = Awaited<ReturnType<typeof getU
     UseQueryOptions<Awaited<ReturnType<typeof getUserByName>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getUserByNameQueryOptions<TData>>
+): ReturnType<typeof _getUserByNameQueryOptions<NoInfer<TData>>>
 export function getUserByNameQueryOptions(
   username: Parameters<typeof getUserByName>[0],
   options?: Omit<
@@ -409,7 +409,7 @@ export function useFindPetsByStatus<TData = Awaited<ReturnType<typeof findPetsBy
     UseQueryOptions<Awaited<ReturnType<typeof findPetsByStatus>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useFindPetsByStatus(
   params: Parameters<typeof findPetsByStatus>[0],
   options?: Omit<
@@ -443,7 +443,7 @@ export function useFindPetsByTags<TData = Awaited<ReturnType<typeof findPetsByTa
     UseQueryOptions<Awaited<ReturnType<typeof findPetsByTags>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useFindPetsByTags(
   params: Parameters<typeof findPetsByTags>[0],
   options?: Omit<
@@ -477,7 +477,7 @@ export function useGetPetById<TData = Awaited<ReturnType<typeof getPetById>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getPetById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetPetById(
   petId: Parameters<typeof getPetById>[0] | undefined | null,
   options?: Omit<
@@ -511,7 +511,7 @@ export function useGetInventory<TData = Awaited<ReturnType<typeof getInventory>>
     UseQueryOptions<Awaited<ReturnType<typeof getInventory>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetInventory(
   options?: Omit<
     UseQueryOptions<
@@ -543,7 +543,7 @@ export function useGetOrderById<TData = Awaited<ReturnType<typeof getOrderById>>
     UseQueryOptions<Awaited<ReturnType<typeof getOrderById>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetOrderById(
   orderId: Parameters<typeof getOrderById>[0] | undefined | null,
   options?: Omit<
@@ -578,7 +578,7 @@ export function useLoginUser<TData = Awaited<ReturnType<typeof loginUser>>>(
     UseQueryOptions<Awaited<ReturnType<typeof loginUser>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useLoginUser(
   params?: Parameters<typeof loginUser>[0],
   options?: Omit<
@@ -611,7 +611,7 @@ export function useLogoutUser<TData = Awaited<ReturnType<typeof logoutUser>>>(
     UseQueryOptions<Awaited<ReturnType<typeof logoutUser>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useLogoutUser(
   options?: Omit<
     UseQueryOptions<
@@ -643,7 +643,7 @@ export function useGetUserByName<TData = Awaited<ReturnType<typeof getUserByName
     UseQueryOptions<Awaited<ReturnType<typeof getUserByName>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetUserByName(
   username: Parameters<typeof getUserByName>[0] | undefined | null,
   options?: Omit<

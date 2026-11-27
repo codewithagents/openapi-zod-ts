@@ -65,7 +65,7 @@ export function listTasksQueryOptions<TData = Awaited<ReturnType<typeof listTask
     UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listTasksQueryOptions<TData>>
+): ReturnType<typeof _listTasksQueryOptions<NoInfer<TData>>>
 export function listTasksQueryOptions(
   params?: Parameters<typeof listTasks>[0],
   options?: Omit<
@@ -109,7 +109,7 @@ export function getTaskQueryOptions<TData = Awaited<ReturnType<typeof getTask>>>
     UseQueryOptions<Awaited<ReturnType<typeof getTask>>, GetTaskError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getTaskQueryOptions<TData>>
+): ReturnType<typeof _getTaskQueryOptions<NoInfer<TData>>>
 export function getTaskQueryOptions(
   id: Parameters<typeof getTask>[0],
   options?: Omit<
@@ -139,7 +139,7 @@ export function useListTasks<TData = Awaited<ReturnType<typeof listTasks>>>(
     UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListTasks(
   params?: Parameters<typeof listTasks>[0],
   options?: Omit<
@@ -173,7 +173,7 @@ export function useSuspenseListTasks<TData = Awaited<ReturnType<typeof listTasks
     UseSuspenseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseSuspenseQueryResult<TData, ApiError>
+): UseSuspenseQueryResult<NoInfer<TData>, ApiError>
 export function useSuspenseListTasks(
   params?: Parameters<typeof listTasks>[0],
   options?: Omit<
@@ -212,7 +212,7 @@ export function useListTasksQueries<
   combine?: (
     results: UseQueryResult<Awaited<ReturnType<typeof listTasks>>, ApiError>[]
   ) => TCombinedResult
-): TCombinedResult
+): NoInfer<TCombinedResult>
 export function useListTasksQueries(
   paramsList: ReadonlyArray<Parameters<typeof listTasks>[0]>,
   options?: Omit<
@@ -253,7 +253,7 @@ export function useListTasksInfinite<TData = InfiniteData<Awaited<ReturnType<typ
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListTasksInfinite(
   params?: Parameters<typeof listTasks>[0],
   options?: Omit<
@@ -304,7 +304,7 @@ export function useGetTask<TData = Awaited<ReturnType<typeof getTask>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getTask>>, GetTaskError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, GetTaskError>
+): UseQueryResult<NoInfer<TData>, GetTaskError>
 export function useGetTask(
   id: Parameters<typeof getTask>[0] | undefined | null,
   options?: Omit<
@@ -339,7 +339,7 @@ export function useSuspenseGetTask<TData = Awaited<ReturnType<typeof getTask>>>(
     UseSuspenseQueryOptions<Awaited<ReturnType<typeof getTask>>, GetTaskError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseSuspenseQueryResult<TData, GetTaskError>
+): UseSuspenseQueryResult<NoInfer<TData>, GetTaskError>
 export function useSuspenseGetTask(
   id: Parameters<typeof getTask>[0],
   options?: Omit<
@@ -378,7 +378,7 @@ export function useGetTaskQueries<
   combine?: (
     results: UseQueryResult<Awaited<ReturnType<typeof getTask>>, GetTaskError>[]
   ) => TCombinedResult
-): TCombinedResult
+): NoInfer<TCombinedResult>
 export function useGetTaskQueries(
   paramsList: ReadonlyArray<Parameters<typeof getTask>[0]>,
   options?: Omit<

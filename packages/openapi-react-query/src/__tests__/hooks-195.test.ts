@@ -108,7 +108,7 @@ describe('#195 ReturnType of generated functions: non-generic signature last', (
     const [generic, defaulted, implementation] = declarations(content, 'useGetTask')
     expect(declarations(content, 'useGetTask')).toHaveLength(3)
     expect(generic).toContain(`export function useGetTask<TData = ${dataType}>(`)
-    expect(generic).toContain(`): UseQueryResult<TData, ApiError>\n`)
+    expect(generic).toContain(`): UseQueryResult<NoInfer<TData>, ApiError>\n`)
     expect(defaulted).toContain('export function useGetTask(\n')
     expect(defaulted).toContain(
       `UseQueryOptions<${dataType}, ApiError, ${dataType}>, 'queryKey' | 'queryFn'>`
@@ -124,7 +124,7 @@ describe('#195 ReturnType of generated functions: non-generic signature last', (
     const { content } = generateHooks(spec, { staleTime: 0, gcTime: 0, suspense: true })
     const [generic, defaulted] = declarations(content, 'useSuspenseGetTask')
     expect(declarations(content, 'useSuspenseGetTask')).toHaveLength(3)
-    expect(generic).toContain('): UseSuspenseQueryResult<TData, ApiError>\n')
+    expect(generic).toContain('): UseSuspenseQueryResult<NoInfer<TData>, ApiError>\n')
     expect(defaulted).toContain(`): UseSuspenseQueryResult<${dataType}, ApiError>\n`)
     expect(content).toContain('type UseSuspenseQueryResult')
   })
@@ -134,7 +134,7 @@ describe('#195 ReturnType of generated functions: non-generic signature last', (
     const [generic, defaulted] = declarations(content, 'useListItemsInfinite')
     const data = 'Awaited<ReturnType<typeof listItems>>'
     expect(declarations(content, 'useListItemsInfinite')).toHaveLength(3)
-    expect(generic).toContain('): UseInfiniteQueryResult<TData, ApiError>\n')
+    expect(generic).toContain('): UseInfiniteQueryResult<NoInfer<TData>, ApiError>\n')
     expect(defaulted).toContain(`ApiError, InfiniteData<${data}>, QueryKey, unknown>`)
     expect(defaulted).toContain(`): UseInfiniteQueryResult<InfiniteData<${data}>, ApiError>\n`)
     expect(content).toContain('type UseInfiniteQueryResult')
@@ -146,7 +146,7 @@ describe('#195 ReturnType of generated functions: non-generic signature last', (
     const [generic, defaulted] = declarations(content, 'useGetTaskQueries')
     expect(declarations(content, 'useGetTaskQueries')).toHaveLength(3)
     expect(generic).toContain(`useGetTaskQueries<TCombinedResult = ${result}>(`)
-    expect(generic).toContain('): TCombinedResult\n')
+    expect(generic).toContain('): NoInfer<TCombinedResult>\n')
     expect(defaulted).toContain(`combine?: (results: ${result}) => ${result},\n): ${result}\n`)
   })
 
@@ -156,7 +156,7 @@ describe('#195 ReturnType of generated functions: non-generic signature last', (
     const [generic, defaulted, implementation] = declarations(content, 'getTaskQueryOptions')
     expect(declarations(content, 'getTaskQueryOptions')).toHaveLength(3)
     expect(generic).toContain(`export function getTaskQueryOptions<TData = ${dataType}>(`)
-    expect(generic).toContain('): ReturnType<typeof _getTaskQueryOptions<TData>>\n')
+    expect(generic).toContain('): ReturnType<typeof _getTaskQueryOptions<NoInfer<TData>>>\n')
     expect(defaulted).toContain('export function getTaskQueryOptions(\n')
     expect(defaulted).toContain(
       `UseQueryOptions<${dataType}, ApiError, ${dataType}>, 'queryKey' | 'queryFn'>`
@@ -165,6 +165,49 @@ describe('#195 ReturnType of generated functions: non-generic signature last', (
     expect(implementation).toContain(`export function getTaskQueryOptions<TData = ${dataType}>(`)
     expect(implementation).toContain('return _getTaskQueryOptions(id, options)')
     expect(content).not.toContain('export const getTaskQueryOptions')
+  })
+
+  // A result annotation is an inference site for the type parameter unless the generic signature
+  // returns it under `NoInfer`: `const r: UseQueryResult<string, E> = useX()` would compile, with
+  // `data` really being the response type. The options parameter keeps the bare type parameter,
+  // which is what infers `TData` from `select`; the default signature is not generic.
+  describe('NoInfer on the result of the generic signature only', () => {
+    const cases: Array<{ name: string; hook: string; generated: () => string }> = [
+      {
+        name: 'query hook',
+        hook: 'useGetTask',
+        generated: () => generateHooks(spec, { staleTime: 0, gcTime: 0 }).content,
+      },
+      {
+        name: 'suspense hook',
+        hook: 'useSuspenseGetTask',
+        generated: () => generateHooks(spec, { staleTime: 0, gcTime: 0, suspense: true }).content,
+      },
+      {
+        name: 'infinite hook',
+        hook: 'useListItemsInfinite',
+        generated: () => generateHooks(paginatedSpec, { staleTime: 0, gcTime: 0 }).content,
+      },
+      {
+        name: 'queries hook',
+        hook: 'useGetTaskQueries',
+        generated: () => generateHooks(spec, { staleTime: 0, gcTime: 0, queries: true }).content,
+      },
+      {
+        name: 'queryOptions factory',
+        hook: 'getTaskQueryOptions',
+        generated: () => generateHooks(spec, { staleTime: 0, gcTime: 0 }).content,
+      },
+    ]
+
+    it.each(cases)('$name', ({ hook, generated }) => {
+      const [generic, defaulted, implementation] = declarations(generated(), hook)
+      const [signature = '', result = ''] = generic!.split('\n): ')
+      expect(result.split('\n')[0]).toMatch(/^(.+<)?NoInfer<T(Data|CombinedResult)>(>*|, \w+>)$/)
+      expect(signature).not.toContain('NoInfer')
+      expect(defaulted).not.toContain('NoInfer')
+      expect(implementation!.split('\n}\n')[0]).not.toContain('NoInfer')
+    })
   })
 
   it('typed errors flow into the trailing signatures', () => {

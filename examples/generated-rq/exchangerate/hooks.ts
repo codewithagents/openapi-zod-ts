@@ -44,7 +44,7 @@ export function getLatestByBaseCurrencyQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getLatestByBaseCurrency>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getLatestByBaseCurrencyQueryOptions<TData>>
+): ReturnType<typeof _getLatestByBaseCurrencyQueryOptions<NoInfer<TData>>>
 export function getLatestByBaseCurrencyQueryOptions(
   baseCurrency: Parameters<typeof getLatestByBaseCurrency>[0],
   options?: Omit<
@@ -80,7 +80,7 @@ export function useGetLatestByBaseCurrency<
     UseQueryOptions<Awaited<ReturnType<typeof getLatestByBaseCurrency>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetLatestByBaseCurrency(
   baseCurrency: Parameters<typeof getLatestByBaseCurrency>[0] | undefined | null,
   options?: Omit<

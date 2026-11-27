@@ -90,7 +90,7 @@ export function getPaymentLinksLinkIdQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getPaymentLinksLinkId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getPaymentLinksLinkIdQueryOptions<TData>>
+): ReturnType<typeof _getPaymentLinksLinkIdQueryOptions<NoInfer<TData>>>
 export function getPaymentLinksLinkIdQueryOptions(
   linkId: Parameters<typeof getPaymentLinksLinkId>[0],
   options?: Omit<
@@ -144,7 +144,7 @@ export function getSessionsSessionIdQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getSessionsSessionId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getSessionsSessionIdQueryOptions<TData>>
+): ReturnType<typeof _getSessionsSessionIdQueryOptions<NoInfer<TData>>>
 export function getSessionsSessionIdQueryOptions(
   sessionId: Parameters<typeof getSessionsSessionId>[0],
   params: Parameters<typeof getSessionsSessionId>[1],
@@ -198,7 +198,7 @@ export function getStoredPaymentMethodsQueryOptions<
     UseQueryOptions<Awaited<ReturnType<typeof getStoredPaymentMethods>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getStoredPaymentMethodsQueryOptions<TData>>
+): ReturnType<typeof _getStoredPaymentMethodsQueryOptions<NoInfer<TData>>>
 export function getStoredPaymentMethodsQueryOptions(
   params?: Parameters<typeof getStoredPaymentMethods>[0],
   options?: Omit<
@@ -232,7 +232,7 @@ export function useGetPaymentLinksLinkId<TData = Awaited<ReturnType<typeof getPa
     UseQueryOptions<Awaited<ReturnType<typeof getPaymentLinksLinkId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetPaymentLinksLinkId(
   linkId: Parameters<typeof getPaymentLinksLinkId>[0] | undefined | null,
   options?: Omit<
@@ -268,7 +268,7 @@ export function useGetSessionsSessionId<TData = Awaited<ReturnType<typeof getSes
     UseQueryOptions<Awaited<ReturnType<typeof getSessionsSessionId>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetSessionsSessionId(
   sessionId: Parameters<typeof getSessionsSessionId>[0] | undefined | null,
   params: Parameters<typeof getSessionsSessionId>[1],
@@ -307,7 +307,7 @@ export function useGetStoredPaymentMethods<
     UseQueryOptions<Awaited<ReturnType<typeof getStoredPaymentMethods>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetStoredPaymentMethods(
   params?: Parameters<typeof getStoredPaymentMethods>[0],
   options?: Omit<

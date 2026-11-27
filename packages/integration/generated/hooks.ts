@@ -55,7 +55,7 @@ export function listTasksQueryOptions<TData = Awaited<ReturnType<typeof listTask
     UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _listTasksQueryOptions<TData>>
+): ReturnType<typeof _listTasksQueryOptions<NoInfer<TData>>>
 export function listTasksQueryOptions(
   params?: Parameters<typeof listTasks>[0],
   options?: Omit<
@@ -99,7 +99,7 @@ export function getTaskQueryOptions<TData = Awaited<ReturnType<typeof getTask>>>
     UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _getTaskQueryOptions<TData>>
+): ReturnType<typeof _getTaskQueryOptions<NoInfer<TData>>>
 export function getTaskQueryOptions(
   id: Parameters<typeof getTask>[0],
   options?: Omit<
@@ -129,7 +129,7 @@ export function useListTasks<TData = Awaited<ReturnType<typeof listTasks>>>(
     UseQueryOptions<Awaited<ReturnType<typeof listTasks>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useListTasks(
   params?: Parameters<typeof listTasks>[0],
   options?: Omit<
@@ -169,7 +169,7 @@ export function useListTasksInfinite<TData = InfiniteData<Awaited<ReturnType<typ
     >,
     'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
   >
-): UseInfiniteQueryResult<TData, ApiError>
+): UseInfiniteQueryResult<NoInfer<TData>, ApiError>
 export function useListTasksInfinite(
   params?: Parameters<typeof listTasks>[0],
   options?: Omit<
@@ -220,7 +220,7 @@ export function useGetTask<TData = Awaited<ReturnType<typeof getTask>>>(
     UseQueryOptions<Awaited<ReturnType<typeof getTask>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useGetTask(
   id: Parameters<typeof getTask>[0] | undefined | null,
   options?: Omit<

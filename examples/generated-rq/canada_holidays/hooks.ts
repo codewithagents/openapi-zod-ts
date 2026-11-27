@@ -56,7 +56,7 @@ export function rootQueryOptions<TData = Awaited<ReturnType<typeof root>>>(
     UseQueryOptions<Awaited<ReturnType<typeof root>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _rootQueryOptions<TData>>
+): ReturnType<typeof _rootQueryOptions<NoInfer<TData>>>
 export function rootQueryOptions(
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof root>>, ApiError, Awaited<ReturnType<typeof root>>>,
@@ -94,7 +94,7 @@ export function holidaysQueryOptions<TData = Awaited<ReturnType<typeof holidays>
     UseQueryOptions<Awaited<ReturnType<typeof holidays>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _holidaysQueryOptions<TData>>
+): ReturnType<typeof _holidaysQueryOptions<NoInfer<TData>>>
 export function holidaysQueryOptions(
   params?: Parameters<typeof holidays>[0],
   options?: Omit<
@@ -140,7 +140,7 @@ export function holidayQueryOptions<TData = Awaited<ReturnType<typeof holiday>>>
     UseQueryOptions<Awaited<ReturnType<typeof holiday>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _holidayQueryOptions<TData>>
+): ReturnType<typeof _holidayQueryOptions<NoInfer<TData>>>
 export function holidayQueryOptions(
   holidayId: Parameters<typeof holiday>[0],
   params?: Parameters<typeof holiday>[1],
@@ -186,7 +186,7 @@ export function provincesQueryOptions<TData = Awaited<ReturnType<typeof province
     UseQueryOptions<Awaited<ReturnType<typeof provinces>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _provincesQueryOptions<TData>>
+): ReturnType<typeof _provincesQueryOptions<NoInfer<TData>>>
 export function provincesQueryOptions(
   params?: Parameters<typeof provinces>[0],
   options?: Omit<
@@ -232,7 +232,7 @@ export function provinceQueryOptions<TData = Awaited<ReturnType<typeof province>
     UseQueryOptions<Awaited<ReturnType<typeof province>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _provinceQueryOptions<TData>>
+): ReturnType<typeof _provinceQueryOptions<NoInfer<TData>>>
 export function provinceQueryOptions(
   provinceId: Parameters<typeof province>[0],
   params?: Parameters<typeof province>[1],
@@ -276,7 +276,7 @@ export function specQueryOptions<TData = Awaited<ReturnType<typeof spec>>>(
     UseQueryOptions<Awaited<ReturnType<typeof spec>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): ReturnType<typeof _specQueryOptions<TData>>
+): ReturnType<typeof _specQueryOptions<NoInfer<TData>>>
 export function specQueryOptions(
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof spec>>, ApiError, Awaited<ReturnType<typeof spec>>>,
@@ -299,7 +299,7 @@ export function useRoot<TData = Awaited<ReturnType<typeof root>>>(
     UseQueryOptions<Awaited<ReturnType<typeof root>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useRoot(
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof root>>, ApiError, Awaited<ReturnType<typeof root>>>,
@@ -327,7 +327,7 @@ export function useHolidays<TData = Awaited<ReturnType<typeof holidays>>>(
     UseQueryOptions<Awaited<ReturnType<typeof holidays>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useHolidays(
   params?: Parameters<typeof holidays>[0],
   options?: Omit<
@@ -362,7 +362,7 @@ export function useHoliday<TData = Awaited<ReturnType<typeof holiday>>>(
     UseQueryOptions<Awaited<ReturnType<typeof holiday>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useHoliday(
   holidayId: Parameters<typeof holiday>[0] | undefined | null,
   params?: Parameters<typeof holiday>[1],
@@ -399,7 +399,7 @@ export function useProvinces<TData = Awaited<ReturnType<typeof provinces>>>(
     UseQueryOptions<Awaited<ReturnType<typeof provinces>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useProvinces(
   params?: Parameters<typeof provinces>[0],
   options?: Omit<
@@ -434,7 +434,7 @@ export function useProvince<TData = Awaited<ReturnType<typeof province>>>(
     UseQueryOptions<Awaited<ReturnType<typeof province>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useProvince(
   provinceId: Parameters<typeof province>[0] | undefined | null,
   params?: Parameters<typeof province>[1],
@@ -470,7 +470,7 @@ export function useSpec<TData = Awaited<ReturnType<typeof spec>>>(
     UseQueryOptions<Awaited<ReturnType<typeof spec>>, ApiError, TData>,
     'queryKey' | 'queryFn'
   >
-): UseQueryResult<TData, ApiError>
+): UseQueryResult<NoInfer<TData>, ApiError>
 export function useSpec(
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof spec>>, ApiError, Awaited<ReturnType<typeof spec>>>,
