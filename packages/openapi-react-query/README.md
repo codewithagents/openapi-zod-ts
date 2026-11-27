@@ -186,13 +186,13 @@ const { data: count } = useListTasks({}, { select: (page) => page.items.length }
 useQuery(getTaskQueryOptions(id, { select: (task) => task.id }))
 ```
 
-Without `select`, `data` is still the raw response type, so existing call sites (including explicit `UseQueryResult<Task, ApiError>` annotations) keep compiling, and an annotation that disagrees with the response type, `const result: UseQueryResult<string, ApiError> = useGetTask(id)`, is still a type error: the generic signature returns `NoInfer<TData>`, so the annotation does not choose `TData`.
+Without `select`, `data` is still the raw response type, so existing call sites (including explicit `UseQueryResult<Task, ApiError>` annotations) keep compiling, and an annotation that disagrees with the response type, `const result: UseQueryResult<string, ApiError> = useGetTask(id)`, is still a type error: the generic signature returns `NoInfer<TData>`, whether or not the installed TanStack Query types `useQuery`'s own result that way, so the annotation does not choose `TData`.
 
 ### Types read from the generated functions
 
 Each query hook, `useSuspense*` hook, `useXxxInfinite` hook, `useXxxQueries` hook and `queryOptions` factory is declared as two overload signatures followed by the implementation. A call resolves to the first, which is generic (`TData`, or `TCombinedResult` for `useXxxQueries`), so `select` changes the type of `data`. `ReturnType` and `Parameters` read the last, the same signature at its default type argument: `ReturnType<typeof useGetTask>` is `UseQueryResult<Task, ApiError>`, so a wrapper typed from the hook keeps `data: Task | undefined`, and `ReturnType<typeof useGetTask<string>>` gives the selected shape.
 
-Two signatures with different type parameter lists are the only way to restore that `ReturnType` while keeping a typed `select`: a single generic signature is read with `TData` erased to `unknown`. The cost is that code which reads a hook as one signature sees the last one, where `select` is typed for the default data type:
+Two signatures with different type parameter lists are the only way to restore that `ReturnType` while keeping a typed `select`: a single generic signature is read with `TData` erased to `unknown`. The cost comes from how TypeScript treats an overloaded function. The first four rows are code that reads a hook as one signature and so sees the last one, where `select` is typed for the default data type. The last three have other causes: an overloaded type gives a stub no contextual parameter types, and TypeScript reports a failed call, and shows a hover, per signature.
 
 | Pattern | What happens | Workaround |
 | --- | --- | --- |
@@ -201,7 +201,7 @@ Two signatures with different type parameter lists are the only way to restore t
 | A wrapper whose options are typed `Parameters<typeof useGetTask>[1]` | The wrapper rejects `select`, with the same error. | Take a type parameter: `Parameters<typeof useGetTask<TData>>[1]`. |
 | `vi.mocked(useGetTask).mockReturnValue(result)` | `result` is checked against the default data type, so a `UseQueryResult<string, ApiError>` is rejected. | `vi.mocked(useGetTask<string>)`. |
 | A stub typed `typeof useGetTask` with untyped parameters, `const fake: typeof useGetTask = (id, options) => ...` (also a factory, or a mock helper such as `fn<typeof useGetTaskQueries>((paramsList, options, combine) => ...)`) | The parameters are not contextually typed from an overloaded type: `TS7006`, implicitly `any`. | Annotate the parameters, or type the stub as one signature: `typeof useGetTask<Task>`. |
-| A call with a wrong argument | TypeScript reports `No overload matches this call` and lists both signatures, where one signature reports a single error. | The reason is listed under each overload, and is the same for both. |
+| A call with a mistake in it | TypeScript reports `No overload matches this call` and lists a failure for each signature it tried. A wrong positional argument, or a wrong option in a call without `select`, gives the same reason under each overload. A call that passes `select` and has another mistake in `options` is also checked against the default signature, which types `select` for the response type, so its error (`Type '(t: Task) => string' is not assignable to type '(data: Task) => Task'`) is listed beside the real one. For a wrong value of a known option, only `Overload 2 of 2` is listed, with the `select` error first. | The `select` error is not a mistake: fix the other one and it disappears. |
 | Hover in the editor | Shows `(+1 overload)`. | None needed. |
 
 ## Typed per-status errors
