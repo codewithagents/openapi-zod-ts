@@ -233,7 +233,11 @@ export function useGetTask<TData = Awaited<ReturnType<typeof getTask>>>(
 }
 ```
 
-A call resolves to the generic signature, so a `select` transform changes the type of `data`. `ReturnType` and `Parameters` read the last signature, so `ReturnType<typeof useGetTask>` is the plain `UseQueryResult<Task, ApiError>`. The `useSuspense*` variants, the `useXxxInfinite` hooks, the `useXxxQueries` hooks and the `queryOptions` factories follow the same pattern.
+A call resolves to the generic signature, so a `select` transform changes the type of `data`. `ReturnType` and `Parameters` read the last signature, so `ReturnType<typeof useGetTask>` is the plain `UseQueryResult<Task, ApiError>`. The `useSuspense*` variants, the `useXxxInfinite` hooks and the `useXxxQueries` hooks (which take a `TCombinedResult` generic in place of `TData`) are overload lists of the same shape.
+
+A `queryOptions` factory is an overload list too, but its two signatures are typed `ReturnType<typeof _getTaskQueryOptions<T>>`, with `T` being `NoInfer<TData>` on the first and the response type on the second. `_getTaskQueryOptions` is a private generic function that holds the `queryOptions(...)` call: the result type of `queryOptions` differs between TanStack Query releases and cannot be named in the generated file, so the exported function, a plain `export function` like the hooks, delegates to it.
+
+Overloads cost something for code that reads a hook as one signature, such as a generic wrapper helper, `.call` or `vi.mocked`: the package README lists each pattern with its workaround under [Types read from the generated functions](https://github.com/codewithagents/openapi-zod-ts/blob/main/packages/openapi-react-query/README.md#types-read-from-the-generated-functions).
 
 **Mutation hooks**: one per POST/PUT/PATCH/DELETE:
 
