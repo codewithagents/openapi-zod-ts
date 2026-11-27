@@ -170,7 +170,14 @@ function _suspenseSelect() {
   >()
 }
 
-// Pattern R5: Parameters<typeof f> is the whole pre-TData parameter list, options type
+// Pattern R5: the opt-in mutation generics default to `unknown`, which is what ReturnType reads,
+// and a call without options infers those same defaults: the two results must be one type.
+function _returnTypeOfOptimisticMutation() {
+  const mutation = useUpdateTask()
+  assertType<Equal<ReturnType<typeof useUpdateTask>, typeof mutation>>()
+}
+
+// Pattern R6: Parameters<typeof f> is the whole pre-TData parameter list, options type
 // included, for the query, suspense, infinite and queries hooks and the factory.
 function _parametersOfGeneratedFunctions() {
   type ListParams = Parameters<typeof listTasks>[0]
@@ -234,13 +241,6 @@ function _parametersOfGeneratedFunctions() {
     >
   >()
   assertType<Equal<Parameters<typeof getTaskQueryOptions>, [id: string, options?: TaskOptions]>>()
-}
-
-// Pattern R6: the opt-in mutation generics default to `unknown`, which is what ReturnType reads,
-// and a call without options infers those same defaults: the two results must be one type.
-function _returnTypeOfOptimisticMutation() {
-  const mutation = useUpdateTask()
-  assertType<Equal<ReturnType<typeof useUpdateTask>, typeof mutation>>()
 }
 
 void _returnTypeOfQueryHooks
