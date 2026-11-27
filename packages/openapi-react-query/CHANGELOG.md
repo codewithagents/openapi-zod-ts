@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.13.1](https://github.com/codewithagents/openapi-zod-ts/compare/openapi-react-query-v3.13.0...openapi-react-query-v3.13.1) (2026-11-27)
+
+
+### Bug Fixes
+
+* **openapi-react-query:** keep ReturnType of generated query functions typed ([#465](https://github.com/codewithagents/openapi-zod-ts/issues/465)) ([e34c1b0](https://github.com/codewithagents/openapi-zod-ts/commit/e34c1b0927f5ad707c652f421319aea83419bb92))
+
 ## [3.13.0](https://github.com/codewithagents/openapi-zod-ts/compare/openapi-react-query-v3.12.3...openapi-react-query-v3.13.0) (2026-11-03)
 
 
